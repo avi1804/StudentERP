@@ -34,7 +34,7 @@ const Login = () => {
             setErrorMsg("");
             const response = await authService.login(data);
             setTokens(response.access_token, response.refresh_token);
-            navigate("/AdminControl"); // Redirect to a protected page after login
+            navigate("/dashboard"); // Redirect to student dashboard after login
         } catch (error: any) {
             setErrorMsg(error.response?.data?.detail || "Login failed. Please try again.");
         }

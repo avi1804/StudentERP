@@ -3,6 +3,7 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import AdminLogin from "./Admin/Admin-Login";
 import ProtectedRoute from "./components/ProtectedRoute";
+import StudentDashboard from "./pages/StudentDashboard";
 
 function App() {
   return (
@@ -19,7 +20,7 @@ function App() {
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={['student']} />}>
-          <Route path="/dashboard" element={<div className="p-10 text-white">Student Dashboard Loaded Securely!</div>} />
+          <Route path="/dashboard" element={<StudentDashboard />} />
         </Route>
         
         {/* Fallback */}
