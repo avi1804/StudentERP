@@ -18,7 +18,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     // If user role is not allowed, redirect them to a safe default
     // e.g., if student tries to access admin routes, redirect to student dashboard
-    if (user.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
+    if (user.role === 'admin') return <Navigate to="/Admin-Dashboard" replace />;
     if (user.role === 'faculty') return <Navigate to="/faculty/dashboard" replace />;
     return <Navigate to="/dashboard" replace />;
   }

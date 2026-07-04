@@ -1,0 +1,194 @@
+<div id="login-screen">
+ <div class="login-box">
+  <div class="login-logo">
+   <div class="logo-icon">
+    ERP
+   </div>
+   <h1>
+    StudentERP
+   </h1>
+   <p>
+    Sign in to your account
+   </p>
+  </div>
+  <!-- Mode tabs -->
+  <div class="login-tabs">
+   <button class="login-tab active" id="tab-password" onclick="switchLoginTab('password')">
+    Password Login
+   </button>
+   <button class="login-tab" id="tab-forgot" onclick="switchLoginTab('forgot')">
+    Forgot Password
+   </button>
+  </div>
+  <!-- ── PASSWORD LOGIN ── -->
+  <div id="pane-password">
+   <div class="fg">
+    <label>
+     Email
+    </label>
+    <input id="l-email" type="email" value="admin@college.edu"/>
+   </div>
+   <div class="fg">
+    <label>
+     Password
+    </label>
+    <input id="l-pass" type="password" value="Admin@1234"/>
+   </div>
+   <button class="btn btn-primary" id="login-btn" onclick="doLogin()">
+    Sign In
+   </button>
+  </div>
+  <!-- ── FORGOT PASSWORD ── -->
+  <div id="pane-forgot" style="display:none">
+   <div class="fg">
+    <label>
+     Registered Email
+    </label>
+    <input id="fp-email" placeholder="your@email.com" type="email"/>
+   </div>
+   <div class="otp-row" style="margin-bottom:16px">
+    <div class="fg">
+     <label>
+      OTP
+     </label>
+     <input id="fp-otp" maxlength="6" placeholder="6-digit OTP" type="text"/>
+    </div>
+    <button class="btn-otp" id="fp-send-btn" onclick="sendOtp('forgot')">
+     Send OTP
+    </button>
+   </div>
+   <div class="fg">
+    <label>
+     New Password
+    </label>
+    <input id="fp-newpass" placeholder="Min 6 characters" type="password"/>
+   </div>
+   <button class="btn btn-primary" id="fp-reset-btn" onclick="doForgotPassword()">
+    Reset Password
+   </button>
+  </div>
+  <div class="login-error" id="login-error">
+  </div>
+  <div class="login-success" id="login-success">
+  </div>
+ </div>
+</div>
+
+---
+<div id="sidebar">
+ <div class="logo">
+  <div class="logo-icon">
+   ERP
+  </div>
+  <div>
+   <div>
+    StudentERP
+   </div>
+   <div style="font-size:10px;color:var(--text3);font-weight:400">
+    Management System
+   </div>
+  </div>
+ </div>
+ <div class="nav">
+  <div class="nav-lbl">
+   Overview
+  </div>
+  <div class="nav-item active" data-roles="ADMIN,FACULTY,STUDENT" onclick="go('dashboard',this)">
+   <span class="nav-icon">
+    ⊞
+   </span>
+   Dashboard
+  </div>
+  <div class="nav-lbl">
+   Academic
+  </div>
+  <div class="nav-item" data-roles="ADMIN,FACULTY" onclick="go('students',this)">
+   <span class="nav-icon">
+    👤
+   </span>
+   Students
+  </div>
+  <div class="nav-item" data-roles="ADMIN" onclick="go('teachers',this)">
+   <span class="nav-icon">
+    🎓
+   </span>
+   Teachers
+  </div>
+  <div class="nav-item" data-roles="ADMIN,FACULTY,STUDENT" onclick="go('subjects',this)">
+   <span class="nav-icon">
+    📖
+   </span>
+   Subjects
+  </div>
+  <div class="nav-item" data-roles="ADMIN,FACULTY,STUDENT" onclick="go('attendance',this)">
+   <span class="nav-icon">
+    ✅
+   </span>
+   Attendance
+  </div>
+  <div class="nav-item" data-roles="ADMIN,FACULTY,STUDENT" onclick="go('marks',this)">
+   <span class="nav-icon">
+    📊
+   </span>
+   Marks &amp; Results
+  </div>
+  <div class="nav-item" data-roles="ADMIN,FACULTY,STUDENT" onclick="go('notices',this)">
+   <span class="nav-icon">
+    📢
+   </span>
+   Notices
+  </div>
+  <div class="nav-lbl" data-roles="ADMIN">
+   Finance
+  </div>
+  <div class="nav-item" data-roles="ADMIN,STUDENT" onclick="go('fees',this)">
+   <span class="nav-icon">
+    ₹
+   </span>
+   Fees
+  </div>
+  <div class="nav-lbl" data-roles="ADMIN,FACULTY">
+   Add New
+  </div>
+  <div class="nav-item" data-roles="ADMIN" onclick="go('addstudent',this)">
+   <span class="nav-icon">
+    ➕
+   </span>
+   Add Student
+  </div>
+  <div class="nav-item" data-roles="ADMIN" onclick="go('addteacher',this)">
+   <span class="nav-icon">
+    ➕
+   </span>
+   Add Teacher
+  </div>
+  <div class="nav-item" data-roles="ADMIN" onclick="go('addsubject',this)">
+   <span class="nav-icon">
+    ➕
+   </span>
+   Add Subject
+  </div>
+  <div class="nav-item" data-roles="ADMIN,FACULTY" onclick="go('addnotice',this)">
+   <span class="nav-icon">
+    📝
+   </span>
+   Post Notice
+  </div>
+ </div>
+ <div class="user-bar">
+  <div class="user-avatar" id="u-init">
+   AD
+  </div>
+  <div>
+   <div class="user-name" id="u-name">
+    Admin
+   </div>
+   <div class="user-role" id="u-role">
+    ADMIN
+   </div>
+  </div>
+  <button class="logout-btn" onclick="doLogout()">
+   Out
+  </button>
+ </div>
+</div>
