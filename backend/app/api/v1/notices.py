@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any, List
 
-from app.schemas.notice import NoticeCreate, NoticeResponse, NoticeUpdate
-from app.repositories.notice import notice_repo
+from app.schemas.communication import NoticeCreate, NoticeResponse, NoticeUpdate
+from app.repositories.communication import notice_repo
 from app.dependencies.database import get_db
 from app.dependencies.auth import get_current_active_user, RequireRole
 from app.models.user import User, Role
@@ -15,7 +15,7 @@ router = APIRouter()
 async def create_notice(
     notice_in: NoticeCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.ADMIN, Role.FACULTY]))
+    current_user: User = Depends(RequireRole(["admin", "faculty"]))
 ) -> Any:
     """
     Create new notice (Admin/Faculty).
@@ -48,7 +48,7 @@ async def update_notice(
     id: int,
     notice_in: NoticeUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.ADMIN, Role.FACULTY]))
+    current_user: User = Depends(RequireRole(["admin", "faculty"]))
 ) -> Any:
     """
     Update a notice (Admin/Faculty).
@@ -63,7 +63,7 @@ async def update_notice(
 async def delete_notice(
     id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.ADMIN]))
+    current_user: User = Depends(RequireRole(["admin"]))
 ) -> Any:
     """
     Delete a notice (Admin only).

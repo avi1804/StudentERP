@@ -1,7 +1,13 @@
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database.base import Base
+
+if TYPE_CHECKING:
+    from app.models.course import Course
+    from app.models.faculty import Faculty
+    from app.models.subject import Subject
+
 
 class Department(Base):
     __tablename__ = "departments"
@@ -12,4 +18,6 @@ class Department(Base):
     description: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
 
     # Relationships
-    # subjects = relationship("Subject", back_populates="department")
+    faculty_members: Mapped[List["Faculty"]] = relationship("Faculty", back_populates="department")
+    courses: Mapped[List["Course"]] = relationship("Course", back_populates="department")
+    subjects: Mapped[List["Subject"]] = relationship("Subject", back_populates="department")

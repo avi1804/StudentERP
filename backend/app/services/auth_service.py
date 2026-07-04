@@ -20,8 +20,9 @@ class AuthService:
         if not user.is_active:
             raise BadRequestException("Inactive user")
 
-        access_token = create_access_token(subject=user.id, role=user.role.value if hasattr(user.role, 'value') else user.role)
-        refresh_token = create_refresh_token(subject=user.id, role=user.role.value if hasattr(user.role, 'value') else user.role)
+        role_name = user.role.name if user.role else None
+        access_token = create_access_token(subject=user.id, role=role_name)
+        refresh_token = create_refresh_token(subject=user.id, role=role_name)
 
         return Token(
             access_token=access_token,
@@ -48,11 +49,12 @@ class AuthService:
         if not user.is_active:
             raise BadRequestException("Inactive user")
 
-        access_token = create_access_token(subject=user.id, role=user.role.value if hasattr(user.role, 'value') else user.role)
-        new_refresh_token = create_refresh_token(subject=user.id, role=user.role.value if hasattr(user.role, 'value') else user.role)
+        role_name = user.role.name if user.role else None
+        access_token = create_access_token(subject=user.id, role=role_name)
+        new_refresh_token = create_refresh_token(subject=user.id, role=role_name)
 
         return Token(
             access_token=access_token,
-            refresh_token=refresh_token, # can issue a new one too
+            refresh_token=new_refresh_token,
             token_type="bearer"
         )

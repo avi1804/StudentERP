@@ -17,12 +17,12 @@ router = APIRouter()
 async def create_marks(
     marks_in: MarksCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.ADMIN, Role.FACULTY]))
+    current_user: User = Depends(RequireRole(["admin", "faculty"]))
 ) -> Any:
     """
     Add marks (Admin/Faculty only).
     """
-    if current_user.role == Role.FACULTY:
+    if current_user.role.name == "faculty":
         faculty = await faculty_repo.get_by_user_id(db, user_id=current_user.id)
         if not faculty or faculty.id != marks_in.faculty_id:
             raise ForbiddenException("You can only add marks as yourself.")
@@ -54,7 +54,7 @@ async def read_student_marks(
     if not student:
         raise NotFoundException("Student not found")
 
-    if current_user.role == Role.STUDENT and student.user_id != current_user.id:
+    if current_user.role.name == "student" and student.user_id != current_user.id:
         raise ForbiddenException("You can only view your own marks.")
 
     return await marks_repo.get_multi_by_student(db, student_id=student_id, skip=skip, limit=limit)

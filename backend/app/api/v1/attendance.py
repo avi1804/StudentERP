@@ -17,12 +17,12 @@ router = APIRouter()
 async def create_attendance(
     attendance_in: AttendanceCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.ADMIN, Role.FACULTY]))
+    current_user: User = Depends(RequireRole(["admin", "faculty"]))
 ) -> Any:
     """
     Mark attendance (Admin/Faculty only).
     """
-    if current_user.role == Role.FACULTY:
+    if current_user.role.name == "faculty":
         faculty = await faculty_repo.get_by_user_id(db, user_id=current_user.id)
         if not faculty or faculty.id != attendance_in.faculty_id:
             raise ForbiddenException("You can only mark attendance as yourself.")
@@ -54,7 +54,7 @@ async def read_student_attendance(
     if not student:
         raise NotFoundException("Student not found")
 
-    if current_user.role == Role.STUDENT and student.user_id != current_user.id:
+    if current_user.role.name == "student" and student.user_id != current_user.id:
         raise ForbiddenException("You can only view your own attendance.")
 
     return await attendance_repo.get_multi_by_student(db, student_id=student_id, skip=skip, limit=limit)

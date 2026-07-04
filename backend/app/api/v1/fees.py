@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any, List
-
-from app.schemas.fees import FeesCreate, FeesResponse, FeesUpdate
+from app.schemas.fees import FeesCreate, FeesResponse, FeesUpdate, FeesWithStudentResponse, FeeStats
 from app.repositories.fees import fees_repo
 from app.repositories.student import student_repo
 from app.dependencies.database import get_db
@@ -16,19 +15,41 @@ router = APIRouter()
 async def create_fee_record(
     fee_in: FeesCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.ADMIN]))
+    current_user: User = Depends(RequireRole(["admin"]))
 ) -> Any:
     """
     Add fee record (Admin only).
     """
     return await fees_repo.create(db, obj_in=fee_in)
 
+@router.get("/all", response_model=List[FeesWithStudentResponse])
+async def read_all_fees(
+    skip: int = 0,
+    limit: int = 100,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(RequireRole(["admin"]))
+) -> Any:
+    """
+    Get all fee records with student details (Admin only).
+    """
+    return await fees_repo.get_all_with_students(db, skip=skip, limit=limit)
+
+@router.get("/stats", response_model=FeeStats)
+async def get_fee_stats(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(RequireRole(["admin"]))
+) -> Any:
+    """
+    Get overall fee statistics for the admin dashboard.
+    """
+    return await fees_repo.get_stats(db)
+
 @router.put("/{id}", response_model=FeesResponse)
 async def update_fee_record(
     id: int,
     fee_in: FeesUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.ADMIN]))
+    current_user: User = Depends(RequireRole(["admin"]))
 ) -> Any:
     """
     Update fee record (Admin only).
@@ -55,7 +76,7 @@ async def read_student_fees(
     if not student:
         raise NotFoundException("Student not found")
 
-    if current_user.role == Role.STUDENT and student.user_id != current_user.id:
+    if current_user.role.name == "student" and student.user_id != current_user.id:
         raise ForbiddenException("You can only view your own fees.")
 
     return await fees_repo.get_multi_by_student(db, student_id=student_id, skip=skip, limit=limit)

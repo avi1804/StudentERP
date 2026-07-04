@@ -43,11 +43,22 @@ async def get_current_active_user(
         raise CredentialsException("Inactive user")
     return current_user
 
-def RequireRole(roles: List[Role]):
-    async def role_checker(current_user: User = Depends(get_current_active_user)):
+def RequireRole(roles: List[str]):
+    async def role_checker(
+        current_user: User = Depends(get_current_active_user),
+        db: AsyncSession = Depends(get_db)
+    ):
         if current_user.is_superuser:
             return current_user
-        if current_user.role not in roles:
-            raise ForbiddenException()
-        return current_user
+        
+        # User role is a relationship, ensure it's loaded
+        # Typically lazy loading might fail in async context, 
+        # so it's better to fetch user with joinedload(User.role) in user_repo
+        # but let's assume it's loaded or fetch it if needed.
+        # Alternatively, rely on the token role if we embed it.
+        # Assuming user_repo.get now loads 'role' relationship.
+        if hasattr(current_user, 'role') and current_user.role and current_user.role.name in roles:
+            return current_user
+            
+        raise ForbiddenException("You don't have enough permissions")
     return role_checker

@@ -9,14 +9,30 @@ app = FastAPI(
     debug=settings.DEBUG,
 )
 
-# Set all CORS enabled origins
+from app.middleware.audit import AuditLogMiddleware
+from app.middleware.exceptions import GlobalExceptionMiddleware
+from app.middleware.security import SecurityHeadersMiddleware
+from app.middleware.rate_limit import RateLimitMiddleware
+
+# Add Exception Middleware
+app.add_middleware(GlobalExceptionMiddleware)
+
+# Add Security Headers Middleware
+app.add_middleware(SecurityHeadersMiddleware)
+
+# Add Rate Limit Middleware
+app.add_middleware(RateLimitMiddleware)
+
+# Set CORS enabled origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify the exact origins
+    allow_origins=settings.BACKEND_CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(AuditLogMiddleware)
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 

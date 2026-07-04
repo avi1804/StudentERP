@@ -18,7 +18,7 @@ router = APIRouter()
 @router.get("/admin", response_model=Dict[str, Any])
 async def get_admin_dashboard_stats(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.ADMIN]))
+    current_user: User = Depends(RequireRole(["admin"]))
 ) -> Any:
     """
     Get aggregated stats for Admin Dashboard.
@@ -43,7 +43,7 @@ async def get_admin_dashboard_stats(
 @router.get("/student", response_model=Dict[str, Any])
 async def get_student_dashboard_stats(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.STUDENT]))
+    current_user: User = Depends(RequireRole(["student"]))
 ) -> Any:
     """
     Get stats for Student Dashboard.

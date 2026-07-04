@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any, List
 
-from app.schemas.department import DepartmentCreate, DepartmentResponse, DepartmentUpdate
-from app.repositories.department import department_repo
+from app.schemas.academic import DepartmentCreate, DepartmentResponse, DepartmentUpdate
+from app.repositories.academic import department_repo
 from app.dependencies.database import get_db
 from app.dependencies.auth import get_current_active_user, RequireRole
 from app.models.user import User, Role
@@ -15,7 +15,7 @@ router = APIRouter()
 async def create_department(
     department_in: DepartmentCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.ADMIN]))
+    current_user: User = Depends(RequireRole(["admin"]))
 ) -> Any:
     """
     Create new department (Admin only).
@@ -26,7 +26,9 @@ async def create_department(
     return await department_repo.create(db, obj_in=department_in)
 
 
-@router.get("/", response_model=List[DepartmentResponse])
+from app.schemas.pagination import Pagination
+
+@router.get("/", response_model=Pagination[DepartmentResponse])
 async def read_departments(
     skip: int = 0,
     limit: int = 100,
@@ -36,7 +38,11 @@ async def read_departments(
     """
     Retrieve all departments.
     """
-    return await department_repo.get_multi(db, skip=skip, limit=limit)
+    departments = await department_repo.get_multi(db, skip=skip, limit=limit)
+    total = len(departments) if departments else 0
+    pages = (total + limit - 1) // limit if limit > 0 else 1
+    page = (skip // limit) + 1 if limit > 0 else 1
+    return Pagination(items=departments, total=total, page=page, size=limit, pages=pages)
 
 
 @router.get("/{id}", response_model=DepartmentResponse)
@@ -59,7 +65,7 @@ async def update_department(
     id: int,
     department_in: DepartmentUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.ADMIN]))
+    current_user: User = Depends(RequireRole(["admin"]))
 ) -> Any:
     """
     Update department (Admin only).
@@ -74,7 +80,7 @@ async def update_department(
 async def delete_department(
     id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.ADMIN]))
+    current_user: User = Depends(RequireRole(["admin"]))
 ) -> Any:
     """
     Delete department (Admin only).

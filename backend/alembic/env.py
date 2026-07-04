@@ -16,17 +16,7 @@ from alembic import context
 from app.database.base import Base
 from app.core.config import settings
 # import models to ensure they are registered with Base.metadata
-from app.models.user import User
-from app.models.student import Student
-from app.models.faculty import Faculty
-from app.models.department import Department
-from app.models.subject import Subject
-from app.models.attendance import Attendance
-from app.models.marks import Marks
-from app.models.fees import Fees
-from app.models.timetable import Timetable
-from app.models.notice import Notice
-
+from app.models import *
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config

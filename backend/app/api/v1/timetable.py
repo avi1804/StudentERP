@@ -15,7 +15,7 @@ router = APIRouter()
 async def create_timetable_entry(
     entry_in: TimetableCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.ADMIN]))
+    current_user: User = Depends(RequireRole(["admin"]))
 ) -> Any:
     """
     Create a new timetable entry (Admin only).
@@ -39,7 +39,7 @@ async def read_department_timetable(
 async def delete_timetable_entry(
     id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.ADMIN]))
+    current_user: User = Depends(RequireRole(["admin"]))
 ) -> Any:
     """
     Delete a timetable entry (Admin only).

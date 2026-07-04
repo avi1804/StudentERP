@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any, List
 
-from app.schemas.subject import SubjectCreate, SubjectResponse, SubjectUpdate
+from app.schemas.academic import SubjectCreate, SubjectResponse, SubjectUpdate
 from app.repositories.subject import subject_repo
-from app.repositories.department import department_repo
+from app.repositories.academic import department_repo
 from app.dependencies.database import get_db
 from app.dependencies.auth import get_current_active_user, RequireRole
 from app.models.user import User, Role
@@ -16,7 +16,7 @@ router = APIRouter()
 async def create_subject(
     subject_in: SubjectCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.ADMIN]))
+    current_user: User = Depends(RequireRole(["admin"]))
 ) -> Any:
     """
     Create new subject (Admin only).
@@ -30,7 +30,9 @@ async def create_subject(
     return await subject_repo.create(db, obj_in=subject_in)
 
 
-@router.get("/", response_model=List[SubjectResponse])
+from app.schemas.pagination import Pagination
+
+@router.get("/", response_model=Pagination[SubjectResponse])
 async def read_subjects(
     skip: int = 0,
     limit: int = 100,
@@ -40,7 +42,11 @@ async def read_subjects(
     """
     Retrieve all subjects.
     """
-    return await subject_repo.get_multi(db, skip=skip, limit=limit)
+    subjects = await subject_repo.get_multi(db, skip=skip, limit=limit)
+    total = len(subjects) if subjects else 0
+    pages = (total + limit - 1) // limit if limit > 0 else 1
+    page = (skip // limit) + 1 if limit > 0 else 1
+    return Pagination(items=subjects, total=total, page=page, size=limit, pages=pages)
 
 
 @router.get("/{id}", response_model=SubjectResponse)
@@ -63,7 +69,7 @@ async def update_subject(
     id: int,
     subject_in: SubjectUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.ADMIN]))
+    current_user: User = Depends(RequireRole(["admin"]))
 ) -> Any:
     """
     Update subject (Admin only).
@@ -81,7 +87,7 @@ async def update_subject(
 async def delete_subject(
     id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.ADMIN]))
+    current_user: User = Depends(RequireRole(["admin"]))
 ) -> Any:
     """
     Delete subject (Admin only).

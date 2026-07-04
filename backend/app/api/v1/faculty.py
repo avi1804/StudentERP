@@ -2,12 +2,14 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any, List
 
-from app.schemas.faculty import FacultyCreate, FacultyResponse, FacultyUpdate
+from app.schemas.faculty import FacultyCreate, FacultyResponse, FacultyUpdate, FacultyEnroll
 from app.repositories.faculty import faculty_repo
 from app.dependencies.database import get_db
 from app.dependencies.auth import get_current_active_user, RequireRole
 from app.models.user import User, Role
 from app.core.exceptions import BadRequestException, NotFoundException, ForbiddenException
+from app.services.faculty_service import FacultyService
+from app.schemas.pagination import Pagination
 
 router = APIRouter()
 
@@ -15,7 +17,7 @@ router = APIRouter()
 async def create_faculty(
     faculty_in: FacultyCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.ADMIN]))
+    current_user: User = Depends(RequireRole(["admin"]))
 ) -> Any:
     """
     Create new faculty profile (Admin only).
@@ -29,23 +31,46 @@ async def create_faculty(
     return await faculty_repo.create(db, obj_in=faculty_in)
 
 
-@router.get("/", response_model=List[FacultyResponse])
+@router.post("/enroll", response_model=FacultyResponse, status_code=status.HTTP_201_CREATED)
+async def enroll_faculty(
+    faculty_data: FacultyEnroll,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(RequireRole(["admin"]))
+) -> Any:
+    """
+    Enroll a new faculty member (create User account + Faculty profile).
+    """
+    return await FacultyService.enroll_faculty(db, faculty_data)
+
+
+@router.get("/", response_model=Pagination[FacultyResponse])
 async def read_faculties(
     skip: int = 0,
     limit: int = 100,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.ADMIN, Role.FACULTY, Role.STUDENT]))
+    current_user: User = Depends(RequireRole(["admin", "faculty", "student"]))
 ) -> Any:
     """
     Retrieve all faculty members.
     """
-    return await faculty_repo.get_multi(db, skip=skip, limit=limit)
+    faculties = await faculty_repo.get_multi(db, skip=skip, limit=limit)
+    total = len(faculties) if faculties else 0
+    pages = (total + limit - 1) // limit if limit > 0 else 1
+    page = (skip // limit) + 1 if limit > 0 else 1
+    
+    return Pagination(
+        items=faculties,
+        total=total,
+        page=page,
+        size=limit,
+        pages=pages
+    )
 
 
 @router.get("/me", response_model=FacultyResponse)
 async def read_faculty_me(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.FACULTY]))
+    current_user: User = Depends(RequireRole(["faculty"]))
 ) -> Any:
     """
     Get current faculty profile.
@@ -76,7 +101,7 @@ async def update_faculty(
     id: int,
     faculty_in: FacultyUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole([Role.ADMIN]))
+    current_user: User = Depends(RequireRole(["admin"]))
 ) -> Any:
     """
     Update faculty profile (Admin only).
@@ -86,3 +111,19 @@ async def update_faculty(
         raise NotFoundException("Faculty not found")
         
     return await faculty_repo.update(db, db_obj=faculty, obj_in=faculty_in)
+
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_faculty(
+    id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(RequireRole(["admin"]))
+) -> None:
+    """
+    Delete faculty profile (Admin only).
+    """
+    success = await FacultyService.delete_faculty(db, id)
+    if not success:
+        raise NotFoundException("Faculty not found")
+        
+    return None

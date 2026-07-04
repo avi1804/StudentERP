@@ -25,3 +25,10 @@ class MarksRepository(CRUDBase[Marks, MarksCreate, MarksUpdate]):
         return result.scalars().all()
 
 marks_repo = MarksRepository(Marks)
+
+from app.models.marks import Exam, ExamResult
+from app.schemas.marks import ExamCreate, ExamUpdate, ExamResultCreate, ExamResultUpdate
+
+exam_repo = CRUDBase[Exam, ExamCreate, ExamUpdate](Exam)
+exam_result_repo = CRUDBase[ExamResult, ExamResultCreate, ExamResultUpdate](ExamResult)
+

@@ -26,3 +26,11 @@ class AttendanceRepository(CRUDBase[Attendance, AttendanceCreate, AttendanceUpda
         return result.scalars().all()
 
 attendance_repo = AttendanceRepository(Attendance)
+
+from app.models.attendance import AttendanceSession, AttendanceLog
+from app.schemas.attendance import AttendanceSessionCreate, AttendanceSessionUpdate, AttendanceLogCreate, AttendanceLogResponse
+
+attendance_session_repo = CRUDBase[AttendanceSession, AttendanceSessionCreate, AttendanceSessionUpdate](AttendanceSession)
+# Pydantic base is used as update for log to avoid creating a dedicated one
+attendance_log_repo = CRUDBase[AttendanceLog, AttendanceLogCreate, AttendanceLogCreate](AttendanceLog)
+
