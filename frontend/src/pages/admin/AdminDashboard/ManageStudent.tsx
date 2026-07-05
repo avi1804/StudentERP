@@ -18,7 +18,9 @@ export default function ManageStudent() {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
-  const [editForm, setEditForm] = useState({ contact_number: "", batch: "" });
+  const [editForm, setEditForm] = useState({ contact_number: "", batch: "", full_name: "", enrollment_number: "" });
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const fetchStudents = async () => {
     try {
@@ -72,7 +74,9 @@ export default function ManageStudent() {
     setEditingStudent(student);
     setEditForm({ 
       contact_number: student.contact_number || "", 
-      batch: student.batch 
+      batch: student.batch,
+      full_name: student.user?.full_name || "",
+      enrollment_number: student.enrollment_number || ""
     });
   };
 
@@ -92,18 +96,36 @@ export default function ManageStudent() {
       });
       
       if (res.ok) {
-        setStudents(students.map(s => s.id === editingStudent.id ? { ...s, ...editForm } : s));
+        setStudents(students.map(s => s.id === editingStudent.id ? { 
+          ...s, 
+          ...editForm,
+          user: { ...s.user, full_name: editForm.full_name }
+        } : s));
         setEditingStudent(null);
+        setSuccessMessage("Student updated successfully!");
+        setTimeout(() => setSuccessMessage(""), 3000);
       } else {
-        alert("Failed to update student.");
+        setErrorMessage("Failed to update student.");
+        setTimeout(() => setErrorMessage(""), 3000);
       }
     } catch (err) {
-      alert("Network error.");
+      setErrorMessage("Network error.");
+      setTimeout(() => setErrorMessage(""), 3000);
     }
   };
 
   return (
     <div className="page-wide">
+      {successMessage && (
+        <div style={{ padding: '12px', background: '#d4edda', color: '#155724', borderRadius: '8px', marginBottom: '16px', border: '1px solid #c3e6cb' }}>
+          {successMessage}
+        </div>
+      )}
+      {errorMessage && (
+        <div style={{ padding: '12px', background: '#f8d7da', color: '#721c24', borderRadius: '8px', marginBottom: '16px', border: '1px solid #f5c6cb' }}>
+          {errorMessage}
+        </div>
+      )}
       <div className="card">
         <div className="card-header">
           <span className="card-title">All Students</span>
@@ -178,6 +200,24 @@ export default function ManageStudent() {
           <div className="card" style={{ width: '400px', padding: '24px' }}>
             <h3 style={{ marginTop: 0 }}>Edit Student</h3>
             <form onSubmit={handleUpdate}>
+              <div className="fg" style={{ marginBottom: '16px' }}>
+                <label>Full Name</label>
+                <input 
+                  type="text" 
+                  value={editForm.full_name} 
+                  onChange={e => setEditForm({...editForm, full_name: e.target.value})} 
+                  required 
+                />
+              </div>
+              <div className="fg" style={{ marginBottom: '16px' }}>
+                <label>Roll No</label>
+                <input 
+                  type="text" 
+                  value={editForm.enrollment_number} 
+                  onChange={e => setEditForm({...editForm, enrollment_number: e.target.value})} 
+                  required 
+                />
+              </div>
               <div className="fg" style={{ marginBottom: '16px' }}>
                 <label>Batch / Branch</label>
                 <input 

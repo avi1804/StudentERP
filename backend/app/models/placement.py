@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from typing import TYPE_CHECKING, List, Optional
-from sqlalchemy import String, DateTime, ForeignKey, Date, Enum as SQLEnum, Float
+from sqlalchemy import String, DateTime, ForeignKey, Date, Enum as SQLEnum, Float, Text
 import enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database.base import Base
@@ -28,7 +28,7 @@ class PlacementDrive(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     company_id: Mapped[int] = mapped_column(ForeignKey("placement_companies.id", ondelete="CASCADE"), index=True)
     title: Mapped[str] = mapped_column(String(255))
-    description: Mapped[str] = mapped_column(String)
+    description: Mapped[str] = mapped_column(Text)
     drive_date: Mapped[date] = mapped_column(Date)
     registration_deadline: Mapped[datetime] = mapped_column(DateTime)
     eligibility_cgpa: Mapped[float] = mapped_column(Float, default=0.0)

@@ -17,7 +17,6 @@ const AddSubject = React.lazy(() => import("./pages/admin/AdminDashboard/AddSubj
 const ManageSubjects = React.lazy(() => import("./pages/admin/AdminDashboard/ManageSubject"));
 const NotifyStudent = React.lazy(() => import("./pages/admin/AdminDashboard/NotifyStudent").then(m => ({ default: m.NotifyStudent })));
 const NotifyFaculty = React.lazy(() => import("./pages/admin/AdminDashboard/NotifyFaculty"));
-const Fees = React.lazy(() => import("./pages/admin/AdminDashboard/Fees"));
 const ManageFaculty = React.lazy(() => import("./pages/admin/AdminDashboard/ManageFaculty"));
 const ManageStudent = React.lazy(() => import("./pages/admin/AdminDashboard/ManageStudent"));
 const AddStudent = React.lazy(() => import("./pages/admin/AdminDashboard/AddStudent"));
@@ -50,7 +49,6 @@ function App() {
               <Route path="subject/manage" element={<ManageSubjects />} />
               <Route path="notify/student" element={<NotifyStudent />} />
               <Route path="notify/faculty" element={<NotifyFaculty />} />
-              <Route path="fees" element={<Fees />} />
               <Route path="faculty/manage" element={<ManageFaculty />} />
               <Route path="faculty/add" element={<AddFaculty />} />
               <Route path="students/manage" element={<ManageStudent />} />

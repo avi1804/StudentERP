@@ -110,7 +110,25 @@ async def update_faculty(
     if not faculty:
         raise NotFoundException("Faculty not found")
         
-    return await faculty_repo.update(db, db_obj=faculty, obj_in=faculty_in)
+    update_data = faculty_in.model_dump(exclude_unset=True)
+    full_name = update_data.pop("full_name", None)
+    
+    if full_name is not None:
+        from sqlalchemy import select
+        user_query = await db.execute(select(User).where(User.id == faculty.user_id))
+        user = user_query.scalars().first()
+        if user:
+            user.full_name = full_name
+            db.add(user)
+            
+    await faculty_repo.update(db, db_obj=faculty, obj_in=update_data)
+    
+    # Reload with joined user to avoid MissingGreenlet during serialization
+    from sqlalchemy.orm import joinedload
+    from sqlalchemy import select
+    from app.models.faculty import Faculty
+    result = await db.execute(select(Faculty).options(joinedload(Faculty.user)).where(Faculty.id == id))
+    return result.scalars().first()
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)

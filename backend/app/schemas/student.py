@@ -17,6 +17,8 @@ class StudentUpdate(BaseModel):
     batch: Optional[str] = None
     date_of_birth: Optional[date] = None
     contact_number: Optional[str] = None
+    full_name: Optional[str] = None
+    enrollment_number: Optional[str] = None
 
 class UserNested(BaseModel):
     full_name: str

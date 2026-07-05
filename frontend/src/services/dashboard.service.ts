@@ -5,17 +5,10 @@ export interface AdminDashboardData {
   total_faculty: number;
   total_departments: number;
   total_subjects: number;
-  pending_fees_total: number;
-  fees_collected_total: number;
   attendance_rate: number;
   attendance_trend: {
     date: string;
     attendance: number;
-  }[];
-  fees_analytics: {
-    name: string;
-    value: number;
-    color: string;
   }[];
   subject_performance: {
     subject: string;

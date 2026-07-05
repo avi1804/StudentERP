@@ -5,7 +5,6 @@ from app.database.base import Base
 
 if TYPE_CHECKING:
     from app.models.department import Department
-    from app.models.marks import Marks
     from app.models.subject_assignment import SubjectAssignment
     from app.models.faculty import Faculty
 
@@ -25,4 +24,3 @@ class Subject(Base):
     department: Mapped["Department"] = relationship("Department", back_populates="subjects")
     faculty: Mapped[Optional["Faculty"]] = relationship("Faculty")
     assignments: Mapped[List["SubjectAssignment"]] = relationship("SubjectAssignment", back_populates="subject", cascade="all, delete-orphan")
-    marks: Mapped[List["Marks"]] = relationship("Marks", back_populates="subject")

@@ -7,6 +7,7 @@ from app.repositories.student import student_repo
 from app.dependencies.database import get_db
 from app.dependencies.auth import get_current_active_user, RequireRole
 from app.models.user import User, Role
+from app.models.student import Student
 from passlib.context import CryptContext
 from sqlalchemy import select
 
@@ -121,7 +122,22 @@ async def update_student(
     if not student:
         raise NotFoundException("Student not found")
         
-    return await student_repo.update(db, db_obj=student, obj_in=student_in)
+    update_data = student_in.model_dump(exclude_unset=True)
+    full_name = update_data.pop("full_name", None)
+    
+    if full_name is not None:
+        user_query = await db.execute(select(User).where(User.id == student.user_id))
+        user = user_query.scalars().first()
+        if user:
+            user.full_name = full_name
+            db.add(user)
+            
+    await student_repo.update(db, db_obj=student, obj_in=update_data)
+    
+    # Reload with joined user to avoid MissingGreenlet during serialization
+    from sqlalchemy.orm import joinedload
+    result = await db.execute(select(Student).options(joinedload(Student.user)).where(Student.id == id))
+    return result.scalars().first()
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_student(

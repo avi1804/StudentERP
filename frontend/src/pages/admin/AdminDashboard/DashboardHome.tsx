@@ -44,8 +44,6 @@ export function DashboardHome() {
     { label: "Total Faculty", value: data.total_faculty, colorClass: "purple", icon: GraduationCap, sub: "Active faculty members" },
     { label: "Total Subjects", value: data.total_subjects, colorClass: "teal", icon: BookText, sub: "Across all semesters" },
     { label: "Attendance Rate", value: `${data.attendance_rate.toFixed(1)}%`, colorClass: "amber", icon: ClipboardList, sub: "Overall across all subjects", badge: data.attendance_rate >= 75 ? "✔ On Track" : "⚠ Low" },
-    { label: "Fees Collected", value: `₹${(data.fees_collected_total / 100000).toFixed(2)}L`, colorClass: "green", icon: IndianRupee, sub: "Total amount received" },
-    { label: "Fees Pending", value: `₹${(data.pending_fees_total / 100000).toFixed(2)}L`, colorClass: "red", icon: Hourglass, sub: "Outstanding balance" },
   ];
 
   return (
@@ -101,32 +99,6 @@ export function DashboardHome() {
                 <Tooltip contentStyle={{ background: "rgba(20,24,34,0.9)", border: "1px solid var(--border)", borderRadius: 8, color: "#fff" }} itemStyle={{ color: '#b0b4cf' }} />
                 <Line type="monotone" dataKey="attendance" stroke="#4f8ef7" strokeWidth={3} dot={{ r: 4, fill: '#141822', stroke: '#4f8ef7', strokeWidth: 2 }} activeDot={{ r: 6, fill: '#4f8ef7' }} fill="url(#lineGradient)" />
               </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="dash-chart-card card">
-          <div className="dash-chart-title">Fees Analytics</div>
-          <div className="dash-chart-sub">Collected vs Pending</div>
-          <div className="dash-chart-wrap h240">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie 
-                  data={data.fees_analytics} 
-                  dataKey="value" 
-                  nameKey="name" 
-                  innerRadius={70}
-                  outerRadius={90} 
-                  stroke="var(--bg)" 
-                  strokeWidth={2}
-                >
-                  {data.fees_analytics.map((entry) => (
-                    <Cell key={entry.name} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Legend verticalAlign="bottom" align="center" iconType="circle" wrapperStyle={{ color: "var(--text2)", fontSize: 12, paddingTop: '10px' }} />
-                <Tooltip contentStyle={{ background: "rgba(20,24,34,0.9)", border: "1px solid var(--border)", borderRadius: 8, color: "#fff" }} itemStyle={{ color: '#b0b4cf' }} />
-              </PieChart>
             </ResponsiveContainer>
           </div>
         </div>

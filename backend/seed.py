@@ -36,5 +36,27 @@ async def seed():
         else:
             print("Admin user already exists!")
             
+        # Check if departments exist
+        from app.models.department import Department
+        from app.models.course import Course
+        
+        dept_cs = (await db.execute(select(Department).where(Department.code == "CSE"))).scalars().first()
+        if not dept_cs:
+            dept_cs = Department(name="Computer Science and Engineering", code="CSE", description="Department of CSE")
+            dept_ee = Department(name="Electrical Engineering", code="EE", description="Department of EE")
+            dept_me = Department(name="Mechanical Engineering", code="ME", description="Department of ME")
+            
+            db.add_all([dept_cs, dept_ee, dept_me])
+            await db.commit()
+            await db.refresh(dept_cs)
+            
+            course_cs = Course(name="B.Tech Computer Science", code="BTECH-CSE", department_id=dept_cs.id)
+            course_ee = Course(name="B.Tech Electrical", code="BTECH-EE", department_id=dept_ee.id)
+            db.add_all([course_cs, course_ee])
+            await db.commit()
+            print("Created seed departments and courses")
+        else:
+            print("Departments already exist!")
+            
 if __name__ == "__main__":
     asyncio.run(seed())

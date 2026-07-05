@@ -25,10 +25,14 @@ class Settings(BaseSettings):
         if v is None and info.field_name == "DIRECT_URL":
             return v
         if isinstance(v, str):
-            if v.startswith("postgres://"):
+            if v.startswith("mysql://"):
+                v = v.replace("mysql://", "mysql+aiomysql://", 1)
+            elif v.startswith("postgres://"):
                 v = v.replace("postgres://", "postgresql://", 1)
+            
             if v.startswith("postgresql://"):
                 v = v.replace("postgresql://", "postgresql+asyncpg://", 1)
+                
             if "?pgbouncer=true" in v:
                 v = v.replace("?pgbouncer=true", "")
             return v

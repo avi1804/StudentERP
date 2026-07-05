@@ -38,8 +38,6 @@ export const STATS: StatCardData[] = [
   { label: "Total Faculty", value: 8, colorClass: "purple", icon: GraduationCap, sub: "Active faculty members" },
   { label: "Total Subjects", value: 7, colorClass: "teal", icon: BookText, sub: "Across all semesters" },
   { label: "Attendance Rate", value: "77.5%", colorClass: "amber", icon: ClipboardList, sub: "Overall across all subjects", badge: "✔ On Track" },
-  { label: "Fees Collected", value: "₹3.82L", colorClass: "green", icon: IndianRupee, sub: "Total amount received" },
-  { label: "Fees Pending", value: "₹1.05L", colorClass: "red", icon: Hourglass, sub: "Outstanding balance" },
 ];
 
 export const ATTENDANCE_DATA = [
@@ -78,8 +76,6 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Attendance", icon: BookMarked, path: "/admin/dashboard/attendance" },
   { label: "Marks & Results", icon: BookText, path: "/admin/dashboard/marks" },
   { label: "Notices", icon: Megaphone, path: "/admin/dashboard/notify/faculty" },
-  { isCategory: true, label: "FINANCE" },
-  { label: "Fees", icon: Layers, path: "/admin/dashboard/fees" },
   { isCategory: true, label: "ADD NEW" },
   { label: "Add Student", icon: UserPlus, path: "/admin/dashboard/students/add" },
   { label: "Add Faculty", icon: UserPlus, path: "/admin/dashboard/faculty/add" },

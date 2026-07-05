@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional
-from sqlalchemy import String, DateTime, ForeignKey, Boolean, Enum as SQLEnum
+from sqlalchemy import String, DateTime, ForeignKey, Boolean, Enum as SQLEnum, Text
 import enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database.base import Base
@@ -23,7 +23,7 @@ class Notice(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String(255), index=True)
-    content: Mapped[str] = mapped_column(String)
+    content: Mapped[str] = mapped_column(Text)
     category: Mapped[NoticeCategory] = mapped_column(SQLEnum(NoticeCategory), default=NoticeCategory.GENERAL)
     author_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
@@ -39,7 +39,7 @@ class Notification(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
     title: Mapped[str] = mapped_column(String(255))
-    message: Mapped[str] = mapped_column(String)
+    message: Mapped[str] = mapped_column(Text)
     is_read: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
@@ -65,7 +65,7 @@ class Complaint(Base):
     ticket_number: Mapped[str] = mapped_column(String(50), unique=True, index=True)
     student_id: Mapped[int] = mapped_column(ForeignKey("students.id", ondelete="CASCADE"), index=True)
     subject: Mapped[str] = mapped_column(String(255))
-    description: Mapped[str] = mapped_column(String)
+    description: Mapped[str] = mapped_column(Text)
     status: Mapped[ComplaintStatus] = mapped_column(SQLEnum(ComplaintStatus), default=ComplaintStatus.OPEN)
     priority: Mapped[ComplaintPriority] = mapped_column(SQLEnum(ComplaintPriority), default=ComplaintPriority.MEDIUM)
     assigned_to: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)

@@ -7,6 +7,7 @@ interface Faculty {
   employee_id: string;
   designation: string;
   contact_number: string | null;
+  department_id: number | null;
   user: {
     full_name: string;
     email: string;
@@ -18,7 +19,16 @@ export default function ManageFaculty() {
   const [facultyList, setFacultyList] = useState<Faculty[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingFaculty, setEditingFaculty] = useState<Faculty | null>(null);
-  const [editForm, setEditForm] = useState({ contact_number: "", designation: "" });
+  const [editForm, setEditForm] = useState({ 
+    contact_number: "", 
+    designation: "",
+    full_name: "",
+    employee_id: "",
+    department_id: "" as number | string
+  });
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const fetchFaculty = async () => {
     try {
@@ -47,6 +57,23 @@ export default function ManageFaculty() {
 
   useEffect(() => {
     fetchFaculty();
+    
+    // Fetch departments for the edit form
+    const fetchDepartments = async () => {
+      try {
+        const token = useAuthStore.getState().accessToken;
+        const res = await fetch('http://localhost:8000/api/v1/departments/', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setDepartments(data.items || data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch departments', err);
+      }
+    };
+    fetchDepartments();
   }, []);
 
   const handleDelete = async (id: number) => {
@@ -72,7 +99,10 @@ export default function ManageFaculty() {
     setEditingFaculty(faculty);
     setEditForm({ 
       contact_number: faculty.contact_number || "", 
-      designation: faculty.designation 
+      designation: faculty.designation,
+      full_name: faculty.user?.full_name || "",
+      employee_id: faculty.employee_id || "",
+      department_id: faculty.department_id || ""
     });
   };
 
@@ -82,28 +112,51 @@ export default function ManageFaculty() {
     
     try {
       const token = useAuthStore.getState().accessToken;
+      const payload = {
+        ...editForm,
+        department_id: editForm.department_id ? Number(editForm.department_id) : null
+      };
+      
       const res = await fetch(`http://localhost:8000/api/v1/faculty/${editingFaculty.id}`, {
         method: "PUT",
         headers: { 
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(editForm)
+        body: JSON.stringify(payload)
       });
       
       if (res.ok) {
-        setFacultyList(facultyList.map(f => f.id === editingFaculty.id ? { ...f, ...editForm } : f));
+        setFacultyList(facultyList.map(f => f.id === editingFaculty.id ? { 
+          ...f, 
+          ...editForm,
+          user: { ...f.user, full_name: editForm.full_name }
+        } : f));
         setEditingFaculty(null);
+        setSuccessMessage("Faculty updated successfully!");
+        setTimeout(() => setSuccessMessage(""), 3000);
       } else {
-        alert("Failed to update faculty.");
+        setErrorMessage("Failed to update faculty.");
+        setTimeout(() => setErrorMessage(""), 3000);
       }
     } catch (err) {
-      alert("Network error.");
+      setErrorMessage("Network error.");
+      setTimeout(() => setErrorMessage(""), 3000);
     }
   };
 
   return (
     <div className="page-wide">
+      {successMessage && (
+        <div style={{ padding: '12px', background: '#d4edda', color: '#155724', borderRadius: '8px', marginBottom: '16px', border: '1px solid #c3e6cb' }}>
+          {successMessage}
+        </div>
+      )}
+      {errorMessage && (
+        <div style={{ padding: '12px', background: '#f8d7da', color: '#721c24', borderRadius: '8px', marginBottom: '16px', border: '1px solid #f5c6cb' }}>
+          {errorMessage}
+        </div>
+      )}
       <div className="card">
         <div className="card-header">
           <span className="card-title">All Faculty</span>
@@ -158,13 +211,48 @@ export default function ManageFaculty() {
             <h3 style={{ marginTop: 0 }}>Edit Faculty</h3>
             <form onSubmit={handleUpdate}>
               <div className="fg" style={{ marginBottom: '16px' }}>
-                <label>Designation</label>
+                <label>Full Name</label>
                 <input 
                   type="text" 
-                  value={editForm.designation} 
-                  onChange={e => setEditForm({...editForm, designation: e.target.value})} 
+                  value={editForm.full_name} 
+                  onChange={e => setEditForm({...editForm, full_name: e.target.value})} 
                   required 
                 />
+              </div>
+              <div className="fg" style={{ marginBottom: '16px' }}>
+                <label>Employee ID / Qualification</label>
+                <input 
+                  type="text" 
+                  value={editForm.employee_id} 
+                  onChange={e => setEditForm({...editForm, employee_id: e.target.value})} 
+                  required 
+                />
+              </div>
+              <div className="fg" style={{ marginBottom: '16px' }}>
+                <label>Department</label>
+                <select 
+                  value={editForm.department_id} 
+                  onChange={e => setEditForm({...editForm, department_id: e.target.value})}
+                >
+                  <option value="">-- Select Department --</option>
+                  {departments.map(d => (
+                    <option key={d.id} value={d.id}>{d.name} ({d.code})</option>
+                  ))}
+                </select>
+              </div>
+              <div className="fg" style={{ marginBottom: '16px' }}>
+                <label>Designation</label>
+                <select 
+                  value={editForm.designation} 
+                  onChange={e => setEditForm({...editForm, designation: e.target.value})} 
+                  required
+                >
+                  <option>Professor</option>
+                  <option>Associate Professor</option>
+                  <option>Assistant Professor</option>
+                  <option>Lecturer</option>
+                  <option>HOD</option>
+                </select>
               </div>
               <div className="fg" style={{ marginBottom: '16px' }}>
                 <label>Phone Number</label>

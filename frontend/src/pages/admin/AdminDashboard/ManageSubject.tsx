@@ -17,7 +17,18 @@ export default function ManageSubject() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
-  const [editForm, setEditForm] = useState({ name: "", code: "", credits: 4 });
+  const [editForm, setEditForm] = useState({ 
+    name: "", 
+    code: "", 
+    credits: 4,
+    department_id: "" as number | string,
+    semester: 1 as number | string,
+    faculty_id: "" as number | string
+  });
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [faculties, setFaculties] = useState<any[]>([]);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const fetchSubjects = async () => {
     try {
@@ -38,6 +49,27 @@ export default function ManageSubject() {
 
   useEffect(() => {
     fetchSubjects();
+
+    const fetchDepsAndFacs = async () => {
+      try {
+        const token = useAuthStore.getState().accessToken;
+        const [depRes, facRes] = await Promise.all([
+          fetch('http://localhost:8000/api/v1/departments/', { headers: { 'Authorization': `Bearer ${token}` } }),
+          fetch('http://localhost:8000/api/v1/faculty/', { headers: { 'Authorization': `Bearer ${token}` } })
+        ]);
+        if (depRes.ok) {
+          const data = await depRes.json();
+          setDepartments(data.items || data);
+        }
+        if (facRes.ok) {
+          const data = await facRes.json();
+          setFaculties(data.items || data);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchDepsAndFacs();
   }, []);
 
   const handleDelete = async (id: number) => {
@@ -64,7 +96,10 @@ export default function ManageSubject() {
     setEditForm({ 
       name: subject.name,
       code: subject.code,
-      credits: subject.credits
+      credits: subject.credits,
+      department_id: subject.department_id || "",
+      semester: subject.semester || "",
+      faculty_id: subject.faculty?.id || ""
     });
   };
 
@@ -74,28 +109,54 @@ export default function ManageSubject() {
     
     try {
       const token = useAuthStore.getState().accessToken;
+      
+      const payload = {
+        ...editForm,
+        department_id: editForm.department_id ? Number(editForm.department_id) : null,
+        semester: editForm.semester ? Number(editForm.semester) : null,
+        faculty_id: editForm.faculty_id ? Number(editForm.faculty_id) : null
+      };
+
       const res = await fetch(`http://localhost:8000/api/v1/subjects/${editingSubject.id}`, {
         method: "PUT",
         headers: { 
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(editForm)
+        body: JSON.stringify(payload)
       });
       
       if (res.ok) {
-        setSubjects(subjects.map(s => s.id === editingSubject.id ? { ...s, ...editForm } : s));
+        setSubjects(subjects.map(s => s.id === editingSubject.id ? { 
+          ...s, 
+          ...payload,
+          faculty: faculties.find(f => f.id === payload.faculty_id) || s.faculty
+        } : s));
         setEditingSubject(null);
+        setSuccessMessage("Subject updated successfully!");
+        setTimeout(() => setSuccessMessage(""), 3000);
       } else {
-        alert("Failed to update subject.");
+        setErrorMessage("Failed to update subject.");
+        setTimeout(() => setErrorMessage(""), 3000);
       }
     } catch (err) {
-      alert("Network error.");
+      setErrorMessage("Network error.");
+      setTimeout(() => setErrorMessage(""), 3000);
     }
   };
 
   return (
     <div className="page-wide">
+      {successMessage && (
+        <div style={{ padding: '12px', background: '#d4edda', color: '#155724', borderRadius: '8px', marginBottom: '16px', border: '1px solid #c3e6cb' }}>
+          {successMessage}
+        </div>
+      )}
+      {errorMessage && (
+        <div style={{ padding: '12px', background: '#f8d7da', color: '#721c24', borderRadius: '8px', marginBottom: '16px', border: '1px solid #f5c6cb' }}>
+          {errorMessage}
+        </div>
+      )}
       <div className="card">
         <div className="card-header">
           <span className="card-title">All Subjects</span>
@@ -126,7 +187,7 @@ export default function ManageSubject() {
                   <tr key={s.id}>
                     <td className="mono">{s.code}</td>
                     <td style={{ color: 'var(--text)', fontWeight: 500 }}>{s.name}</td>
-                    <td><span className="badge badge-teal">DEP {s.department_id}</span></td>
+                    <td><span className="badge badge-teal">{departments.find(d => d.id === s.department_id)?.code || `DEP ${s.department_id}`}</span></td>
                     <td>{s.semester || '-'}</td>
                     <td>{s.credits}</td>
                     <td style={{ fontSize: '12px', color: 'var(--text2)' }}>{s.faculty?.user?.full_name || '-'}</td>
@@ -175,6 +236,41 @@ export default function ManageSubject() {
                   onChange={e => setEditForm({...editForm, credits: parseInt(e.target.value)})} 
                   required 
                 />
+              </div>
+              <div className="fg" style={{ marginBottom: '16px' }}>
+                <label>Department</label>
+                <select 
+                  value={editForm.department_id} 
+                  onChange={e => setEditForm({...editForm, department_id: e.target.value})}
+                  required
+                >
+                  <option value="">-- Select Department --</option>
+                  {departments.map(d => (
+                    <option key={d.id} value={d.id}>{d.name} ({d.code})</option>
+                  ))}
+                </select>
+              </div>
+              <div className="fg" style={{ marginBottom: '16px' }}>
+                <label>Semester</label>
+                <input 
+                  type="number" 
+                  min="1" max="8"
+                  value={editForm.semester} 
+                  onChange={e => setEditForm({...editForm, semester: parseInt(e.target.value)})} 
+                  required 
+                />
+              </div>
+              <div className="fg" style={{ marginBottom: '16px' }}>
+                <label>Faculty</label>
+                <select 
+                  value={editForm.faculty_id} 
+                  onChange={e => setEditForm({...editForm, faculty_id: e.target.value})}
+                >
+                  <option value="">-- Select Faculty --</option>
+                  {faculties.map(f => (
+                    <option key={f.id} value={f.id}>{f.user?.full_name || f.employee_id}</option>
+                  ))}
+                </select>
               </div>
               <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '24px' }}>
                 <button type="button" className="btn" style={{ background: 'var(--surface2)', color: 'var(--text)' }} onClick={() => setEditingSubject(null)}>Cancel</button>

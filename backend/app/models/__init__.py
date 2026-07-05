@@ -6,9 +6,6 @@ from app.models.department import Department
 from app.models.course import Course
 from app.models.subject import Subject
 from app.models.subject_assignment import SubjectAssignment
-from app.models.attendance import AttendanceSession, AttendanceLog, Attendance
-from app.models.marks import Exam, Marks, ExamResult
-from app.models.fees import Fees, Payment
 from app.models.timetable import Timetable
 from app.models.communication import Notice, Notification, Complaint
 from app.models.placement import PlacementCompany, PlacementDrive, PlacementApplication
@@ -21,9 +18,7 @@ __all__ = [
     "Student",
     "Faculty",
     "Department", "Course", "Subject", "SubjectAssignment",
-    "AttendanceSession", "AttendanceLog", "Attendance",
-    "Exam", "Marks", "ExamResult",
-    "Fees", "Payment",
+
     "Timetable",
     "Notice", "Notification", "Complaint",
     "PlacementCompany", "PlacementDrive", "PlacementApplication",

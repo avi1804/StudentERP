@@ -1,81 +1,88 @@
+import { useState } from "react";
+
 export default function Attendance() {
+  const [subject, setSubject] = useState("");
+  const [student, setStudent] = useState("");
+  const [date, setDate] = useState("");
+
   return (
-    <div className="page-center">
-      <div className="att-grid">
-        {/* Mark panel */}
-        <div className="mark-panel" id="att-mark-panel">
-          <div className="card-header">
-            <span className="card-title">Mark Attendance</span>
-            <button className="btn-qr-gen">
-              <span>&#x25A6;</span> Generate QR
-            </button>
-          </div>
-          <div className="panel-body">
-            <div className="fg">
-              <label>Subject</label>
-              <select>
-                <option value="">- Select Subject -</option>
-                <option value="cs01">CS01 - Advance Java</option>
-                <option value="cs02">CS02 - Data Prepration & Analysis</option>
-              </select>
-            </div>
-            <div className="fg">
-              <label>Student</label>
-              <select>
-                <option value="">- Select Subject First -</option>
-                <option value="1">Mit Bulsari (CS631)</option>
-              </select>
-            </div>
-            <div className="fg">
-              <label>Date</label>
-              <input type="date" />
-            </div>
-            <div className="fg" style={{ marginBottom: 0 }}>
-              <label>Status</label>
-              <div className="att-status-btns">
-                <button className="att-btn present">
-                  <span className="icon">✓</span><span>Present</span>
-                </button>
-                <button className="att-btn absent">
-                  <span className="icon">✕</span><span>Absent</span>
-                </button>
-                <button className="att-btn late">
-                  <span className="icon">⏱</span><span>Late</span>
-                </button>
-              </div>
-            </div>
-          </div>
+    <div className="page-wide" style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
+      
+      {/* Mark Attendance Card */}
+      <div className="card" style={{ flex: 1, padding: '24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <h3 style={{ margin: 0, color: 'var(--text)' }}>Mark Attendance</h3>
+          <button className="btn" style={{ background: 'var(--surface2)', color: 'var(--text)', border: '1px solid var(--border)' }}>
+            ⊞ Generate QR
+          </button>
         </div>
-        
-        {/* Report panel */}
-        <div className="mark-panel">
-          <div className="card-header">
-            <span className="card-title" id="att-report-title">Attendance Report</span>
-          </div>
-          <div className="panel-body">
-            <div className="fg" id="rpt-student-field">
-              <label id="rpt-student-label">Student</label>
-              <select>
-                <option value="">- Select Student -</option>
-                <option value="1">Mit Bulsari (CS631)</option>
-              </select>
-            </div>
-            <div className="fg">
-              <label>Subject <span style={{ fontSize: '10px', color: 'var(--text3)' }}>(blank = all)</span></label>
-              <select>
-                <option value="">All subjects</option>
-                <option value="cs01">CS01 - Advance Java</option>
-              </select>
-            </div>
-            <button className="btn btn-primary" style={{ marginBottom: '16px' }}>View Report</button>
-            <div id="att-report-result">
-              <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text3)', fontSize: '13px' }}>
-                Select a student and click View Report
-              </div>
-            </div>
+
+        <div className="fg" style={{ marginBottom: '16px' }}>
+          <label>Subject</label>
+          <select value={subject} onChange={e => setSubject(e.target.value)}>
+            <option value="">- Select Subject -</option>
+            <option value="CS01">Software Group Project</option>
+          </select>
+        </div>
+
+        <div className="fg" style={{ marginBottom: '16px' }}>
+          <label>Student</label>
+          <select value={student} onChange={e => setStudent(e.target.value)}>
+            <option value="">- Select Subject First -</option>
+          </select>
+        </div>
+
+        <div className="fg" style={{ marginBottom: '24px' }}>
+          <label>Date</label>
+          <input type="date" value={date} onChange={e => setDate(e.target.value)} />
+        </div>
+
+        <div>
+          <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'var(--text2)', marginBottom: '8px' }}>Status</label>
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <button className="btn" style={{ flex: 1, height: '80px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'var(--surface2)', border: '1px solid #198754', color: '#198754', borderRadius: '12px' }}>
+              <span style={{ fontSize: '24px' }}>✓</span>
+              Present
+            </button>
+            <button className="btn" style={{ flex: 1, height: '80px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'var(--surface2)', border: '1px solid #dc3545', color: '#dc3545', borderRadius: '12px' }}>
+              <span style={{ fontSize: '24px' }}>✕</span>
+              Absent
+            </button>
+            <button className="btn" style={{ flex: 1, height: '80px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'var(--surface2)', border: '1px solid #fd7e14', color: '#fd7e14', borderRadius: '12px' }}>
+              <span style={{ fontSize: '24px' }}>⏱</span>
+              Late
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Attendance Report Card */}
+      <div className="card" style={{ width: '380px', padding: '24px' }}>
+        <h3 style={{ margin: 0, color: 'var(--text)', marginBottom: '24px' }}>Attendance Report</h3>
+
+        <div className="fg" style={{ marginBottom: '16px' }}>
+          <label>Student</label>
+          <select>
+            <option value="">- Select Student -</option>
+          </select>
+        </div>
+
+        <div className="fg" style={{ marginBottom: '24px' }}>
+          <label>Subject <span style={{ fontSize: '10px', color: 'var(--text3)' }}>(blank = all)</span></label>
+          <select>
+            <option value="">All subjects</option>
+          </select>
+        </div>
+
+        <button className="btn btn-primary" style={{ width: '100%', padding: '12px', marginBottom: '16px' }}>
+          View Report
+        </button>
+
+        <p style={{ textAlign: 'center', fontSize: '12px', color: 'var(--text3)', margin: 0 }}>
+          Select a student and click View Report
+        </p>
+      </div>
+
     </div>
   );
 }

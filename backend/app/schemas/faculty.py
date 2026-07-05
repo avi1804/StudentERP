@@ -14,6 +14,8 @@ class FacultyUpdate(BaseModel):
     designation: Optional[str] = None
     department_id: Optional[int] = None
     contact_number: Optional[str] = None
+    full_name: Optional[str] = None
+    employee_id: Optional[str] = None
 
 class UserNested(BaseModel):
     full_name: str
