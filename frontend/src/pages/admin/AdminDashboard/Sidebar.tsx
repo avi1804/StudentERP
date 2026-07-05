@@ -1,5 +1,6 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { NAV_ITEMS, type NavItem } from "@/pages/admin/AdminDashboard/DashboardData";
+import { useAuthStore } from "../../../store/authStore";
 
 interface SidebarProps {
   open?: boolean;
@@ -8,11 +9,18 @@ interface SidebarProps {
 
 export function Sidebar({ open, onNavigate }: SidebarProps) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuthStore();
 
   const handleNavigate = () => {
     if (window.innerWidth < 1024 && onNavigate) {
       onNavigate();
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
   return (
@@ -53,12 +61,12 @@ export function Sidebar({ open, onNavigate }: SidebarProps) {
       </div>
 
       <div className="user-bar">
-        <div className="user-avatar" id="u-init">AD</div>
+        <div className="user-avatar" id="u-init">{user?.full_name?.substring(0, 2).toUpperCase() || 'AD'}</div>
         <div>
-          <div className="user-name" id="u-name">System Administrator</div>
+          <div className="user-name" id="u-name">{user?.full_name || 'System Administrator'}</div>
           <div className="user-role" id="u-role">ADMIN</div>
         </div>
-        <button className="logout-btn">Out</button>
+        <button className="logout-btn" onClick={handleLogout}>Out</button>
       </div>
     </div>
   );

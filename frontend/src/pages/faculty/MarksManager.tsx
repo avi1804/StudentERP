@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { apiClient as api } from "@/api/axios";
+import React, { useEffect, useState } from 'react';
+import { apiClient as api } from '../../api/axios';
 
-export default function Marks() {
+export const MarksManager: React.FC = () => {
   const [subjects, setSubjects] = useState<any[]>([]);
   const [students, setStudents] = useState<any[]>([]);
   
@@ -15,12 +15,12 @@ export default function Marks() {
   const [message, setMessage] = useState({ text: '', type: '' });
 
   useEffect(() => {
-    fetchSubjects();
+    fetchMySubjects();
   }, []);
 
-  const fetchSubjects = async () => {
+  const fetchMySubjects = async () => {
     try {
-      const res = await api.get('/subjects/');
+      const res = await api.get('/faculty-dash/my-subjects');
       setSubjects(res.data);
     } catch (error) {
       console.error(error);
@@ -33,7 +33,7 @@ export default function Marks() {
       return;
     }
     try {
-      const res = await api.get(`/subjects/${subjectId}/students`);
+      const res = await api.get(`/faculty-dash/subjects/${subjectId}/students`);
       setStudents(res.data);
     } catch (error) {
       console.error(error);
@@ -55,7 +55,7 @@ export default function Marks() {
     setLoading(true);
     setMessage({ text: '', type: '' });
     try {
-      await api.post('/marks/', {
+      await api.post('/faculty-dash/marks', {
         student_id: parseInt(selectedStudent),
         subject_id: parseInt(selectedSubject),
         exam_type: examType,
@@ -65,7 +65,7 @@ export default function Marks() {
       setMessage({ text: `Marks saved successfully!`, type: 'success' });
       setMarksObtained('');
     } catch (error: any) {
-      setMessage({ text: error.response?.data?.detail || 'Failed to save marks. Check Admin permissions.', type: 'error' });
+      setMessage({ text: error.response?.data?.detail || 'Failed to save marks', type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -79,14 +79,14 @@ export default function Marks() {
         </div>
       )}
 
-      <div className="marks-grid">
+      <div style={{ maxWidth: '600px', margin: '0 auto' }}>
         {/* Enter marks panel */}
         <div className="marks-input-panel">
           <div className="card-header"><span className="card-title">Enter Marks</span></div>
           <div className="panel-body">
             <div className="fg">
               <label>Subject</label>
-              <select value={selectedSubject} onChange={handleSubjectChange}>
+              <select className="premium-fg" value={selectedSubject} onChange={handleSubjectChange}>
                 <option value="">— Select Subject —</option>
                 {subjects.map(s => (
                   <option key={s.id} value={s.id}>{s.name} ({s.code})</option>
@@ -95,7 +95,7 @@ export default function Marks() {
             </div>
             <div className="fg">
               <label>Student</label>
-              <select value={selectedStudent} onChange={(e) => setSelectedStudent(e.target.value)} disabled={!selectedSubject}>
+              <select className="premium-fg" value={selectedStudent} onChange={(e) => setSelectedStudent(e.target.value)} disabled={!selectedSubject}>
                 <option value="">— Select Subject First —</option>
                 {students.map(s => (
                   <option key={s.id} value={s.id}>{s.name} ({s.enrollment_number})</option>
@@ -104,7 +104,7 @@ export default function Marks() {
             </div>
             <div className="fg">
               <label>Exam Type</label>
-              <select value={examType} onChange={(e) => setExamType(e.target.value)}>
+              <select className="premium-fg" value={examType} onChange={(e) => setExamType(e.target.value)}>
                 <option value="MID_SEM">Mid Semester</option>
                 <option value="END_SEM">End Semester</option>
                 <option value="INTERNAL">Internal</option>
@@ -121,41 +121,12 @@ export default function Marks() {
                 <input type="number" placeholder="50" value={totalMarks} onChange={(e) => setTotalMarks(e.target.value)} />
               </div>
             </div>
-            <button className="btn btn-primary" onClick={submitMarks} disabled={loading}>
+            <button className="btn btn-primary" onClick={submitMarks} disabled={loading} style={{ width: '100%' }}>
               {loading ? 'Saving...' : 'Save Marks'}
             </button>
-          </div>
-        </div>
-
-        {/* View Result Card */}
-        <div className="marks-input-panel">
-          <div className="card-header"><span className="card-title">View Result Card</span></div>
-          <div className="panel-body">
-            <div className="fg">
-              <label>Student</label>
-              <select>
-                <option value="">— Select Student —</option>
-                {students.map(s => (
-                  <option key={s.id} value={s.id}>{s.name} ({s.enrollment_number})</option>
-                ))}
-              </select>
-            </div>
-            <div className="fg">
-              <label>Exam Type</label>
-              <select>
-                <option value="MID_SEM">Mid Semester</option>
-                <option value="END_SEM">End Semester</option>
-                <option value="INTERNAL">Internal</option>
-                <option value="PRACTICAL">Practical</option>
-              </select>
-            </div>
-            <button className="btn btn-primary">Get Result Card</button>
-            <div style={{ marginTop: '16px', color: 'var(--text3)', fontSize: '12px', textAlign: 'center' }}>
-              Select a student and click Get Result Card
-            </div>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};

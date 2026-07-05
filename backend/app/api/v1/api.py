@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1 import auth, users, students, faculty, departments, subjects, timetable, notices, dashboard, placements, complaints, exams
+from app.api.v1 import auth, users, students, faculty, departments, subjects, timetable, notices, dashboard, placements, complaints, faculty_dashboard, student_dashboard
 
 api_router = APIRouter()
 api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
@@ -14,4 +14,5 @@ api_router.include_router(notices.router, prefix="/notices", tags=["notices"])
 api_router.include_router(dashboard.router, prefix="/dashboard", tags=["dashboard"])
 api_router.include_router(placements.router, prefix="/placements", tags=["placements"])
 api_router.include_router(complaints.router, prefix="/complaints", tags=["complaints"])
-api_router.include_router(exams.router, prefix="/exams", tags=["exams"])
+api_router.include_router(faculty_dashboard.router, prefix="/faculty-dash", tags=["faculty-dash"])
+api_router.include_router(student_dashboard.router, prefix="/student-dash", tags=["student-dash"])
