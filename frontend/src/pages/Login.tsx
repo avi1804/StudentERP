@@ -5,8 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { authService } from "../services/auth.service";
-import { useAuthStore } from "../store/authStore";
+import { authService } from "@/services/auth.service";
+import { useAuthStore } from "@/store/authStore";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -36,7 +36,7 @@ const Login = () => {
             setTokens(response.access_token, response.refresh_token);
             const user = useAuthStore.getState().user;
             if (user?.role === "admin") {
-                navigate("/Admin-Dashboard");
+                navigate("/admin/dashboard");
             } else if (user?.role === "faculty") {
                 navigate("/faculty/dashboard");
             } else {

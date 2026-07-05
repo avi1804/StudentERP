@@ -8,7 +8,7 @@ export function AddCourse() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    navigate("/Admin-Dashboard/course/manage");
+    navigate("/admin/dashboard/course/manage");
   };
 
   return (

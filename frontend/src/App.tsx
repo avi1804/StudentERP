@@ -5,7 +5,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 // Lazy Loaded Pages
 const Login = React.lazy(() => import("./pages/Login"));
-const AdminLogin = React.lazy(() => import("./pages/admin/Admin-Login"));
 const StudentDashboard = React.lazy(() => import("./pages/StudentDashboard"));
 
 // Lazy Loaded Admin Dashboard Pages
@@ -41,10 +40,8 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Navigate to="/" replace />} />
-          <Route path="/AdminControl" element={<AdminLogin />} />
-          
           <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-            <Route path="/Admin-Dashboard" element={<AdminLayout />}>
+            <Route path="/admin/dashboard" element={<AdminLayout />}>
               <Route index element={<DashboardHome />} />
               <Route path="AdminProfile" element={<UpdateAdminProfile />} />
               <Route path="course/add" element={<AddCourse />} />

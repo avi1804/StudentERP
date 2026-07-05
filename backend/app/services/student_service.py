@@ -47,6 +47,7 @@ class StudentService:
         )
         
         created_student = await student_repo.create(db, obj_in=new_student)
+        created_student.user = new_user
         await db.commit()
         return created_student
 

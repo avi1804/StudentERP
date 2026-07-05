@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
 
 export default function AddFaculty() {
@@ -7,7 +7,7 @@ export default function AddFaculty() {
     email: '',
     password: '',
     phone: '',
-    department: 'CSE',
+    department_id: '' as number | string,
     designation: 'Professor',
     employee_id: ''
   });
@@ -15,6 +15,25 @@ export default function AddFaculty() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState(false);
+  const [departments, setDepartments] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const token = useAuthStore.getState().accessToken;
+        const res = await fetch('http://localhost:8000/api/v1/departments/', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setDepartments(data.items || data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch departments', err);
+      }
+    };
+    fetchDepartments();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +46,7 @@ export default function AddFaculty() {
         email: formData.email,
         password: formData.password,
         phone: formData.phone,
+        department_id: formData.department_id ? Number(formData.department_id) : null,
         designation: formData.designation,
         employee_id: formData.employee_id
       };
@@ -44,7 +64,7 @@ export default function AddFaculty() {
         setMessage('Faculty enrolled successfully!');
         setError(false);
         setFormData({
-          full_name: '', email: '', password: '', phone: '', department: 'CSE', designation: 'Professor', employee_id: ''
+          full_name: '', email: '', password: '', phone: '', department_id: '', designation: 'Professor', employee_id: ''
         });
       } else {
         const data = await response.json();
@@ -101,15 +121,11 @@ export default function AddFaculty() {
           <div className="two-input-row">
             <div className="fg">
               <label>Department *</label>
-              <select value={formData.department} onChange={e => setFormData({...formData, department: e.target.value})}>
-                <option>CSE</option>
-                <option>ECE</option>
-                <option>ME</option>
-                <option>CE</option>
-                <option>IT</option>
-                <option>Mathematics</option>
-                <option>Physics</option>
-                <option>English</option>
+              <select value={formData.department_id} onChange={e => setFormData({...formData, department_id: e.target.value})} required>
+                <option value="">-- Select Department --</option>
+                {departments.map(d => (
+                  <option key={d.id} value={d.id}>{d.name} ({d.code})</option>
+                ))}
               </select>
             </div>
             <div className="fg">

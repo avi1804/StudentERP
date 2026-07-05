@@ -12,6 +12,13 @@ class SubjectRepository(CRUDBase[Subject, SubjectCreate, SubjectUpdate]):
         result = await db.execute(select(Subject).where(Subject.code == code))
         return result.scalars().first()
 
+    async def get_with_relations(self, db: AsyncSession, id: int) -> Optional[Subject]:
+        query = select(Subject).options(
+            joinedload(Subject.faculty).joinedload(Faculty.user)
+        ).where(Subject.id == id)
+        result = await db.execute(query)
+        return result.scalars().first()
+
     async def get_multi(self, db: AsyncSession, *, skip: int = 0, limit: int = 100):
         query = select(Subject).options(
             joinedload(Subject.faculty).joinedload(Faculty.user)

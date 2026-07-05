@@ -27,7 +27,9 @@ async def create_subject(
     if not await department_repo.get(db, id=subject_in.department_id):
         raise BadRequestException("Department does not exist.")
 
-    return await subject_repo.create(db, obj_in=subject_in)
+    new_subject = await subject_repo.create(db, obj_in=subject_in)
+    # Reload with relations to satisfy SubjectResponse Pydantic schema
+    return await subject_repo.get_with_relations(db, id=new_subject.id)
 
 
 from app.schemas.pagination import Pagination
@@ -81,7 +83,8 @@ async def update_subject(
     if subject_in.department_id and not await department_repo.get(db, id=subject_in.department_id):
         raise BadRequestException("Department does not exist.")
         
-    return await subject_repo.update(db, db_obj=subject, obj_in=subject_in)
+    updated_subject = await subject_repo.update(db, db_obj=subject, obj_in=subject_in)
+    return await subject_repo.get_with_relations(db, id=updated_subject.id)
 
 @router.delete("/{id}", response_model=SubjectResponse)
 async def delete_subject(

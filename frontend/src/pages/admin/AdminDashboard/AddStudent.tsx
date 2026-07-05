@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
 
+import { apiClient } from '../../../api/axios';
+
 export default function AddStudent() {
   const [formData, setFormData] = useState({
     full_name: '',
@@ -23,28 +25,17 @@ export default function AddStudent() {
     setLoading(true);
     setMessage('');
     try {
-      const token = useAuthStore.getState().accessToken;
-      const response = await fetch('http://localhost:8000/api/v1/students/enroll', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
+      await apiClient.post('/students/enroll', formData);
+      setMessage('Student enrolled successfully!');
+      setFormData({
+        full_name: '', email: '', password: '', enrollment_number: '', branch: 'CSE', semester: '', phone: ''
       });
-      
-      const data = await response.json();
-      
-      if (response.ok) {
-        setMessage('Student enrolled successfully!');
-        setFormData({
-          full_name: '', email: '', password: '', enrollment_number: '', branch: 'CSE', semester: '', phone: ''
-        });
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.detail) {
+        setMessage(`Error: ${error.response.data.detail}`);
       } else {
-        setMessage(`Error: ${data.detail || 'Failed to enroll student'}`);
+        setMessage('Network error or failed to enroll student. Please try again.');
       }
-    } catch (error) {
-      setMessage('Network error. Please try again.');
     } finally {
       setLoading(false);
     }

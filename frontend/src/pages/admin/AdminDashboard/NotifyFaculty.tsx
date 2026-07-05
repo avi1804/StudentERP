@@ -101,7 +101,7 @@ export default function NotifyFaculty() {
           <span className="card-title">Notice Board</span>
           <button 
             className="card-btn" 
-            onClick={() => navigate('/Admin-Dashboard/notify/student')}
+            onClick={() => navigate('/admin/dashboard/notify/student')}
           >
             + Post Notice
           </button>

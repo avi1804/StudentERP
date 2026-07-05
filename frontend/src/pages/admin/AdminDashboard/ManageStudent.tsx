@@ -113,7 +113,7 @@ export default function ManageStudent() {
               placeholder="Search name / roll no..." 
               style={{ padding: '7px 12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface2)', color: 'var(--text)', fontSize: '12px', fontFamily: 'inherit', width: '200px' }} 
             />
-            <button className="card-btn" onClick={() => navigate('/Admin-Dashboard/students/add')}>
+            <button className="card-btn" onClick={() => navigate('/admin/dashboard/students/add')}>
               + Add Student
             </button>
           </div>

@@ -6,7 +6,7 @@ export default function AddSubject() {
     name: '',
     code: '',
     credits: 4,
-    department_id: 1,
+    department_id: '' as number | string,
     semester: 1,
     faculty_id: '' as number | string
   });
@@ -15,23 +15,35 @@ export default function AddSubject() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState(false);
   const [faculties, setFaculties] = useState<any[]>([]);
+  const [departments, setDepartments] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchFaculties = async () => {
+    const fetchData = async () => {
       try {
         const token = useAuthStore.getState().accessToken;
-        const res = await fetch('http://localhost:8000/api/v1/faculty/', {
+        
+        // Fetch Faculties
+        const facRes = await fetch('http://localhost:8000/api/v1/faculty/', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        if (res.ok) {
-          const data = await res.json();
+        if (facRes.ok) {
+          const data = await facRes.json();
           setFaculties(data.items || data);
+        }
+
+        // Fetch Departments
+        const depRes = await fetch('http://localhost:8000/api/v1/departments/', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (depRes.ok) {
+          const data = await depRes.json();
+          setDepartments(data.items || data);
         }
       } catch (err) {
         console.error(err);
       }
     };
-    fetchFaculties();
+    fetchData();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,19 +52,29 @@ export default function AddSubject() {
     setMessage('');
     try {
       const token = useAuthStore.getState().accessToken;
+      
+      const payload = {
+        name: formData.name,
+        code: formData.code,
+        credits: formData.credits,
+        department_id: formData.department_id ? Number(formData.department_id) : null,
+        semester: formData.semester,
+        faculty_id: formData.faculty_id ? Number(formData.faculty_id) : null
+      };
+
       const response = await fetch('http://localhost:8000/api/v1/subjects/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
       
       if (response.ok) {
         setMessage('Subject added successfully!');
         setError(false);
-        setFormData({ name: '', code: '', credits: 4, department_id: 1, semester: 1, faculty_id: '' });
+        setFormData({ name: '', code: '', credits: 4, department_id: '', semester: 1, faculty_id: '' });
       } else {
         const data = await response.json();
         let msg = 'Failed to add subject.';
@@ -117,10 +139,11 @@ export default function AddSubject() {
             </div>
             <div className="fg">
               <label>Department *</label>
-              <select value={formData.department_id} onChange={e => setFormData({...formData, department_id: parseInt(e.target.value)})}>
-                <option value={1}>Computer Science</option>
-                <option value={2}>Mechanical</option>
-                <option value={3}>Electrical</option>
+              <select value={formData.department_id} onChange={e => setFormData({...formData, department_id: e.target.value ? parseInt(e.target.value) : ''})} required>
+                <option value="">-- Select Department --</option>
+                {departments.map(d => (
+                  <option key={d.id} value={d.id}>{d.name}</option>
+                ))}
               </select>
             </div>
           </div>

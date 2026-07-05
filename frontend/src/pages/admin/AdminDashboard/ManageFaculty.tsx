@@ -107,7 +107,7 @@ export default function ManageFaculty() {
       <div className="card">
         <div className="card-header">
           <span className="card-title">All Faculty</span>
-          <button className="card-btn" onClick={() => navigate('/Admin-Dashboard/faculty/add')}>
+          <button className="card-btn" onClick={() => navigate('/admin/dashboard/faculty/add')}>
             + Add Faculty
           </button>
         </div>

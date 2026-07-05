@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -13,9 +14,40 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { STATS, ATTENDANCE_DATA, OVERVIEW_DATA, COURSE_DATA, SUBJECT_DATA } from "@/pages/admin/AdminDashboard/DashboardData";
+import { Users, GraduationCap, BookText, ClipboardList, IndianRupee, Hourglass } from "lucide-react";
+import { dashboardService, type AdminDashboardData } from "@/services/dashboard.service";
 
 export function DashboardHome() {
+  const [data, setData] = useState<AdminDashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await dashboardService.getAdminStats();
+        setData(result);
+      } catch (error) {
+        console.error("Failed to load dashboard stats", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loading || !data) {
+    return <div style={{ padding: "40px", color: "var(--text2)" }}>Loading Dashboard Data...</div>;
+  }
+
+  const STATS = [
+    { label: "Total Students", value: data.total_students, colorClass: "blue", icon: Users, sub: "Enrolled across all branches" },
+    { label: "Total Faculty", value: data.total_faculty, colorClass: "purple", icon: GraduationCap, sub: "Active faculty members" },
+    { label: "Total Subjects", value: data.total_subjects, colorClass: "teal", icon: BookText, sub: "Across all semesters" },
+    { label: "Attendance Rate", value: `${data.attendance_rate.toFixed(1)}%`, colorClass: "amber", icon: ClipboardList, sub: "Overall across all subjects", badge: data.attendance_rate >= 75 ? "✔ On Track" : "⚠ Low" },
+    { label: "Fees Collected", value: `₹${(data.fees_collected_total / 100000).toFixed(2)}L`, colorClass: "green", icon: IndianRupee, sub: "Total amount received" },
+    { label: "Fees Pending", value: `₹${(data.pending_fees_total / 100000).toFixed(2)}L`, colorClass: "red", icon: Hourglass, sub: "Outstanding balance" },
+  ];
+
   return (
     <>
       <div className="dash-stat-grid">
@@ -33,7 +65,7 @@ export function DashboardHome() {
               <div className={`stat-val ${valColor}`}>{value}</div>
               {sub && <div className="stat-sub">{sub}</div>}
               {badge && (
-                <div style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(34,197,94,0.1)', color: 'var(--green)', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 600, marginTop: '8px', border: '1px solid rgba(34,197,94,0.2)' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', background: badge.includes('✔') ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)', color: badge.includes('✔') ? 'var(--green)' : 'var(--red)', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 600, marginTop: '8px', border: badge.includes('✔') ? '1px solid rgba(34,197,94,0.2)' : '1px solid rgba(239,68,68,0.2)' }}>
                   {badge}
                 </div>
               )}
@@ -49,7 +81,7 @@ export function DashboardHome() {
           <div className="dash-chart-sub">Daily attendance % - last 30 days</div>
           <div className="dash-chart-wrap h260">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={ATTENDANCE_DATA}>
+              <LineChart data={data.attendance_trend}>
                 <defs>
                   <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="rgba(79,142,247,0.28)" />
@@ -57,7 +89,7 @@ export function DashboardHome() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                <XAxis dataKey="subject" tick={{ fontSize: 12, fill: "var(--text3)" }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
+                <XAxis dataKey="date" tick={{ fontSize: 12, fill: "var(--text3)" }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
                 <YAxis
                   domain={[0, 1]}
                   ticks={[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
@@ -80,7 +112,7 @@ export function DashboardHome() {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie 
-                  data={OVERVIEW_DATA} 
+                  data={data.fees_analytics} 
                   dataKey="value" 
                   nameKey="name" 
                   innerRadius={70}
@@ -88,7 +120,7 @@ export function DashboardHome() {
                   stroke="var(--bg)" 
                   strokeWidth={2}
                 >
-                  {OVERVIEW_DATA.map((entry) => (
+                  {data.fees_analytics.map((entry) => (
                     <Cell key={entry.name} fill={entry.color} />
                   ))}
                 </Pie>
@@ -106,7 +138,7 @@ export function DashboardHome() {
           <div className="dash-chart-sub">Average marks % and attendance % per subject</div>
           <div className="dash-chart-wrap h260">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={ATTENDANCE_DATA}>
+              <BarChart data={data.subject_performance}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                 <XAxis dataKey="subject" tick={{ fontSize: 12, fill: "var(--text3)" }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
                 <YAxis
@@ -118,8 +150,8 @@ export function DashboardHome() {
                   tickLine={false}
                 />
                 <Tooltip contentStyle={{ background: "rgba(20,24,34,0.9)", border: "1px solid var(--border)", borderRadius: 8, color: "#fff" }} itemStyle={{ color: '#b0b4cf' }} />
-                <Bar dataKey="attendance" fill="#4f8ef7" radius={[4, 4, 0, 0]} barSize={20} />
-                <Bar dataKey="attendance" fill="#b78efe" radius={[4, 4, 0, 0]} barSize={20} />
+                <Bar name="Attendance" dataKey="attendance" fill="#4f8ef7" radius={[4, 4, 0, 0]} barSize={20} />
+                <Bar name="Marks" dataKey="marks" fill="#b78efe" radius={[4, 4, 0, 0]} barSize={20} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -127,5 +159,4 @@ export function DashboardHome() {
       </div>
     </>
   );
-}
- 
+} 

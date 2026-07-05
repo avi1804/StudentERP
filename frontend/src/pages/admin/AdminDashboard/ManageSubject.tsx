@@ -99,7 +99,7 @@ export default function ManageSubject() {
       <div className="card">
         <div className="card-header">
           <span className="card-title">All Subjects</span>
-          <button className="card-btn" onClick={() => navigate('/Admin-Dashboard/subject/add')}>
+          <button className="card-btn" onClick={() => navigate('/admin/dashboard/subject/add')}>
             + Add Subject
           </button>
         </div>
