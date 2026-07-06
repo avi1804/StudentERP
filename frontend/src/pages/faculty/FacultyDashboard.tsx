@@ -99,7 +99,7 @@ export const FacultyDashboard: React.FC = () => {
                 <Tooltip 
                   contentStyle={{ background: "rgba(20,24,34,0.9)", border: "1px solid var(--border)", borderRadius: 8, color: "#fff" }} 
                   itemStyle={{ color: '#b0b4cf' }} 
-                  formatter={(value: number, name: string) => [`${(value * 100).toFixed(0)}%`, name]}
+                  formatter={(value: any, name: any) => [`${(Number(value) * 100).toFixed(0)}%`, name]}
                 />
                 <Bar name="Attendance" dataKey="attendance" fill="#4f8ef7" radius={[4, 4, 0, 0]} barSize={20} />
                 <Bar name="Marks" dataKey="averageMarks" fill="#b78efe" radius={[4, 4, 0, 0]} barSize={20} />
