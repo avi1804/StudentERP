@@ -283,3 +283,283 @@
   transform: none;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   MOBILE EXPERIENCE STYLES
+   ══════════════════════════════════════════════════════════════ */
+
+/* Hide desktop sidebar on mobile */
+@media (max-width: 767px) {
+  #sidebar {
+    display: none !important;
+  }
+  .mobile-drawer-sidebar-wrapper #sidebar {
+    display: flex !important;
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 1 !important;
+    border-right: none !important;
+  }
+  .mobile-drawer-sidebar-wrapper .logo span:not(.logo-icon),
+  .mobile-drawer-sidebar-wrapper .nav-lbl,
+  .mobile-drawer-sidebar-wrapper .nav-text,
+  .mobile-drawer-sidebar-wrapper .user-bar div:not(.user-avatar),
+  .mobile-drawer-sidebar-wrapper .logout-btn {
+    display: block !important;
+  }
+  .mobile-drawer-sidebar-wrapper .logo {
+    padding: 24px 20px 20px !important;
+    justify-content: flex-start !important;
+  }
+  #main {
+    margin-left: 0 !important;
+  }
+  #topbar {
+    display: none !important;
+  }
+  #content {
+    padding: 0 !important;
+  }
+  #root {
+    flex-direction: column;
+  }
+}
+
+/* Mobile card base */
+.m-card {
+  background: rgba(26, 30, 41, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 16px;
+  transition: transform 0.15s ease;
+}
+.m-card:active {
+  transform: scale(0.98);
+}
+
+/* Mobile stat cards — 2 per row */
+.m-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.m-stat-card {
+  background: rgba(26, 30, 41, 0.5);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.m-stat-card .m-stat-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.m-stat-card .m-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+.m-stat-card .m-stat-label {
+  font-size: 12px;
+  color: #7a80a1;
+  font-weight: 500;
+}
+
+/* Mobile progress ring */
+.m-progress-ring {
+  transform: rotate(-90deg);
+}
+.m-progress-ring-track {
+  stroke: rgba(255, 255, 255, 0.06);
+  fill: transparent;
+}
+.m-progress-ring-fill {
+  fill: transparent;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.8s ease;
+}
+
+/* Mobile subject card */
+.m-subject-card {
+  background: rgba(26, 30, 41, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 10px;
+  transition: transform 0.15s ease;
+}
+.m-subject-card:active {
+  transform: scale(0.98);
+}
+
+/* Mobile form inputs */
+.m-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  outline: none;
+  min-height: 48px;
+  transition: border-color 0.2s ease;
+}
+.m-input:focus {
+  border-color: rgba(183, 142, 254, 0.4);
+}
+.m-input::placeholder {
+  color: #7a80a1;
+}
+
+/* Mobile section label */
+.m-section-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #7a80a1;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+  padding-left: 4px;
+}
+
+/* Skeleton loader */
+@keyframes m-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.m-skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+  background-size: 200% 100%;
+  animation: m-shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* Mobile content wrapper — accounts for top bar + bottom nav */
+.m-content {
+  padding: 16px;
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  min-height: calc(100vh - 56px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile progress bar */
+.m-progress-bar {
+  background: rgba(255, 255, 255, 0.08);
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.m-progress-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ADMIN MOBILE STYLES
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  /* Admin Stat Grid */
+  .dash-stat-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  
+  /* Make 4th stat span full width if needed */
+  .dash-stat-grid .dash-stat-card:nth-child(4) {
+    grid-column: span 2;
+  }
+  
+  /* Tables horizontally scrollable */
+  .card table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Adjust charts */
+  .dash-chart-wrap.h260 {
+    height: 200px !important;
+  }
+  
+  /* Fix card headers with inputs */
+  .card-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  .card-header > div {
+    width: 100% !important;
+    flex-wrap: wrap;
+  }
+  .card-header input {
+    flex: 1;
+  }
+
+  /* Mobile List Cards (For tables replacement) */
+  .mobile-list-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .mobile-list-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .mobile-list-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text2);
+  }
+  .mobile-list-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .mobile-list-card-row span:first-child {
+    color: var(--text3);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .mobile-list-card-row span:last-child {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text);
+  }
+  .mobile-list-card-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 4px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .mobile-list-card-actions button {
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+}

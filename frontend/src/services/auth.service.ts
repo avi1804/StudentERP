@@ -22,5 +22,25 @@ export const authService = {
   getProfile: async (): Promise<UserResponse> => {
     const response = await apiClient.post<UserResponse>('/auth/test-token');
     return response.data;
+  },
+
+  googleLogin: async (token: string): Promise<AuthResponse> => {
+    const response = await apiClient.post<AuthResponse>('/auth/google', { token });
+    return response.data;
+  },
+  
+  forgotPassword: async (email: string): Promise<{ message: string }> => {
+    const response = await apiClient.post<{ message: string }>('/auth/forgot-password', { email });
+    return response.data;
+  },
+
+  verifyOtp: async (email: string, otp: string): Promise<{ message: string; reset_token: string }> => {
+    const response = await apiClient.post<{ message: string; reset_token: string }>('/auth/verify-otp', { email, otp });
+    return response.data;
+  },
+
+  resetPassword: async (email: string, reset_token: string, new_password: string): Promise<{ message: string }> => {
+    const response = await apiClient.post<{ message: string }>('/auth/reset-password', { email, reset_token, new_password });
+    return response.data;
   }
 };

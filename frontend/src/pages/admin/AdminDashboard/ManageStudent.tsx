@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface Student {
   id: number;
@@ -14,6 +15,7 @@ interface Student {
 }
 
 export default function ManageStudent() {
+  const { isMobile } = useIsMobile();
   const navigate = useNavigate();
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
@@ -143,6 +145,48 @@ export default function ManageStudent() {
         <div>
           {loading ? (
             <div style={{ padding: '24px', textAlign: 'center' }}>Loading students...</div>
+          ) : students.length === 0 ? (
+            <div style={{ padding: '24px', textAlign: 'center' }}>No students enrolled yet.</div>
+          ) : isMobile ? (
+            <div className="mobile-list-container" style={{ padding: '0 16px 16px 16px' }}>
+              {students.map(s => {
+                const name = s.user?.full_name || "Unknown";
+                const email = s.user?.email || "No Email";
+                const initials = name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+                return (
+                  <div className="mobile-list-card" key={s.id}>
+                    <div className="mobile-list-card-header">
+                      <div className="student-info">
+                        <div className="student-avatar">{initials}</div>
+                        <div>
+                          <div className="student-name">{name}</div>
+                          <div className="student-email">{email}</div>
+                        </div>
+                      </div>
+                      <span className="badge badge-green">ACTIVE</span>
+                    </div>
+                    <div className="mobile-list-card-body">
+                      <div className="mobile-list-card-row">
+                        <span>Roll No</span>
+                        <span>{s.enrollment_number}</span>
+                      </div>
+                      <div className="mobile-list-card-row">
+                        <span>Batch/Branch</span>
+                        <span>{s.batch}</span>
+                      </div>
+                      <div className="mobile-list-card-row">
+                        <span>Phone</span>
+                        <span>{s.contact_number || "-"}</span>
+                      </div>
+                    </div>
+                    <div className="mobile-list-card-actions">
+                      <button className="btn-edit" onClick={() => handleEditClick(s)}>Edit</button>
+                      <button className="btn-del" onClick={() => handleDelete(s.id)}>Delete</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           ) : (
           <table>
             <thead>
@@ -184,11 +228,6 @@ export default function ManageStudent() {
                   </tr>
                 );
               })}
-              {students.length === 0 && (
-                <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', padding: '24px' }}>No students enrolled yet.</td>
-                </tr>
-              )}
             </tbody>
           </table>
           )}
@@ -196,8 +235,9 @@ export default function ManageStudent() {
       </div>
 
       {editingStudent && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div className="card" style={{ width: '400px', padding: '24px' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '16px' }}>
+          <div className="card" style={{ width: '100%', maxWidth: '400px', padding: '24px', maxHeight: '90vh', overflowY: 'auto' }}>
+
             <h3 style={{ marginTop: 0 }}>Edit Student</h3>
             <form onSubmit={handleUpdate}>
               <div className="fg" style={{ marginBottom: '16px' }}>

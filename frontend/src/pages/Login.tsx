@@ -8,6 +8,9 @@ import { authService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/authStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { AnimatedBackground } from "./AnimatedBackground";
+import { useGoogleLogin } from '@react-oauth/google';
+import { OTPVerification } from "@/components/OTPVerification";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Institution ID / Email is required"), // the user wants "Institution ID" visually
@@ -17,11 +20,69 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
+    const { isMobile } = useIsMobile();
     const [showPassword, setShowPassword] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
     const navigate = useNavigate();
     const setTokens = useAuthStore((state) => state.setTokens);
     const [activeTab, setActiveTab] = useState("password");
+    
+    // Forgot Password Flow State
+    const [forgotStep, setForgotStep] = useState<'email' | 'otp' | 'reset'>('email');
+    const [forgotEmail, setForgotEmail] = useState("");
+    const [isSendingOtp, setIsSendingOtp] = useState(false);
+    const [forgotError, setForgotError] = useState("");
+    const [resetToken, setResetToken] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [isResetting, setIsResetting] = useState(false);
+    
+    // Add real API call to handleSendOtp
+
+    const handleSendOtp = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!forgotEmail) {
+            setForgotError("Please enter your email");
+            return;
+        }
+        if (!/^\S+@\S+\.\S+$/.test(forgotEmail)) {
+            setForgotError("Please enter a valid email address");
+            return;
+        }
+        setForgotError("");
+        setIsSendingOtp(true);
+        // Real API call to send OTP
+        try {
+            await authService.forgotPassword(forgotEmail);
+            setIsSendingOtp(false);
+            setForgotStep('otp');
+        } catch (error: any) {
+            setForgotError(error.response?.data?.detail || "Failed to send OTP.");
+            setIsSendingOtp(false);
+        }
+    };
+
+    const handleResetPassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newPassword || newPassword.length < 6) {
+            setForgotError("Password must be at least 6 characters.");
+            return;
+        }
+        setForgotError("");
+        setIsResetting(true);
+        try {
+            await authService.resetPassword(forgotEmail, resetToken, newPassword);
+            setIsResetting(false);
+            setActiveTab('password');
+            setForgotStep('email');
+            setForgotEmail("");
+            setResetToken("");
+            setNewPassword("");
+            // optionally show success toast here
+        } catch (error: any) {
+            setForgotError(error.response?.data?.detail || "Failed to reset password.");
+            setIsResetting(false);
+        }
+    };
 
     const {
         register,
@@ -29,6 +90,30 @@ const Login = () => {
         formState: { errors, isSubmitting },
     } = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
+    });
+
+    const googleLogin = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            try {
+                setErrorMsg("");
+                const response = await authService.googleLogin(tokenResponse.access_token);
+                setTokens(response.access_token, response.refresh_token);
+                const user = useAuthStore.getState().user;
+                
+                if (user?.role === "admin") {
+                    navigate("/admin/dashboard");
+                } else if (user?.role === "faculty") {
+                    navigate("/faculty/dashboard");
+                } else {
+                    navigate("/dashboard");
+                }
+            } catch (error: any) {
+                setErrorMsg(error.response?.data?.detail || "Google login failed. Please try again.");
+            }
+        },
+        onError: () => {
+            setErrorMsg("Google login failed. Please try again.");
+        }
     });
 
     const onSubmit = async (data: LoginFormValues) => {
@@ -51,7 +136,7 @@ const Login = () => {
     };
 
     return (
-        <div style={{ minHeight: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#09090B', position: 'relative', overflow: 'hidden', fontFamily: '"Inter", sans-serif' }}>
+        <div style={{ minHeight: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#09090B', position: 'relative', overflow: 'hidden', fontFamily: '"Inter", sans-serif', padding: isMobile ? '24px' : '0' }}>
             <AnimatedBackground />
 
             <motion.div 
@@ -66,7 +151,7 @@ const Login = () => {
                 background: '#111216', // Dark background exactly like reference
                 border: '1px solid rgba(255, 255, 255, 0.05)',
                 borderRadius: '24px',
-                padding: '40px 32px',
+                padding: isMobile ? '32px 24px' : '40px 32px',
                 boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
                 display: 'flex',
                 flexDirection: 'column'
@@ -116,7 +201,7 @@ const Login = () => {
                         Password Login
                     </div>
                     <div 
-                        onClick={() => setActiveTab('forgot')}
+                        onClick={() => { setActiveTab('forgot'); setForgotStep('email'); setForgotError(""); }}
                         style={{
                             flex: 1, 
                             textAlign: 'center', 
@@ -235,9 +320,185 @@ const Login = () => {
                         </button>
                     </form>
                 ) : (
-                    <div style={{ textAlign: 'center', padding: '40px 0', color: '#888', fontSize: '14px' }}>
-                        Contact your administrator to reset your password.
-                    </div>
+                    forgotStep === 'email' ? (
+                        <motion.form 
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            onSubmit={handleSendOtp}
+                        >
+                            <AnimatePresence>
+                                {forgotError && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, height: 0, y: -10 }}
+                                        animate={{ opacity: 1, height: 'auto', y: 0 }}
+                                        exit={{ opacity: 0, height: 0, y: -10 }}
+                                        style={{ overflow: 'hidden', marginBottom: '20px' }}
+                                    >
+                                        <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#FCA5A5', padding: '10px 14px', borderRadius: '8px', fontSize: '13px' }}>
+                                            {forgotError}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                                <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#fff', margin: '0 0 8px 0', letterSpacing: '-0.01em' }}>
+                                    Reset Password
+                                </h2>
+                                <p style={{ fontSize: '13px', color: '#888', margin: 0, lineHeight: 1.5 }}>
+                                    Enter your registered email address and we'll send you a verification code.
+                                </p>
+                            </div>
+
+                            <div style={{ marginBottom: '24px' }}>
+                                <label style={{ display: 'block', fontSize: '12px', color: '#999', marginBottom: '8px' }}>Email Address</label>
+                                <div style={{ position: 'relative' }}>
+                                    <User size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#666', pointerEvents: 'none' }} />
+                                    <input 
+                                        type="email" 
+                                        placeholder="Enter your email" 
+                                        value={forgotEmail}
+                                        onChange={(e) => setForgotEmail(e.target.value)}
+                                        style={{ 
+                                            width: '100%', 
+                                            background: '#090A0C', 
+                                            border: '1px solid rgba(255,255,255,0.08)', 
+                                            color: '#fff', 
+                                            padding: '12px 14px 12px 40px', 
+                                            borderRadius: '8px', 
+                                            fontSize: '13px',
+                                            outline: 'none',
+                                            transition: 'border-color 0.2s ease'
+                                        }}
+                                        onFocus={(e) => e.target.style.borderColor = 'rgba(167, 139, 250, 0.5)'}
+                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
+                                    />
+                                </div>
+                            </div>
+
+                            <button 
+                                type="submit" 
+                                disabled={isSendingOtp} 
+                                style={{ 
+                                    width: '100%', 
+                                    padding: '12px', 
+                                    borderRadius: '8px', 
+                                    background: isSendingOtp ? '#8B5CF6' : '#A78BFA', 
+                                    color: '#000', 
+                                    fontWeight: 600, 
+                                    fontSize: '14px', 
+                                    border: 'none', 
+                                    cursor: isSendingOtp ? 'not-allowed' : 'pointer',
+                                    transition: 'background 0.2s ease',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                                onMouseOver={(e) => { if(!isSendingOtp) e.currentTarget.style.background = '#8B5CF6' }}
+                                onMouseOut={(e) => { if(!isSendingOtp) e.currentTarget.style.background = '#A78BFA' }}
+                            >
+                                {isSendingOtp ? <Loader2 size={18} className="animate-spin" /> : "Send OTP"}
+                            </button>
+                        </motion.form>
+                    ) : forgotStep === 'otp' ? (
+                        <OTPVerification 
+                            email={forgotEmail}
+                            onBack={() => setForgotStep('email')} 
+                            onSuccess={(token) => {
+                                setResetToken(token);
+                                setForgotStep('reset');
+                            }}
+                        />
+                    ) : (
+                        <motion.form 
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            onSubmit={handleResetPassword}
+                        >
+                            <AnimatePresence>
+                                {forgotError && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, height: 0, y: -10 }}
+                                        animate={{ opacity: 1, height: 'auto', y: 0 }}
+                                        exit={{ opacity: 0, height: 0, y: -10 }}
+                                        style={{ overflow: 'hidden', marginBottom: '20px' }}
+                                    >
+                                        <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#FCA5A5', padding: '10px 14px', borderRadius: '8px', fontSize: '13px' }}>
+                                            {forgotError}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                                <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#fff', margin: '0 0 8px 0', letterSpacing: '-0.01em' }}>
+                                    Create New Password
+                                </h2>
+                                <p style={{ fontSize: '13px', color: '#888', margin: 0, lineHeight: 1.5 }}>
+                                    Your OTP was verified. Please enter your new password below.
+                                </p>
+                            </div>
+
+                            <div style={{ marginBottom: '24px' }}>
+                                <label style={{ display: 'block', fontSize: '12px', color: '#999', marginBottom: '8px' }}>New Password</label>
+                                <div style={{ position: 'relative' }}>
+                                    <Lock size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#666', pointerEvents: 'none' }} />
+                                    <input 
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder="Enter new password" 
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        style={{ 
+                                            width: '100%', 
+                                            background: '#090A0C', 
+                                            border: '1px solid rgba(255,255,255,0.08)', 
+                                            color: '#fff', 
+                                            padding: '12px 40px', 
+                                            borderRadius: '8px', 
+                                            fontSize: '13px',
+                                            outline: 'none',
+                                            transition: 'border-color 0.2s ease'
+                                        }}
+                                        onFocus={(e) => e.target.style.borderColor = 'rgba(167, 139, 250, 0.5)'}
+                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
+                                    />
+                                    <button 
+                                        type="button" 
+                                        onClick={() => setShowPassword(!showPassword)} 
+                                        style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: '#666', cursor: 'pointer', padding: 0, display: 'flex' }}
+                                    >
+                                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button 
+                                type="submit" 
+                                disabled={isResetting} 
+                                style={{ 
+                                    width: '100%', 
+                                    padding: '12px', 
+                                    borderRadius: '8px', 
+                                    background: isResetting ? '#8B5CF6' : '#A78BFA', 
+                                    color: '#000', 
+                                    fontWeight: 600, 
+                                    fontSize: '14px', 
+                                    border: 'none', 
+                                    cursor: isResetting ? 'not-allowed' : 'pointer',
+                                    transition: 'background 0.2s ease',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                                onMouseOver={(e) => { if(!isResetting) e.currentTarget.style.background = '#8B5CF6' }}
+                                onMouseOut={(e) => { if(!isResetting) e.currentTarget.style.background = '#A78BFA' }}
+                            >
+                                {isResetting ? <Loader2 size={18} className="animate-spin" /> : "Reset Password"}
+                            </button>
+                        </motion.form>
+                    )
                 )}
 
                 {/* Google Sign In Divider */}
@@ -249,6 +510,7 @@ const Login = () => {
 
                 <button 
                     type="button" 
+                    onClick={() => googleLogin()}
                     style={{ 
                         width: '100%', 
                         padding: '12px', 

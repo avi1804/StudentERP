@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface Subject {
   id: number;
@@ -13,6 +14,7 @@ interface Subject {
 }
 
 export default function ManageSubject() {
+  const { isMobile } = useIsMobile();
   const navigate = useNavigate();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
@@ -165,6 +167,50 @@ export default function ManageSubject() {
           </button>
         </div>
         <div>
+          {loading ? (
+            <div style={{ padding: '24px', textAlign: 'center' }}>Loading...</div>
+          ) : subjects.length === 0 ? (
+            <div style={{ padding: '24px', textAlign: 'center' }}>No subjects found.</div>
+          ) : isMobile ? (
+            <div className="mobile-list-container" style={{ padding: '0 16px 16px 16px' }}>
+              {subjects.map(s => {
+                const branchCode = departments.find(d => d.id === s.department_id)?.code || `DEP ${s.department_id}`;
+                return (
+                  <div className="mobile-list-card" key={s.id}>
+                    <div className="mobile-list-card-header">
+                      <div className="student-info" style={{ alignItems: 'flex-start' }}>
+                        <div className="student-avatar" style={{ background: 'linear-gradient(135deg, #4f8ef7, #9aa8ff)', borderRadius: '8px' }}>
+                          {s.code.substring(0, 2).toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="student-name" style={{ fontSize: '15px' }}>{s.name}</div>
+                          <div className="student-email mono" style={{ fontSize: '11px', marginTop: '2px' }}>{s.code}</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mobile-list-card-body">
+                      <div className="mobile-list-card-row">
+                        <span>Branch</span>
+                        <span className="badge badge-teal" style={{ padding: '2px 8px', fontSize: '10px' }}>{branchCode}</span>
+                      </div>
+                      <div className="mobile-list-card-row">
+                        <span>Semester & Credits</span>
+                        <span>Sem {s.semester || '-'} • {s.credits} CR</span>
+                      </div>
+                      <div className="mobile-list-card-row">
+                        <span>Faculty</span>
+                        <span>{s.faculty?.user?.full_name || 'Not Assigned'}</span>
+                      </div>
+                    </div>
+                    <div className="mobile-list-card-actions">
+                      <button className="btn-edit" onClick={() => handleEditClick(s)}>Edit</button>
+                      <button className="btn-del" onClick={() => handleDelete(s.id)}>Delete</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
           <table>
             <thead>
               <tr>
@@ -178,36 +224,32 @@ export default function ManageSubject() {
               </tr>
             </thead>
             <tbody>
-              {loading ? (
-                <tr><td colSpan={7} style={{textAlign: 'center'}}>Loading...</td></tr>
-              ) : subjects.length === 0 ? (
-                <tr><td colSpan={7} style={{textAlign: 'center'}}>No subjects found.</td></tr>
-              ) : (
-                subjects.map(s => (
-                  <tr key={s.id}>
-                    <td className="mono">{s.code}</td>
-                    <td style={{ color: 'var(--text)', fontWeight: 500 }}>{s.name}</td>
-                    <td><span className="badge badge-teal">{departments.find(d => d.id === s.department_id)?.code || `DEP ${s.department_id}`}</span></td>
-                    <td>{s.semester || '-'}</td>
-                    <td>{s.credits}</td>
-                    <td style={{ fontSize: '12px', color: 'var(--text2)' }}>{s.faculty?.user?.full_name || '-'}</td>
-                    <td>
-                      <div className="action-btns">
-                        <button className="btn-edit" onClick={() => handleEditClick(s)}>Edit</button>
-                        <button className="btn-del" onClick={() => handleDelete(s.id)}>Delete</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
+              {subjects.map(s => (
+                <tr key={s.id}>
+                  <td className="mono">{s.code}</td>
+                  <td style={{ color: 'var(--text)', fontWeight: 500 }}>{s.name}</td>
+                  <td><span className="badge badge-teal">{departments.find(d => d.id === s.department_id)?.code || `DEP ${s.department_id}`}</span></td>
+                  <td>{s.semester || '-'}</td>
+                  <td>{s.credits}</td>
+                  <td style={{ fontSize: '12px', color: 'var(--text2)' }}>{s.faculty?.user?.full_name || '-'}</td>
+                  <td>
+                    <div className="action-btns">
+                      <button className="btn-edit" onClick={() => handleEditClick(s)}>Edit</button>
+                      <button className="btn-del" onClick={() => handleDelete(s.id)}>Delete</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
+          )}
         </div>
       </div>
 
       {editingSubject && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div className="card" style={{ width: '400px', padding: '24px' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '16px' }}>
+          <div className="card" style={{ width: '100%', maxWidth: '400px', padding: '24px', maxHeight: '90vh', overflowY: 'auto' }}>
+
             <h3 style={{ marginTop: 0 }}>Edit Subject</h3>
             <form onSubmit={handleUpdate}>
               <div className="fg" style={{ marginBottom: '16px' }}>

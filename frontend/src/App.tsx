@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import React, { Suspense } from 'react';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -44,59 +45,63 @@ const LoadingSpinner = () => (
 );
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Suspense fallback={<LoadingSpinner />}>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Login />} />
-          <Route path="/login" element={<Navigate to="/" replace />} />
-          <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-            <Route path="/admin/dashboard" element={<AdminLayout />}>
-              <Route index element={<DashboardHome />} />
-              <Route path="AdminProfile" element={<UpdateAdminProfile />} />
-              <Route path="course/add" element={<AddCourse />} />
-              <Route path="course/manage" element={<ManageCourse />} />
-              <Route path="subject/add" element={<AddSubject />} />
-              <Route path="subject/manage" element={<ManageSubjects />} />
-              <Route path="notify/student" element={<NotifyStudent />} />
-              <Route path="notify/faculty" element={<NotifyFaculty />} />
-              <Route path="faculty/manage" element={<ManageFaculty />} />
-              <Route path="faculty/add" element={<AddFaculty />} />
-              <Route path="students/manage" element={<ManageStudent />} />
-              <Route path="students/add" element={<AddStudent />} />
-              <Route path="attendance" element={<AttendanceManager />} />
-              <Route path="attendance-report" element={<AttendanceReport />} />
-              <Route path="marks" element={<MarksManager />} />
-              <Route path="results" element={<ResultCard />} />
-            </Route> 
-          </Route>
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID_HERE";
 
-          <Route element={<ProtectedRoute allowedRoles={['student']} />}>
-            <Route path="/dashboard" element={<StudentLayout />}>
-              <Route index element={<StudentHome />} />
-              <Route path="attendance" element={<MyAttendance />} />
-              <Route path="results" element={<MyResults />} />
-              <Route path="profile" element={<MyProfile />} />
+  return (
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <BrowserRouter>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Navigate to="/" replace />} />
+            <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+              <Route path="/admin/dashboard" element={<AdminLayout />}>
+                <Route index element={<DashboardHome />} />
+                <Route path="AdminProfile" element={<UpdateAdminProfile />} />
+                <Route path="course/add" element={<AddCourse />} />
+                <Route path="course/manage" element={<ManageCourse />} />
+                <Route path="subject/add" element={<AddSubject />} />
+                <Route path="subject/manage" element={<ManageSubjects />} />
+                <Route path="notify/student" element={<NotifyStudent />} />
+                <Route path="notify/faculty" element={<NotifyFaculty />} />
+                <Route path="faculty/manage" element={<ManageFaculty />} />
+                <Route path="faculty/add" element={<AddFaculty />} />
+                <Route path="students/manage" element={<ManageStudent />} />
+                <Route path="students/add" element={<AddStudent />} />
+                <Route path="attendance" element={<AttendanceManager />} />
+                <Route path="attendance-report" element={<AttendanceReport />} />
+                <Route path="marks" element={<MarksManager />} />
+                <Route path="results" element={<ResultCard />} />
+              </Route> 
             </Route>
-          </Route>
-          
-          {/* Faculty Routes */}
-          <Route element={<ProtectedRoute allowedRoles={['faculty']} />}>
-            <Route path="/faculty" element={<FacultyLayout />}>
-              <Route path="dashboard" element={<FacultyDashboard />} />
-              <Route path="attendance" element={<AttendanceManager />} />
-              <Route path="attendance-report" element={<AttendanceReport />} />
-              <Route path="marks" element={<MarksManager />} />
-              <Route path="results" element={<ResultCard />} />
+
+            <Route element={<ProtectedRoute allowedRoles={['student']} />}>
+              <Route path="/dashboard" element={<StudentLayout />}>
+                <Route index element={<StudentHome />} />
+                <Route path="attendance" element={<MyAttendance />} />
+                <Route path="results" element={<MyResults />} />
+                <Route path="profile" element={<MyProfile />} />
+              </Route>
             </Route>
-          </Route>
-          
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
+            
+            {/* Faculty Routes */}
+            <Route element={<ProtectedRoute allowedRoles={['faculty']} />}>
+              <Route path="/faculty" element={<FacultyLayout />}>
+                <Route path="dashboard" element={<FacultyDashboard />} />
+                <Route path="attendance" element={<AttendanceManager />} />
+                <Route path="attendance-report" element={<AttendanceReport />} />
+                <Route path="marks" element={<MarksManager />} />
+                <Route path="results" element={<ResultCard />} />
+              </Route>
+            </Route>
+            
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </GoogleOAuthProvider>
   );
 }
 

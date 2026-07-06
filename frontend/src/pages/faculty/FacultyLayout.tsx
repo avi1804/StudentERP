@@ -1,5 +1,11 @@
 import { NavLink, useLocation, Outlet, useNavigate } from "react-router-dom";
 import { LayoutGrid, BookMarked, BookText } from "lucide-react";
+import { useState } from "react";
+import { useIsMobile } from "../../hooks/useIsMobile";
+import { FacultyMobileTopBar } from "../../components/mobile/FacultyMobileTopBar";
+import { FacultyMobileBottomNav } from "../../components/mobile/FacultyMobileBottomNav";
+import { FacultyMobileDrawer } from "../../components/mobile/FacultyMobileDrawer";
+
 
 import { useAuthStore } from "../../store/authStore";
 
@@ -64,6 +70,26 @@ export function FacultySidebar() {
 }
 
 export function FacultyLayout() {
+  const { isMobile } = useIsMobile();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  // ── Mobile Layout ──
+  if (isMobile) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'var(--bg)' }}>
+        <FacultyMobileTopBar onMenuClick={() => setIsDrawerOpen(true)} />
+        
+        <main className="m-content">
+          <Outlet />
+        </main>
+        
+        <FacultyMobileBottomNav onMenuClick={() => setIsDrawerOpen(true)} />
+        <FacultyMobileDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
+      </div>
+    );
+  }
+
+  // ── Desktop Layout (unchanged) ──
   return (
     <>
       <FacultySidebar />

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { apiClient as api } from '../../api/axios';
 import { UserCircle, GraduationCap, Building2, Library, CheckCircle2, Award, TrendingUp, Search } from 'lucide-react';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 export const ResultCard: React.FC = () => {
+  const { isMobile } = useIsMobile();
   const [allStudents, setAllStudents] = useState<any[]>([]);
   
   const [reportStudent, setReportStudent] = useState('');
@@ -81,7 +83,7 @@ export const ResultCard: React.FC = () => {
       )}
       
       {/* Search Controls */}
-      <div className="glass-card" style={{ marginBottom: '32px', display: 'flex', gap: '24px', alignItems: 'flex-end' }}>
+      <div className="glass-card" style={{ marginBottom: '32px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '24px', alignItems: isMobile ? 'stretch' : 'flex-end' }}>
         <div className="premium-fg" style={{ flex: 2 }}>
           <label>Select Student <span style={{color: 'var(--red)'}}>*</span></label>
           <select value={reportStudent} onChange={(e) => setReportStudent(e.target.value)} style={{ width: '100%' }}>
@@ -115,15 +117,15 @@ export const ResultCard: React.FC = () => {
           <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(183,142,254,0.15) 0%, rgba(0,0,0,0) 70%)', zIndex: 0 }}></div>
           
           <div style={{ position: 'relative', zIndex: 1 }}>
-            <div className="glass-header" style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+            <div className="glass-header" style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: 'center', gap: isMobile ? '16px' : '24px' }}>
               <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, rgba(183, 142, 254, 0.2), rgba(87, 46, 153, 0.4))', border: '2px solid rgba(183, 142, 254, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 20px rgba(183, 142, 254, 0.2)' }}>
                 <UserCircle size={48} color="var(--secondary)" />
               </div>
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, textAlign: isMobile ? 'center' : 'left' }}>
                 <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#fff', margin: '0 0 8px 0' }}>
                   {selectedStudentObj?.name || selectedStudentObj?.user?.full_name || "Unknown Student"}
                 </h2>
-                <div style={{ display: 'flex', gap: '24px', color: 'var(--text3)', fontSize: '13px' }}>
+                <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'center' : 'flex-start', gap: isMobile ? '8px' : '24px', color: 'var(--text3)', fontSize: '13px', justifyContent: isMobile ? 'center' : 'flex-start' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <GraduationCap size={14} color="var(--secondary)" /> {selectedStudentObj?.enrollment_number || 'N/A'}
                   </div>
@@ -144,7 +146,7 @@ export const ResultCard: React.FC = () => {
             </div>
 
             {/* Overall Stats Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '32px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '16px', marginBottom: '32px' }}>
               <div className="report-stat-box">
                 <div style={{ fontSize: '12px', color: 'var(--text3)', marginBottom: '8px' }}>Total Subjects</div>
                 <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#fff' }}>{reportData.length}</div>
@@ -172,12 +174,12 @@ export const ResultCard: React.FC = () => {
                       <div style={{ fontSize: '14px', fontWeight: 600, color: '#fff', marginBottom: '4px' }}>{r.subjectName || `Subject ${r.subjectId}`} {r.subjectCode ? `(${r.subjectCode})` : ''}</div>
                       <div style={{ fontSize: '12px', color: 'var(--text3)' }}>Exam Type: {r.examType}</div>
                     </div>
-                    <div style={{ width: '120px', textAlign: 'right', marginRight: '32px' }}>
+                    <div style={{ width: isMobile ? '70px' : '120px', textAlign: 'right', marginRight: isMobile ? '12px' : '32px' }}>
                       <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#fff' }}>{r.marksObtained}</span>
                       <span style={{ fontSize: '12px', color: 'var(--text3)' }}> / {r.totalMarks}</span>
                     </div>
-                    <div style={{ width: '200px', marginRight: '32px' }}>
-                      <div style={{ background: 'rgba(255,255,255,0.1)', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div style={{ width: isMobile ? '70px' : '200px', marginRight: isMobile ? '12px' : '32px', display: 'flex', alignItems: 'center' }}>
+                      <div style={{ background: 'rgba(255,255,255,0.1)', height: '6px', borderRadius: '3px', overflow: 'hidden', width: '100%' }}>
                         <div style={{ background: r.percentage >= 70 ? 'var(--green)' : r.percentage >= 50 ? 'var(--amber)' : 'var(--red)', width: `${r.percentage}%`, height: '100%', borderRadius: '3px', boxShadow: `0 0 10px ${r.percentage >= 70 ? 'var(--green)' : 'var(--red)'}` }}></div>
                       </div>
                     </div>

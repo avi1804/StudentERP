@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { apiClient as api } from '../../api/axios';
 import { BookOpen, Calendar, CheckCircle2, Clock, Users, ChevronRight, BellRing } from 'lucide-react';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 export const AttendanceManager: React.FC = () => {
+  const { isMobile } = useIsMobile();
   const [subjects, setSubjects] = useState<any[]>([]);
   const [students, setStudents] = useState<any[]>([]);
   
@@ -120,7 +122,7 @@ export const AttendanceManager: React.FC = () => {
       </div>
 
       {/* Top Stats Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px', marginBottom: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)', gap: '16px', marginBottom: '24px' }}>
         {STATS.map((s, i) => {
           const Icon = s.icon;
           return (
@@ -145,7 +147,7 @@ export const AttendanceManager: React.FC = () => {
       )}
 
       {/* Main Content Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '24px', marginBottom: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.5fr 1fr', gap: '24px', marginBottom: '24px' }}>
         
         {/* LEFT COL: Mark Attendance */}
         <div className="card" style={{ background: 'var(--surface-glass)', border: '1px solid var(--border)' }}>
@@ -159,8 +161,8 @@ export const AttendanceManager: React.FC = () => {
             </button>
           </div>
           
-          <div style={{ padding: '24px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+          <div style={{ padding: isMobile ? '16px' : '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '20px', marginBottom: '20px' }}>
               <div className="premium-fg">
                 <label>Subject <span style={{color: 'var(--red)'}}>*</span></label>
                 <select value={selectedSubject} onChange={handleSubjectChange}>
@@ -185,7 +187,7 @@ export const AttendanceManager: React.FC = () => {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginBottom: '30px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '20px', marginBottom: '30px' }}>
               <div className="premium-fg">
                 <label>Date <span style={{color: 'var(--red)'}}>*</span></label>
                 <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
@@ -202,7 +204,7 @@ export const AttendanceManager: React.FC = () => {
 
             <div style={{ marginBottom: '10px' }}>
               <label style={{ fontSize: '12px', color: 'var(--text3)', display: 'block', marginBottom: '12px' }}>Attendance Status</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '16px' }}>
                 <button className="premium-att-btn present-btn" onClick={() => markAttendance('PRESENT')} disabled={loading}>
                   <CheckCircle2 size={24} />
                   <div className="btn-title">Present</div>

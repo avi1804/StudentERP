@@ -2,9 +2,99 @@ import React, { useEffect, useState } from "react";
 import { apiClient as api } from "../../api/axios";
 import { useAuthStore } from "../../store/authStore";
 import { UserCircle, GraduationCap, Building2, Library, CheckCircle2, Award } from 'lucide-react';
+import { useIsMobile } from "../../hooks/useIsMobile";
+import { motion } from "framer-motion";
 
+// ── Mobile Results ──
+function MobileResults({ data, totalObtained, totalMax, overallPercentage }: any) {
+  const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.06 } } };
+  const itemVariants = { hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0, transition: { duration: 0.3 } } };
+
+  return (
+    <motion.div variants={containerVariants} initial="hidden" animate="visible">
+      {/* Summary */}
+      <motion.div variants={itemVariants} className="m-card" style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '16px' }}>
+        <div style={{ position: 'relative', width: 80, height: 80 }}>
+          <svg className="m-progress-ring" width={80} height={80}>
+            <circle className="m-progress-ring-track" cx={40} cy={40} r={34} strokeWidth={6} />
+            <circle
+              className="m-progress-ring-fill"
+              cx={40} cy={40} r={34} strokeWidth={6}
+              stroke={overallPercentage >= 70 ? '#22c55e' : overallPercentage >= 50 ? '#f59e0b' : '#ef4444'}
+              strokeDasharray={213.6}
+              strokeDashoffset={213.6 - (overallPercentage / 100) * 213.6}
+            />
+          </svg>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontSize: '18px', fontWeight: 700, color: overallPercentage >= 70 ? '#22c55e' : overallPercentage >= 50 ? '#f59e0b' : '#ef4444' }}>{overallPercentage}%</span>
+          </div>
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: '16px', fontWeight: 600, color: '#fff', marginBottom: '4px' }}>Overall Result</div>
+          <div style={{ fontSize: '12px', color: '#7a80a1' }}>{totalObtained} / {totalMax} marks scored</div>
+        </div>
+      </motion.div>
+
+      {/* Compact Stats */}
+      <motion.div variants={itemVariants} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '20px' }}>
+        <div className="m-stat-card" style={{ padding: '12px', alignItems: 'center', textAlign: 'center' }}>
+          <div style={{ fontSize: '20px', fontWeight: 700, color: '#fff' }}>{data.length}</div>
+          <div style={{ fontSize: '10px', color: '#7a80a1' }}>Subjects</div>
+        </div>
+        <div className="m-stat-card" style={{ padding: '12px', alignItems: 'center', textAlign: 'center', borderBottom: '2px solid #b78efe' }}>
+          <div style={{ fontSize: '20px', fontWeight: 700, color: '#b78efe' }}>{totalObtained}</div>
+          <div style={{ fontSize: '10px', color: '#7a80a1' }}>Obtained</div>
+        </div>
+        <div className="m-stat-card" style={{ padding: '12px', alignItems: 'center', textAlign: 'center' }}>
+          <div style={{ fontSize: '20px', fontWeight: 700, color: '#fff' }}>{totalMax}</div>
+          <div style={{ fontSize: '10px', color: '#7a80a1' }}>Maximum</div>
+        </div>
+      </motion.div>
+
+      {/* Subject Cards */}
+      <motion.div variants={itemVariants}>
+        <div className="m-section-label">Subject-wise Marks</div>
+        {data.map((r: any, i: number) => {
+          const pctColor = r.percentage >= 70 ? '#22c55e' : r.percentage >= 50 ? '#f59e0b' : '#ef4444';
+          const badgeColor = r.percentage >= 85 ? '#22c55e' : r.percentage >= 50 ? '#f59e0b' : '#ef4444';
+          return (
+            <motion.div key={i} variants={itemVariants} className="m-subject-card" whileTap={{ scale: 0.98 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#fff' }}>
+                    {r.subjectName || `Subject ${r.subjectId}`} {r.subjectCode ? `(${r.subjectCode})` : ''}
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#7a80a1', marginTop: '2px' }}>
+                    {r.examType?.replace('_', ' ')}
+                  </div>
+                </div>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: badgeColor, background: `${badgeColor}15`, padding: '3px 8px', borderRadius: '6px' }}>
+                  {r.remark}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                <div style={{ flex: 1 }}>
+                  <div className="m-progress-bar">
+                    <div className="m-progress-bar-fill" style={{ width: `${r.percentage}%`, background: pctColor, boxShadow: `0 0 8px ${pctColor}44` }} />
+                  </div>
+                </div>
+                <span style={{ fontSize: '14px', fontWeight: 700, color: pctColor, minWidth: '40px', textAlign: 'right' }}>{r.percentage}%</span>
+              </div>
+              <div style={{ fontSize: '12px', color: '#7a80a1' }}>
+                <span style={{ fontWeight: 600, color: '#fff' }}>{r.marksObtained}</span> / {r.totalMarks} marks
+              </div>
+            </motion.div>
+          );
+        })}
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// ── Main Export ──
 export function MyResults() {
   const { user } = useAuthStore();
+  const { isMobile } = useIsMobile();
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -15,7 +105,6 @@ export function MyResults() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Calculate Overall Stats
   let totalObtained = 0;
   let totalMax = 0;
   let overallPercentage = 0;
@@ -28,6 +117,26 @@ export function MyResults() {
     overallPercentage = totalMax > 0 ? Math.round((totalObtained / totalMax) * 100) : 0;
   }
 
+  // ── Mobile ──
+  if (isMobile) {
+    if (loading) {
+      return (
+        <div>
+          <div className="m-skeleton" style={{ height: '100px', marginBottom: '16px' }} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '8px', marginBottom: '20px' }}>
+            {[1, 2, 3].map(i => <div key={i} className="m-skeleton" style={{ height: '60px' }} />)}
+          </div>
+          {[1, 2, 3, 4].map(i => <div key={i} className="m-skeleton" style={{ height: '100px', marginBottom: '10px' }} />)}
+        </div>
+      );
+    }
+    if (data.length === 0) {
+      return <div className="m-card" style={{ textAlign: 'center', color: '#7a80a1', padding: '40px 16px' }}>No exam marks found yet.</div>;
+    }
+    return <MobileResults data={data} totalObtained={totalObtained} totalMax={totalMax} overallPercentage={overallPercentage} />;
+  }
+
+  // ── Desktop (unchanged) ──
   return (
     <div style={{ padding: '0px', maxWidth: '900px', margin: '0 auto' }}>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '32px' }}>
@@ -41,7 +150,6 @@ export function MyResults() {
       </div>
 
       <div className="glass-card" style={{ position: 'relative', overflow: 'hidden' }}>
-        {/* Subtle gradient background glow */}
         <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(183,142,254,0.15) 0%, rgba(0,0,0,0) 70%)', zIndex: 0 }}></div>
         
         <div style={{ position: 'relative', zIndex: 1 }}>
@@ -67,7 +175,6 @@ export function MyResults() {
             </div>
           </div>
 
-          {/* Overall Stats Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '32px' }}>
             <div className="report-stat-box">
               <div style={{ fontSize: '12px', color: 'var(--text3)', marginBottom: '8px' }}>Total Subjects Evaluated</div>
@@ -83,7 +190,6 @@ export function MyResults() {
             </div>
           </div>
 
-          {/* Subject Breakdown */}
           <h3 style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--secondary)', marginBottom: '16px', borderBottom: '1px solid rgba(183,142,254,0.2)', paddingBottom: '8px' }}>Subject-wise Marks</h3>
           
           {loading ? (

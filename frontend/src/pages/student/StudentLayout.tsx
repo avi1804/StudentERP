@@ -1,16 +1,34 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
 import { LayoutGrid, BookMarked, BookText, UserCircle } from "lucide-react";
+import { useIsMobile } from "../../hooks/useIsMobile";
+import { MobileTopBar } from "../../components/mobile/MobileTopBar";
+import { MobileBottomNav } from "../../components/mobile/MobileBottomNav";
 
 export function StudentLayout() {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
+  const { isMobile } = useIsMobile();
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
+  // ── Mobile Layout ──
+  if (isMobile) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'var(--bg)' }}>
+        <MobileTopBar />
+        <main className="m-content">
+          <Outlet />
+        </main>
+        <MobileBottomNav />
+      </div>
+    );
+  }
+
+  // ── Desktop Layout (unchanged) ──
   return (
     <>
       <div id="sidebar">

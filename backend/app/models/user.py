@@ -1,5 +1,6 @@
 from typing import Optional, List
-from sqlalchemy import String, Boolean, ForeignKey, Table, Column, Integer
+from sqlalchemy import String, Boolean, ForeignKey, Table, Column, Integer, DateTime
+from datetime import datetime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database.base import Base
 
@@ -44,6 +45,10 @@ class User(Base):
     role_id: Mapped[int] = mapped_column(ForeignKey("roles.id", ondelete="RESTRICT"), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
+    
+    # OTP Fields
+    otp_code: Mapped[Optional[str]] = mapped_column(String(6), nullable=True)
+    otp_expiry: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # Relationships
     role: Mapped["Role"] = relationship("Role", back_populates="users")
