@@ -7,10 +7,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { authService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/authStore";
 import { motion, AnimatePresence } from "framer-motion";
-import { AnimatedBackground } from "./AnimatedBackground";
+import DotField from "@/components/DotField";
 import { useGoogleLogin } from '@react-oauth/google';
 import { OTPVerification } from "@/components/OTPVerification";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import BorderGlow from "@/components/BorderGlow";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Institution ID / Email is required"), // the user wants "Institution ID" visually
@@ -137,7 +138,16 @@ const Login = () => {
 
     return (
         <div style={{ minHeight: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#09090B', position: 'relative', overflow: 'hidden', fontFamily: '"Inter", sans-serif', padding: isMobile ? '24px' : '0' }}>
-            <AnimatedBackground />
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0 }}>
+                <DotField
+                    dotRadius={1.5}
+                    dotSpacing={14}
+                    bulgeStrength={67}
+                    glowRadius={160}
+                    sparkle={true}
+                    waveAmplitude={0}
+                />
+            </div>
 
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
@@ -148,33 +158,34 @@ const Login = () => {
                 zIndex: 10,
                 width: '100%',
                 maxWidth: '420px',
-                background: '#111216', // Dark background exactly like reference
-                border: '1px solid rgba(255, 255, 255, 0.05)',
-                borderRadius: '24px',
-                padding: isMobile ? '32px 24px' : '40px 32px',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
-                display: 'flex',
-                flexDirection: 'column'
               }}
             >
+              <BorderGlow
+                backgroundColor="#111216"
+                borderRadius={24}
+                glowColor="268 100 76"
+                animated={false}
+              >
+                <div style={{
+                  padding: isMobile ? '32px 24px' : '40px 32px',
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}>
                 {/* Logo and Titles */}
                 <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                    <div style={{ 
-                        display: 'inline-flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center', 
-                        width: '48px', 
-                        height: '48px', 
-                        borderRadius: '12px', 
-                        background: 'linear-gradient(135deg, #7C3AED, #A78BFA)', 
-                        marginBottom: '20px',
-                        boxShadow: '0 0 20px rgba(139, 92, 246, 0.3)'
-                    }}>
-                        <span style={{ color: 'white', fontWeight: 'bold', fontSize: '18px', letterSpacing: '1px' }}>ERP</span>
+                    <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
+                        <img 
+                            src="/indus-logo.png" 
+                            alt="Indus University" 
+                            style={{ 
+                                height: '64px', 
+                                objectFit: 'contain'
+                            }} 
+                        />
                     </div>
                     
                     <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#fff', margin: '0 0 8px 0', letterSpacing: '-0.01em' }}>
-                        StudentERP
+                        IndusERP
                     </h1>
                     <p style={{ fontSize: '13px', color: '#888', margin: 0 }}>
                         Sign in to your account
@@ -538,6 +549,8 @@ const Login = () => {
                     </svg>
                     Sign in with Google
                 </button>
+                </div>
+              </BorderGlow>
             </motion.div>
         </div>
     );
