@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../../config';
 import { useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
 
@@ -18,7 +19,7 @@ export function NotifyStudent() {
     setMessage('');
     try {
       const token = useAuthStore.getState().accessToken;
-      const response = await fetch('http://localhost:8000/api/v1/notices/', {
+      const response = await fetch(API_BASE_URL + '/api/v1/notices/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

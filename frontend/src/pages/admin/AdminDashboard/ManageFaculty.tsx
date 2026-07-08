@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../../config';
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
@@ -35,7 +36,7 @@ export default function ManageFaculty() {
   const fetchFaculty = async () => {
     try {
       const token = useAuthStore.getState().accessToken;
-      const res = await fetch("http://localhost:8000/api/v1/faculty/", {
+      const res = await fetch(API_BASE_URL + "/api/v1/faculty/", {
         headers: { "Authorization": `Bearer ${token}` }
       });
       
@@ -64,7 +65,7 @@ export default function ManageFaculty() {
     const fetchDepartments = async () => {
       try {
         const token = useAuthStore.getState().accessToken;
-        const res = await fetch('http://localhost:8000/api/v1/departments/', {
+        const res = await fetch(API_BASE_URL + '/api/v1/departments/', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {
@@ -82,7 +83,7 @@ export default function ManageFaculty() {
     if (!window.confirm("Are you sure you want to delete this faculty member?")) return;
     try {
       const token = useAuthStore.getState().accessToken;
-      const res = await fetch(`http://localhost:8000/api/v1/faculty/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/faculty/${id}`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}` }
       });
@@ -119,7 +120,7 @@ export default function ManageFaculty() {
         department_id: editForm.department_id ? Number(editForm.department_id) : null
       };
       
-      const res = await fetch(`http://localhost:8000/api/v1/faculty/${editingFaculty.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/faculty/${editingFaculty.id}`, {
         method: "PUT",
         headers: { 
           "Authorization": `Bearer ${token}`,
@@ -132,7 +133,8 @@ export default function ManageFaculty() {
         setFacultyList(facultyList.map(f => f.id === editingFaculty.id ? { 
           ...f, 
           ...editForm,
-          user: { ...f.user, full_name: editForm.full_name }
+          department_id: payload.department_id !== null ? payload.department_id : f.department_id,
+          user: f.user ? { ...f.user, full_name: editForm.full_name } : null
         } : f));
         setEditingFaculty(null);
         setSuccessMessage("Faculty updated successfully!");

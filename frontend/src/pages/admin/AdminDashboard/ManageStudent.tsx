@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../../config';
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
@@ -27,7 +28,7 @@ export default function ManageStudent() {
   const fetchStudents = async () => {
     try {
       const token = useAuthStore.getState().accessToken;
-      const res = await fetch("http://localhost:8000/api/v1/students/", {
+      const res = await fetch(API_BASE_URL + "/api/v1/students/", {
         headers: { "Authorization": `Bearer ${token}` }
       });
       
@@ -57,7 +58,7 @@ export default function ManageStudent() {
     if (!window.confirm("Are you sure you want to delete this student?")) return;
     try {
       const token = useAuthStore.getState().accessToken;
-      const res = await fetch(`http://localhost:8000/api/v1/students/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/students/${id}`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}` }
       });
@@ -88,7 +89,7 @@ export default function ManageStudent() {
     
     try {
       const token = useAuthStore.getState().accessToken;
-      const res = await fetch(`http://localhost:8000/api/v1/students/${editingStudent.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/students/${editingStudent.id}`, {
         method: "PUT",
         headers: { 
           "Authorization": `Bearer ${token}`,

@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../../config';
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
 
@@ -21,7 +22,7 @@ export default function AddFaculty() {
     const fetchDepartments = async () => {
       try {
         const token = useAuthStore.getState().accessToken;
-        const res = await fetch('http://localhost:8000/api/v1/departments/', {
+        const res = await fetch(API_BASE_URL + '/api/v1/departments/', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {
@@ -51,7 +52,7 @@ export default function AddFaculty() {
         employee_id: formData.employee_id
       };
       
-      const response = await fetch('http://localhost:8000/api/v1/faculty/enroll', {
+      const response = await fetch(API_BASE_URL + '/api/v1/faculty/enroll', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

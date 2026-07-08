@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../../config';
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
@@ -21,7 +22,7 @@ export default function NotifyFaculty() {
   const fetchNotices = async () => {
     try {
       const token = useAuthStore.getState().accessToken;
-      const res = await fetch("http://localhost:8000/api/v1/notices/", {
+      const res = await fetch(API_BASE_URL + "/api/v1/notices/", {
         headers: { "Authorization": `Bearer ${token}` }
       });
       if (res.ok) {
@@ -43,7 +44,7 @@ export default function NotifyFaculty() {
     if (!window.confirm("Are you sure you want to delete this notice?")) return;
     try {
       const token = useAuthStore.getState().accessToken;
-      const res = await fetch(`http://localhost:8000/api/v1/notices/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/notices/${id}`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}` }
       });
@@ -74,7 +75,7 @@ export default function NotifyFaculty() {
     
     try {
       const token = useAuthStore.getState().accessToken;
-      const res = await fetch(`http://localhost:8000/api/v1/notices/${editingNotice.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/notices/${editingNotice.id}`, {
         method: "PUT",
         headers: { 
           "Authorization": `Bearer ${token}`,

@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../../config';
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
@@ -35,7 +36,7 @@ export default function ManageSubject() {
   const fetchSubjects = async () => {
     try {
       const token = useAuthStore.getState().accessToken;
-      const res = await fetch("http://localhost:8000/api/v1/subjects/", {
+      const res = await fetch(API_BASE_URL + "/api/v1/subjects/", {
         headers: { "Authorization": `Bearer ${token}` }
       });
       if (res.ok) {
@@ -56,8 +57,8 @@ export default function ManageSubject() {
       try {
         const token = useAuthStore.getState().accessToken;
         const [depRes, facRes] = await Promise.all([
-          fetch('http://localhost:8000/api/v1/departments/', { headers: { 'Authorization': `Bearer ${token}` } }),
-          fetch('http://localhost:8000/api/v1/faculty/', { headers: { 'Authorization': `Bearer ${token}` } })
+          fetch(API_BASE_URL + '/api/v1/departments/', { headers: { 'Authorization': `Bearer ${token}` } }),
+          fetch(API_BASE_URL + '/api/v1/faculty/', { headers: { 'Authorization': `Bearer ${token}` } })
         ]);
         if (depRes.ok) {
           const data = await depRes.json();
@@ -78,7 +79,7 @@ export default function ManageSubject() {
     if (!window.confirm("Are you sure you want to delete this subject?")) return;
     try {
       const token = useAuthStore.getState().accessToken;
-      const res = await fetch(`http://localhost:8000/api/v1/subjects/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/subjects/${id}`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}` }
       });
@@ -119,7 +120,7 @@ export default function ManageSubject() {
         faculty_id: editForm.faculty_id ? Number(editForm.faculty_id) : null
       };
 
-      const res = await fetch(`http://localhost:8000/api/v1/subjects/${editingSubject.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/subjects/${editingSubject.id}`, {
         method: "PUT",
         headers: { 
           "Authorization": `Bearer ${token}`,
@@ -131,8 +132,10 @@ export default function ManageSubject() {
       if (res.ok) {
         setSubjects(subjects.map(s => s.id === editingSubject.id ? { 
           ...s, 
-          ...payload,
-          faculty: faculties.find(f => f.id === payload.faculty_id) || s.faculty
+          ...payload, 
+          department_id: payload.department_id || s.department_id,
+          semester: payload.semester || s.semester,
+          faculty: payload.faculty_id ? (faculties.find(f => f.id === payload.faculty_id) || null) : null
         } : s));
         setEditingSubject(null);
         setSuccessMessage("Subject updated successfully!");

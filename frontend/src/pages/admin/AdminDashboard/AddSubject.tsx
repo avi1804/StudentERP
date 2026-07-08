@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../../config';
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
 
@@ -23,7 +24,7 @@ export default function AddSubject() {
         const token = useAuthStore.getState().accessToken;
         
         // Fetch Faculties
-        const facRes = await fetch('http://localhost:8000/api/v1/faculty/', {
+        const facRes = await fetch(API_BASE_URL + '/api/v1/faculty/', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (facRes.ok) {
@@ -32,7 +33,7 @@ export default function AddSubject() {
         }
 
         // Fetch Departments
-        const depRes = await fetch('http://localhost:8000/api/v1/departments/', {
+        const depRes = await fetch(API_BASE_URL + '/api/v1/departments/', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (depRes.ok) {
@@ -62,7 +63,7 @@ export default function AddSubject() {
         faculty_id: formData.faculty_id ? Number(formData.faculty_id) : null
       };
 
-      const response = await fetch('http://localhost:8000/api/v1/subjects/', {
+      const response = await fetch(API_BASE_URL + '/api/v1/subjects/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
