@@ -46,8 +46,6 @@
 .border-glow-card::before {
   border: 1px solid transparent;
   background:
-    linear-gradient(var(--card-bg, #120F17) 0 100%) padding-box,
-    linear-gradient(rgb(255 255 255 / 0%) 0% 100%) border-box,
     var(--gradient-one, radial-gradient(at 80% 55%, hsla(268, 100%, 76%, 1) 0px, transparent 50%)) border-box,
     var(--gradient-two, radial-gradient(at 69% 34%, hsla(349, 100%, 74%, 1) 0px, transparent 50%)) border-box,
     var(--gradient-three, radial-gradient(at 8% 6%, hsla(136, 100%, 78%, 1) 0px, transparent 50%)) border-box,
@@ -59,14 +57,18 @@
 
   opacity: calc((var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
 
-  mask-image:
+  -webkit-mask-image:
     conic-gradient(
       from var(--cursor-angle) at center,
       black calc(var(--cone-spread) * 1%),
       transparent calc((var(--cone-spread) + 15) * 1%),
       transparent calc((100 - var(--cone-spread) - 15) * 1%),
       black calc((100 - var(--cone-spread)) * 1%)
-    );
+    ),
+    linear-gradient(black 0 0);
+  -webkit-mask-clip: border-box, padding-box;
+  -webkit-mask-composite: source-out;
+  mask-composite: subtract;
 }
 
 /* colored mesh-gradient background fill near edges */

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Eye, EyeOff, User, Lock, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -11,6 +11,7 @@ import DotField from "@/components/DotField";
 import { useGoogleLogin } from '@react-oauth/google';
 import { OTPVerification } from "@/components/OTPVerification";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { useLiquidGlass } from "@/hooks/useLiquidGlass";
 import BorderGlow from "@/components/BorderGlow";
 
 const loginSchema = z.object({
@@ -22,6 +23,8 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
     const { isMobile } = useIsMobile();
+    const glassRef = useRef<HTMLDivElement>(null);
+    useLiquidGlass(glassRef);
     const [showPassword, setShowPassword] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
     const navigate = useNavigate();
@@ -161,16 +164,23 @@ const Login = () => {
               }}
             >
               <BorderGlow
-                backgroundColor="#111216"
+                backgroundColor="transparent"
                 borderRadius={24}
                 glowColor="268 100 76"
                 animated={false}
+                fillOpacity={0}
               >
-                <div style={{
-                  padding: isMobile ? '32px 24px' : '40px 32px',
-                  display: 'flex',
-                  flexDirection: 'column'
-                }}>
+                <div 
+                  ref={glassRef}
+                  style={{
+                    padding: isMobile ? '32px 24px' : '40px 32px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    borderRadius: '24px',
+                    background: 'linear-gradient(180deg, rgba(14, 14, 22, 0.18), rgba(14, 14, 22, 0.32))',
+                    boxShadow: '0 24px 60px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.5), inset 0 -8px 20px rgba(255, 255, 255, 0.06), inset 0 0 0 1px rgba(255, 255, 255, 0.13)'
+                  }}
+                >
                 {/* Logo and Titles */}
                 <div style={{ textAlign: 'center', marginBottom: '32px' }}>
                     <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
