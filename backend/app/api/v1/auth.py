@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any
 
-from app.schemas.auth import Token, RefreshTokenRequest, GoogleLoginRequest, ForgotPasswordRequest, VerifyOTPRequest, ResetPasswordRequest
+from app.schemas.auth import Token, RefreshTokenRequest, GoogleLoginRequest, ForgotPasswordRequest, VerifyOTPRequest, ResetPasswordRequest, CheckEmailRequest
 from app.schemas.user import UserCreate, UserResponse
 from app.services.auth_service import AuthService
 from app.repositories.user import user_repo
@@ -76,3 +76,13 @@ async def reset_password(
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     return await AuthService.reset_password(db, request.email, request.reset_token, request.new_password)
+
+@router.post("/check-email", status_code=status.HTTP_200_OK)
+async def check_email(
+    request: CheckEmailRequest,
+    db: AsyncSession = Depends(get_db)
+) -> Any:
+    user = await user_repo.get_by_email(db, email=request.email)
+    if not user:
+        raise BadRequestException("Invalid email")
+    return {"message": "Email exists"}

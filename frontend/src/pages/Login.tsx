@@ -31,6 +31,28 @@ const Login = () => {
     const setTokens = useAuthStore((state) => state.setTokens);
     const [activeTab, setActiveTab] = useState("password");
     
+    // Password Login Flow State
+    const [loginStep, setLoginStep] = useState<'email' | 'password'>('email');
+    const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+
+    const handleNext = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        const isValid = await trigger("email");
+        if (isValid) {
+            const email = getValues("email");
+            try {
+                setErrorMsg("");
+                setIsCheckingEmail(true);
+                await authService.checkEmail(email);
+                setLoginStep('password');
+            } catch (error: any) {
+                setErrorMsg(error.response?.data?.detail || "Invalid email. Please try again.");
+            } finally {
+                setIsCheckingEmail(false);
+            }
+        }
+    };
+    
     // Forgot Password Flow State
     const [forgotStep, setForgotStep] = useState<'email' | 'otp' | 'reset'>('email');
     const [forgotEmail, setForgotEmail] = useState("");
@@ -91,6 +113,8 @@ const Login = () => {
     const {
         register,
         handleSubmit,
+        trigger,
+        getValues,
         formState: { errors, isSubmitting },
     } = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
@@ -283,61 +307,71 @@ const Login = () => {
                             {errors.email && <p style={{ fontSize: '11px', color: '#FCA5A5', marginTop: '4px' }}>{errors.email.message}</p>}
                         </div>
 
-                        <div style={{ marginBottom: '24px' }}>
-                            <label style={{ display: 'block', fontSize: '12px', color: '#999', marginBottom: '8px' }}>Password</label>
-                            <div style={{ position: 'relative' }}>
-                                <Lock size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#666', pointerEvents: 'none' }} />
-                                <input 
-                                    type={showPassword ? "text" : "password"} 
-                                    placeholder="Enter your password" 
-                                    {...register("password")} 
-                                    style={{ 
-                                        width: '100%', 
-                                        background: '#090A0C', 
-                                        border: '1px solid rgba(255,255,255,0.08)', 
-                                        color: '#fff', 
-                                        padding: '12px 40px', 
-                                        borderRadius: '8px', 
-                                        fontSize: '13px',
-                                        outline: 'none',
-                                        transition: 'border-color 0.2s ease'
-                                    }}
-                                    onFocus={(e) => e.target.style.borderColor = 'rgba(167, 139, 250, 0.5)'}
-                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
-                                />
-                                <button 
-                                    type="button" 
-                                    onClick={() => setShowPassword(!showPassword)} 
-                                    style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: '#666', cursor: 'pointer', padding: 0, display: 'flex' }}
+                        <AnimatePresence>
+                            {loginStep === 'password' && (
+                                <motion.div 
+                                    initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                                    animate={{ opacity: 1, height: 'auto', marginBottom: '24px' }}
+                                    exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                                    style={{ overflow: 'hidden' }}
                                 >
-                                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                                </button>
-                            </div>
-                            {errors.password && <p style={{ fontSize: '11px', color: '#FCA5A5', marginTop: '4px' }}>{errors.password.message}</p>}
-                        </div>
+                                    <label style={{ display: 'block', fontSize: '12px', color: '#999', marginBottom: '8px' }}>Password</label>
+                                    <div style={{ position: 'relative' }}>
+                                        <Lock size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#666', pointerEvents: 'none' }} />
+                                        <input 
+                                            type={showPassword ? "text" : "password"} 
+                                            placeholder="Enter your password" 
+                                            {...register("password")} 
+                                            style={{ 
+                                                width: '100%', 
+                                                background: '#090A0C', 
+                                                border: '1px solid rgba(255,255,255,0.08)', 
+                                                color: '#fff', 
+                                                padding: '12px 40px', 
+                                                borderRadius: '8px', 
+                                                fontSize: '13px',
+                                                outline: 'none',
+                                                transition: 'border-color 0.2s ease'
+                                            }}
+                                            onFocus={(e) => e.target.style.borderColor = 'rgba(167, 139, 250, 0.5)'}
+                                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
+                                        />
+                                        <button 
+                                            type="button" 
+                                            onClick={() => setShowPassword(!showPassword)} 
+                                            style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: '#666', cursor: 'pointer', padding: 0, display: 'flex' }}
+                                        >
+                                            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                        </button>
+                                    </div>
+                                    {errors.password && <p style={{ fontSize: '11px', color: '#FCA5A5', marginTop: '4px' }}>{errors.password.message}</p>}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
 
                         <button 
-                            type="submit" 
-                            disabled={isSubmitting} 
+                            type={loginStep === 'email' ? "button" : "submit"} 
+                            onClick={loginStep === 'email' ? handleNext : undefined}
+                            disabled={loginStep === 'email' ? isCheckingEmail : isSubmitting}
                             style={{ 
                                 width: '100%', 
                                 padding: '12px', 
                                 borderRadius: '8px', 
-                                background: '#A78BFA', 
+                                background: (loginStep === 'email' ? isCheckingEmail : isSubmitting) ? '#8B5CF6' : '#A78BFA', 
                                 color: '#000', 
                                 fontWeight: 600, 
                                 fontSize: '14px', 
                                 border: 'none', 
-                                cursor: 'pointer',
+                                cursor: (loginStep === 'email' ? isCheckingEmail : isSubmitting) ? 'not-allowed' : 'pointer',
                                 transition: 'background 0.2s ease',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center'
                             }}
-                            onMouseOver={(e) => e.currentTarget.style.background = '#8B5CF6'}
-                            onMouseOut={(e) => e.currentTarget.style.background = '#A78BFA'}
+                            onMouseOver={(e) => { if(!(loginStep === 'email' ? isCheckingEmail : isSubmitting)) e.currentTarget.style.background = '#8B5CF6' }}
+                            onMouseOut={(e) => { if(!(loginStep === 'email' ? isCheckingEmail : isSubmitting)) e.currentTarget.style.background = '#A78BFA' }}
                         >
-                            {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : "Sign In"}
+                            {loginStep === 'email' ? (isCheckingEmail ? <Loader2 size={18} className="animate-spin" /> : "Next") : (isSubmitting ? <Loader2 size={18} className="animate-spin" /> : "Sign In")}
                         </button>
                     </form>
                 ) : (
