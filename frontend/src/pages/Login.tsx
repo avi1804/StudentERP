@@ -24,7 +24,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 const Login = () => {
     const { isMobile } = useIsMobile();
     const glassRef = useRef<HTMLDivElement>(null);
-    useLiquidGlass(glassRef as React.RefObject<any>);
+    useLiquidGlass(glassRef as React.RefObject<any>, { disabled: isMobile });
     const passwordInputRef = useRef<HTMLInputElement>(null);
     const [showPassword, setShowPassword] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
@@ -322,7 +322,8 @@ const Login = () => {
                                     initial={{ opacity: 0, height: 0, marginBottom: 0 }}
                                     animate={{ opacity: 1, height: 'auto', marginBottom: '24px' }}
                                     exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                                    style={{ overflow: 'hidden' }}
+                                    transition={{ duration: 0.35, ease: [0.25, 1, 0.5, 1] }}
+                                    style={{ overflow: 'hidden', willChange: 'height, opacity, margin-bottom', transformOrigin: 'top' }}
                                 >
                                     <label style={{ display: 'block', fontSize: '12px', color: '#999', marginBottom: '8px' }}>Password</label>
                                     <div style={{ position: 'relative' }}>

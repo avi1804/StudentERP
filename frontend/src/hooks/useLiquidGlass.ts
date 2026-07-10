@@ -140,6 +140,7 @@ export interface LiquidGlassOptions {
   saturate?: number;
   radius?: number | null;
   fallbackBlur?: number;
+  disabled?: boolean;
 }
 
 export function useLiquidGlass(ref: RefObject<HTMLElement>, options: LiquidGlassOptions = {}) {
@@ -153,7 +154,7 @@ export function useLiquidGlass(ref: RefObject<HTMLElement>, options: LiquidGlass
       ...options
     };
 
-    if (!supported) {
+    if (!supported || o.disabled) {
       const frosted = `blur(${o.fallbackBlur}px) saturate(${o.saturate})`;
       el.style.backdropFilter = frosted;
       (el.style as any).webkitBackdropFilter = frosted;
