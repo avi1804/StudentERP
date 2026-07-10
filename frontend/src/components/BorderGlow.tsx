@@ -61,6 +61,7 @@ interface BorderGlowProps {
   animated?: boolean;
   colors?: string[];
   fillOpacity?: number;
+  disabled?: boolean;
 }
 
 const BorderGlow = ({
@@ -76,7 +77,9 @@ const BorderGlow = ({
   animated = false,
   colors = ['#c084fc', '#f472b6', '#38bdf8'],
   fillOpacity = 0.5,
+  disabled = false,
 }: BorderGlowProps) => {
+
   const cardRef = useRef<HTMLDivElement>(null);
 
   const getCenterOfElement = useCallback((el: HTMLElement) => {
@@ -147,9 +150,9 @@ const BorderGlow = ({
   return (
     <div
       ref={cardRef}
-      onPointerMove={handlePointerMove}
-      className={`border-glow-card ${className}`}
-      style={{
+      onPointerMove={disabled ? undefined : handlePointerMove}
+      className={disabled ? className : `border-glow-card ${className}`}
+      style={disabled ? {} : {
         '--card-bg': backgroundColor,
         '--edge-sensitivity': edgeSensitivity,
         '--border-radius': `${borderRadius}px`,
@@ -160,8 +163,8 @@ const BorderGlow = ({
         ...buildGradientVars(colors),
       } as React.CSSProperties}
     >
-      <span className="edge-light" />
-      <div className="border-glow-inner">
+      {!disabled && <span className="edge-light" />}
+      <div className={disabled ? "" : "border-glow-inner"}>
         {children}
       </div>
     </div>

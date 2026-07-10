@@ -27,42 +27,6 @@ A complete full-stack Student Enterprise Resource Planning (ERP) system featurin
 
 ---
 
-## Project Folder Structure
-
-```text
-StudentERP/
-├── backend/                  # Python FastAPI Backend
-│   ├── alembic/              # Database Migrations
-│   ├── app/
-│   │   ├── api/v1/           # API Endpoints (Auth, Students, etc.)
-│   │   ├── core/             # JWT Security & Config settings
-│   │   ├── database/         # SQLAlchemy DB Connection (Asyncpg)
-│   │   ├── models/           # SQLAlchemy Database Models
-│   │   ├── repositories/     # CRUD Operations
-│   │   ├── schemas/          # Pydantic Validation Models
-│   │   ├── services/         # Business Logic (e.g. AuthService)
-│   │   └── main.py           # FastAPI Application Entrypoint
-│   ├── .env                  # Backend Environment Variables
-│   └── requirements.txt      # Python Dependencies
-│
-├── frontend/                 # React Frontend
-│   ├── src/
-│   │   ├── Admin/            # Admin UI Components
-│   │   ├── api/              # Axios instance with Interceptors
-│   │   ├── components/       # ProtectedRoute, AnimatedBackground, etc.
-│   │   ├── pages/            # Views (Login, Signup, Dashboard)
-│   │   ├── services/         # API Service wrappers (auth.service.ts)
-│   │   ├── store/            # Zustand Global State (authStore.ts)
-│   │   ├── types/            # TypeScript Interface definitions
-│   │   ├── App.tsx           # React Router Setup
-│   │   └── main.tsx          # React Entrypoint
-│   └── package.json          # Node Dependencies
-│
-└── README.md                 # You are here!
-```
-
----
-
 ## Startup Instructions
 
 Follow these instructions to run the project locally on any PC.

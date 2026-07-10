@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Eye, EyeOff, User, Lock, Loader2 } from "lucide-react";
+import { Eye, EyeOff, User, Lock, Loader2, Sun, Moon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -15,16 +15,56 @@ import { useLiquidGlass } from "@/hooks/useLiquidGlass";
 import BorderGlow from "@/components/BorderGlow";
 
 const loginSchema = z.object({
-  email: z.string().min(1, "Institution ID / Email is required"), // the user wants "Institution ID" visually
+  email: z.string().min(1, "Institution ID / Email is required"), 
   password: z.string().min(1, "Password is required"),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
+const LightBackground = () => (
+    <div style={{ 
+        position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, 
+        backgroundImage: 'url(/loginwhitebg.png)', 
+        backgroundSize: 'cover', 
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+    }} />
+);
+
 const Login = () => {
+    const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+        return (localStorage.getItem('erp-theme') as 'light' | 'dark') || 'light';
+    });
+
+    useEffect(() => {
+        localStorage.setItem('erp-theme', theme);
+    }, [theme]);
+
+    const isLight = theme === 'light';
+
+    // Theme variables
+    const bgBase = isLight ? '#FAFAFC' : '#0a0a12';
+    // Use the exact dark liquid glass aesthetic for the card on BOTH themes as requested
+    const cardBg = 'linear-gradient(180deg, rgba(14, 14, 22, 0.18), rgba(14, 14, 22, 0.32))';
+    const cardShadow = '0 24px 60px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.5), inset 0 -8px 20px rgba(255, 255, 255, 0.06), inset 0 0 0 1px rgba(255, 255, 255, 0.13)';
+    const cardBorder = 'none';
+    const titleColor = isLight ? '#000000' : '#fff';
+    const subColor = isLight ? '#333333' : 'rgba(245,245,247,0.65)';
+    const activeTabColor = isLight ? '#000000' : '#fff';
+    const inactiveTabColor = isLight ? '#555555' : 'rgba(255,255,255,0.4)';
+    const activeTabBg = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.09)';
+    const inputBg = isLight ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.09)';
+    const inputBorder = isLight ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.18)';
+    const inputText = isLight ? '#000000' : '#fff';
+    const primaryBtnBg = isLight ? '#ffffff' : '#f5f5f7';
+    const primaryBtnHover = isLight ? '#f3f4f6' : '#ffffff';
+    const primaryBtnText = isLight ? '#000000' : '#0a0a12';
+    const dividerColor = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)';
+
     const { isMobile } = useIsMobile();
     const glassRef = useRef<HTMLDivElement>(null);
     useLiquidGlass(glassRef as React.RefObject<any>, { disabled: isMobile });
+
     const passwordInputRef = useRef<HTMLInputElement>(null);
     const [showPassword, setShowPassword] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
@@ -71,8 +111,6 @@ const Login = () => {
     const [newPassword, setNewPassword] = useState("");
     const [isResetting, setIsResetting] = useState(false);
     
-    // Add real API call to handleSendOtp
-
     const handleSendOtp = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!forgotEmail) {
@@ -85,7 +123,6 @@ const Login = () => {
         }
         setForgotError("");
         setIsSendingOtp(true);
-        // Real API call to send OTP
         try {
             await authService.forgotPassword(forgotEmail);
             setIsSendingOtp(false);
@@ -112,7 +149,6 @@ const Login = () => {
             setForgotEmail("");
             setResetToken("");
             setNewPassword("");
-            // optionally show success toast here
         } catch (error: any) {
             setForgotError(error.response?.data?.detail || "Failed to reset password.");
             setIsResetting(false);
@@ -173,81 +209,108 @@ const Login = () => {
     };
 
     return (
-        <div style={{ minHeight: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#09090B', position: 'relative', overflow: 'hidden', fontFamily: '"Inter", sans-serif', padding: isMobile ? '24px' : '0' }}>
+        <div style={{ minHeight: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: bgBase, position: 'relative', overflow: 'hidden', fontFamily: '"Inter", sans-serif', padding: isMobile ? '24px' : '0', transition: 'background-color 0.5s ease' }}>
+            
+            {/* Theme Toggle Button */}
+            <div style={{ position: 'absolute', top: '24px', right: '24px', zIndex: 50 }}>
+                <button
+                    onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')}
+                    style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        width: '44px', height: '44px', borderRadius: '22px',
+                        background: isLight ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.1)',
+                        backdropFilter: 'blur(12px)',
+                        border: isLight ? '1px solid rgba(0, 0, 0, 0.05)' : '1px solid rgba(255, 255, 255, 0.1)',
+                        boxShadow: isLight ? '0 4px 14px rgba(0,0,0,0.05)' : 'none',
+                        color: isLight ? '#6B7280' : '#D1D5DB',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease'
+                    }}
+                    onMouseOver={(e) => {
+                        e.currentTarget.style.transform = 'scale(1.05)';
+                    }}
+                    onMouseOut={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)';
+                    }}
+                >
+                    <AnimatePresence mode="wait">
+                        {isLight ? (
+                            <motion.div key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                                <Sun size={20} color="#8B5CF6" />
+                            </motion.div>
+                        ) : (
+                            <motion.div key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                                <Moon size={20} color="#A78BFA" />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </button>
+            </div>
+
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0 }}>
-                <DotField
-                    dotRadius={1.5}
-                    dotSpacing={14}
-                    bulgeStrength={67}
-                    glowRadius={160}
-                    sparkle={true}
-                    waveAmplitude={0}
-                />
+                <AnimatePresence mode="wait">
+                    {isLight ? (
+                        <motion.div key="light-bg" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.8 }} style={{position: 'absolute', width: '100%', height: '100%'}}>
+                            <LightBackground />
+                        </motion.div>
+                    ) : (
+                        <motion.div key="dark-bg" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.8 }} style={{position: 'absolute', width: '100%', height: '100%'}}>
+                            <DotField dotRadius={1.5} dotSpacing={14} bulgeStrength={67} glowRadius={160} sparkle={true} waveAmplitude={0} />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
 
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              style={{
-                position: 'relative',
-                zIndex: 10,
-                width: '100%',
-                maxWidth: '420px',
-              }}
+              style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: '420px' }}
             >
               <BorderGlow
                 backgroundColor="transparent"
                 borderRadius={24}
-                glowColor="268 100 76"
-                animated={false}
+                glowColor={isLight ? "transparent" : "268 100 76"}
+                animated={!isLight}
                 fillOpacity={0}
+                disabled={isLight}
               >
                 <div 
                   ref={glassRef}
                   style={{
                     padding: isMobile ? '32px 24px' : '40px 32px',
-                    display: 'flex',
-                    flexDirection: 'column',
+                    display: 'flex', flexDirection: 'column',
                     borderRadius: '24px',
-                    background: 'linear-gradient(180deg, rgba(14, 14, 22, 0.18), rgba(14, 14, 22, 0.32))',
-                    boxShadow: '0 24px 60px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.5), inset 0 -8px 20px rgba(255, 255, 255, 0.06), inset 0 0 0 1px rgba(255, 255, 255, 0.13)'
+                    background: cardBg,
+                    border: cardBorder,
+                    backdropFilter: 'none',
+                    boxShadow: cardShadow,
+                    transition: 'all 0.5s ease'
                   }}
                 >
                 {/* Logo and Titles */}
                 <div style={{ textAlign: 'center', marginBottom: '32px' }}>
                     <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
-                        <img 
-                            src="/indus-logo.png" 
-                            alt="Indus University" 
-                            style={{ 
-                                height: '64px', 
-                                objectFit: 'contain'
-                            }} 
-                        />
+                        <img src="/indus-logo.png" alt="Indus University" style={{ height: '64px', objectFit: 'contain' }} />
                     </div>
                     
-                    <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#fff', margin: '0 0 8px 0', letterSpacing: '-0.01em' }}>
+                    <h1 style={{ fontSize: '24px', fontWeight: 700, color: titleColor, margin: '0 0 8px 0', letterSpacing: '-0.01em', transition: 'color 0.3s ease' }}>
                         IndusERP
                     </h1>
-                    <p style={{ fontSize: '13px', color: '#888', margin: 0 }}>
+                    <p style={{ fontSize: '13px', color: subColor, margin: 0, transition: 'color 0.3s ease' }}>
                         Sign in to your account
                     </p>
                 </div>
 
                 {/* Tabs */}
-                <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', borderBottom: `1px solid ${dividerColor}`, marginBottom: '24px', transition: 'border-color 0.3s ease' }}>
                     <div 
                         onClick={() => setActiveTab('password')}
                         style={{
-                            flex: 1, 
-                            textAlign: 'center', 
-                            padding: '10px 0', 
-                            fontSize: '13px', 
-                            cursor: 'pointer',
-                            color: activeTab === 'password' ? '#A78BFA' : '#666',
-                            borderBottom: activeTab === 'password' ? '2px solid #A78BFA' : '2px solid transparent',
-                            background: activeTab === 'password' ? 'rgba(167, 139, 250, 0.05)' : 'transparent',
+                            flex: 1, textAlign: 'center', padding: '10px 0', fontSize: '13px', cursor: 'pointer',
+                            color: activeTab === 'password' ? activeTabColor : inactiveTabColor,
+                            borderBottom: activeTab === 'password' ? `2px solid ${activeTabColor}` : '2px solid transparent',
+                            background: activeTab === 'password' ? activeTabBg : 'transparent',
                             borderRadius: '6px 6px 0 0',
                             transition: 'all 0.2s ease'
                         }}
@@ -257,14 +320,10 @@ const Login = () => {
                     <div 
                         onClick={() => { setActiveTab('forgot'); setForgotStep('email'); setForgotError(""); }}
                         style={{
-                            flex: 1, 
-                            textAlign: 'center', 
-                            padding: '10px 0', 
-                            fontSize: '13px', 
-                            cursor: 'pointer',
-                            color: activeTab === 'forgot' ? '#A78BFA' : '#666',
-                            borderBottom: activeTab === 'forgot' ? '2px solid #A78BFA' : '2px solid transparent',
-                            background: activeTab === 'forgot' ? 'rgba(167, 139, 250, 0.05)' : 'transparent',
+                            flex: 1, textAlign: 'center', padding: '10px 0', fontSize: '13px', cursor: 'pointer',
+                            color: activeTab === 'forgot' ? activeTabColor : inactiveTabColor,
+                            borderBottom: activeTab === 'forgot' ? `2px solid ${activeTabColor}` : '2px solid transparent',
+                            background: activeTab === 'forgot' ? activeTabBg : 'transparent',
                             borderRadius: '6px 6px 0 0',
                             transition: 'all 0.2s ease'
                         }}
@@ -277,13 +336,8 @@ const Login = () => {
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <AnimatePresence>
                             {errorMsg && (
-                                <motion.div 
-                                    initial={{ opacity: 0, height: 0, y: -10 }}
-                                    animate={{ opacity: 1, height: 'auto', y: 0 }}
-                                    exit={{ opacity: 0, height: 0, y: -10 }}
-                                    style={{ overflow: 'hidden', marginBottom: '20px' }}
-                                >
-                                    <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#FCA5A5', padding: '10px 14px', borderRadius: '8px', fontSize: '13px' }}>
+                                <motion.div initial={{ opacity: 0, height: 0, y: -10 }} animate={{ opacity: 1, height: 'auto', y: 0 }} exit={{ opacity: 0, height: 0, y: -10 }} style={{ overflow: 'hidden', marginBottom: '20px' }}>
+                                    <div style={{ background: isLight ? 'rgba(239, 68, 68, 0.05)' : 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#EF4444', padding: '10px 14px', borderRadius: '8px', fontSize: '13px' }}>
                                         {errorMsg}
                                     </div>
                                 </motion.div>
@@ -291,29 +345,28 @@ const Login = () => {
                         </AnimatePresence>
 
                         <div style={{ marginBottom: '20px' }}>
-                            <label style={{ display: 'block', fontSize: '12px', color: '#999', marginBottom: '8px' }}>Institution ID</label>
+                            <label style={{ display: 'block', fontSize: '12px', color: subColor, marginBottom: '8px', fontWeight: 500, transition: 'color 0.3s ease' }}>Institution ID</label>
                             <div style={{ position: 'relative' }}>
-                                <User size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#666', pointerEvents: 'none' }} />
+                                <User size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: inactiveTabColor, pointerEvents: 'none' }} />
                                 <input 
                                     type="text" 
                                     placeholder="Enter your institution ID" 
                                     {...register("email")} 
                                     style={{ 
-                                        width: '100%', 
-                                        background: '#090A0C', 
-                                        border: '1px solid rgba(255,255,255,0.08)', 
-                                        color: '#fff', 
-                                        padding: '12px 14px 12px 40px', 
-                                        borderRadius: '8px', 
-                                        fontSize: '13px',
-                                        outline: 'none',
-                                        transition: 'border-color 0.2s ease'
+                                        width: '100%', background: inputBg, border: `1px solid ${inputBorder}`, color: inputText, 
+                                        padding: '12px 14px 12px 40px', borderRadius: '8px', fontSize: '13px', outline: 'none', transition: 'all 0.2s ease'
                                     }}
-                                    onFocus={(e) => e.target.style.borderColor = 'rgba(167, 139, 250, 0.5)'}
-                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
+                                    onFocus={(e) => {
+                                        e.target.style.borderColor = activeTabColor;
+                                        e.target.style.boxShadow = `0 0 0 3px ${isLight ? 'rgba(139, 92, 246, 0.15)' : 'rgba(167, 139, 250, 0.15)'}`;
+                                    }}
+                                    onBlur={(e) => {
+                                        e.target.style.borderColor = inputBorder;
+                                        e.target.style.boxShadow = 'none';
+                                    }}
                                 />
                             </div>
-                            {errors.email && <p style={{ fontSize: '11px', color: '#FCA5A5', marginTop: '4px' }}>{errors.email.message}</p>}
+                            {errors.email && <p style={{ fontSize: '11px', color: '#EF4444', marginTop: '4px' }}>{errors.email.message}</p>}
                         </div>
 
                         <AnimatePresence>
@@ -325,40 +378,36 @@ const Login = () => {
                                     transition={{ duration: 0.35, ease: [0.25, 1, 0.5, 1] }}
                                     style={{ overflow: 'hidden', willChange: 'height, opacity, margin-bottom', transformOrigin: 'top' }}
                                 >
-                                    <label style={{ display: 'block', fontSize: '12px', color: '#999', marginBottom: '8px' }}>Password</label>
+                                    <label style={{ display: 'block', fontSize: '12px', color: subColor, marginBottom: '8px', fontWeight: 500, transition: 'color 0.3s ease' }}>Password</label>
                                     <div style={{ position: 'relative' }}>
-                                        <Lock size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#666', pointerEvents: 'none' }} />
+                                        <Lock size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: inactiveTabColor, pointerEvents: 'none' }} />
                                         <input 
                                             type={showPassword ? "text" : "password"} 
                                             placeholder="Enter your password" 
                                             {...register("password")} 
-                                            ref={(e) => {
-                                                register("password").ref(e);
-                                                passwordInputRef.current = e;
-                                            }}
+                                            ref={(e) => { register("password").ref(e); passwordInputRef.current = e; }}
                                             style={{ 
-                                                width: '100%', 
-                                                background: '#090A0C', 
-                                                border: '1px solid rgba(255,255,255,0.08)', 
-                                                color: '#fff', 
-                                                padding: '12px 40px', 
-                                                borderRadius: '8px', 
-                                                fontSize: '13px',
-                                                outline: 'none',
-                                                transition: 'border-color 0.2s ease'
+                                                width: '100%', background: inputBg, border: `1px solid ${inputBorder}`, color: inputText, 
+                                                padding: '12px 40px', borderRadius: '8px', fontSize: '13px', outline: 'none', transition: 'all 0.2s ease'
                                             }}
-                                            onFocus={(e) => e.target.style.borderColor = 'rgba(167, 139, 250, 0.5)'}
-                                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
+                                            onFocus={(e) => {
+                                                e.target.style.borderColor = activeTabColor;
+                                                e.target.style.boxShadow = `0 0 0 3px ${isLight ? 'rgba(139, 92, 246, 0.15)' : 'rgba(167, 139, 250, 0.15)'}`;
+                                            }}
+                                            onBlur={(e) => {
+                                                e.target.style.borderColor = inputBorder;
+                                                e.target.style.boxShadow = 'none';
+                                            }}
                                         />
                                         <button 
                                             type="button" 
                                             onClick={() => setShowPassword(!showPassword)} 
-                                            style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: '#666', cursor: 'pointer', padding: 0, display: 'flex' }}
+                                            style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: inactiveTabColor, cursor: 'pointer', padding: 0, display: 'flex' }}
                                         >
                                             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                         </button>
                                     </div>
-                                    {errors.password && <p style={{ fontSize: '11px', color: '#FCA5A5', marginTop: '4px' }}>{errors.password.message}</p>}
+                                    {errors.password && <p style={{ fontSize: '11px', color: '#EF4444', marginTop: '4px' }}>{errors.password.message}</p>}
                                 </motion.div>
                             )}
                         </AnimatePresence>
@@ -368,43 +417,26 @@ const Login = () => {
                             onClick={loginStep === 'email' ? handleNext : undefined}
                             disabled={loginStep === 'email' ? isCheckingEmail : isSubmitting}
                             style={{ 
-                                width: '100%', 
-                                padding: '12px', 
-                                borderRadius: '8px', 
-                                background: (loginStep === 'email' ? isCheckingEmail : isSubmitting) ? '#8B5CF6' : '#A78BFA', 
-                                color: '#000', 
-                                fontWeight: 600, 
-                                fontSize: '14px', 
-                                border: 'none', 
+                                width: '100%', padding: '12px', borderRadius: '8px', 
+                                background: (loginStep === 'email' ? isCheckingEmail : isSubmitting) ? primaryBtnHover : primaryBtnBg, 
+                                color: primaryBtnText, fontWeight: 600, fontSize: '14px', border: 'none', 
                                 cursor: (loginStep === 'email' ? isCheckingEmail : isSubmitting) ? 'not-allowed' : 'pointer',
-                                transition: 'background 0.2s ease',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
+                                transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                boxShadow: isLight ? '0 4px 12px rgba(139, 92, 246, 0.3)' : 'none'
                             }}
-                            onMouseOver={(e) => { if(!(loginStep === 'email' ? isCheckingEmail : isSubmitting)) e.currentTarget.style.background = '#8B5CF6' }}
-                            onMouseOut={(e) => { if(!(loginStep === 'email' ? isCheckingEmail : isSubmitting)) e.currentTarget.style.background = '#A78BFA' }}
+                            onMouseOver={(e) => { if(!(loginStep === 'email' ? isCheckingEmail : isSubmitting)) e.currentTarget.style.background = primaryBtnHover }}
+                            onMouseOut={(e) => { if(!(loginStep === 'email' ? isCheckingEmail : isSubmitting)) e.currentTarget.style.background = primaryBtnBg }}
                         >
                             {loginStep === 'email' ? (isCheckingEmail ? <Loader2 size={18} className="animate-spin" /> : "Next") : (isSubmitting ? <Loader2 size={18} className="animate-spin" /> : "Sign In")}
                         </button>
                     </form>
                 ) : (
                     forgotStep === 'email' ? (
-                        <motion.form 
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
-                            onSubmit={handleSendOtp}
-                        >
+                        <motion.form initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} onSubmit={handleSendOtp}>
                             <AnimatePresence>
                                 {forgotError && (
-                                    <motion.div 
-                                        initial={{ opacity: 0, height: 0, y: -10 }}
-                                        animate={{ opacity: 1, height: 'auto', y: 0 }}
-                                        exit={{ opacity: 0, height: 0, y: -10 }}
-                                        style={{ overflow: 'hidden', marginBottom: '20px' }}
-                                    >
-                                        <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#FCA5A5', padding: '10px 14px', borderRadius: '8px', fontSize: '13px' }}>
+                                    <motion.div initial={{ opacity: 0, height: 0, y: -10 }} animate={{ opacity: 1, height: 'auto', y: 0 }} exit={{ opacity: 0, height: 0, y: -10 }} style={{ overflow: 'hidden', marginBottom: '20px' }}>
+                                        <div style={{ background: isLight ? 'rgba(239, 68, 68, 0.05)' : 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#EF4444', padding: '10px 14px', borderRadius: '8px', fontSize: '13px' }}>
                                             {forgotError}
                                         </div>
                                     </motion.div>
@@ -412,89 +444,60 @@ const Login = () => {
                             </AnimatePresence>
 
                             <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                                <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#fff', margin: '0 0 8px 0', letterSpacing: '-0.01em' }}>
+                                <h2 style={{ fontSize: '20px', fontWeight: 600, color: titleColor, margin: '0 0 8px 0', letterSpacing: '-0.01em', transition: 'color 0.3s ease' }}>
                                     Reset Password
                                 </h2>
-                                <p style={{ fontSize: '13px', color: '#888', margin: 0, lineHeight: 1.5 }}>
+                                <p style={{ fontSize: '13px', color: subColor, margin: 0, lineHeight: 1.5, transition: 'color 0.3s ease' }}>
                                     Enter your registered email address and we'll send you a verification code.
                                 </p>
                             </div>
 
                             <div style={{ marginBottom: '24px' }}>
-                                <label style={{ display: 'block', fontSize: '12px', color: '#999', marginBottom: '8px' }}>Email Address</label>
+                                <label style={{ display: 'block', fontSize: '12px', color: subColor, marginBottom: '8px', fontWeight: 500, transition: 'color 0.3s ease' }}>Email Address</label>
                                 <div style={{ position: 'relative' }}>
-                                    <User size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#666', pointerEvents: 'none' }} />
+                                    <User size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: inactiveTabColor, pointerEvents: 'none' }} />
                                     <input 
-                                        type="email" 
-                                        placeholder="Enter your email" 
-                                        value={forgotEmail}
-                                        onChange={(e) => setForgotEmail(e.target.value)}
+                                        type="email" placeholder="Enter your email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)}
                                         style={{ 
-                                            width: '100%', 
-                                            background: '#090A0C', 
-                                            border: '1px solid rgba(255,255,255,0.08)', 
-                                            color: '#fff', 
-                                            padding: '12px 14px 12px 40px', 
-                                            borderRadius: '8px', 
-                                            fontSize: '13px',
-                                            outline: 'none',
-                                            transition: 'border-color 0.2s ease'
+                                            width: '100%', background: inputBg, border: `1px solid ${inputBorder}`, color: inputText, 
+                                            padding: '12px 14px 12px 40px', borderRadius: '8px', fontSize: '13px', outline: 'none', transition: 'all 0.2s ease'
                                         }}
-                                        onFocus={(e) => e.target.style.borderColor = 'rgba(167, 139, 250, 0.5)'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
+                                        onFocus={(e) => {
+                                            e.target.style.borderColor = activeTabColor;
+                                            e.target.style.boxShadow = `0 0 0 3px ${isLight ? 'rgba(139, 92, 246, 0.15)' : 'rgba(167, 139, 250, 0.15)'}`;
+                                        }}
+                                        onBlur={(e) => {
+                                            e.target.style.borderColor = inputBorder;
+                                            e.target.style.boxShadow = 'none';
+                                        }}
                                     />
                                 </div>
                             </div>
 
                             <button 
-                                type="submit" 
-                                disabled={isSendingOtp} 
+                                type="submit" disabled={isSendingOtp} 
                                 style={{ 
-                                    width: '100%', 
-                                    padding: '12px', 
-                                    borderRadius: '8px', 
-                                    background: isSendingOtp ? '#8B5CF6' : '#A78BFA', 
-                                    color: '#000', 
-                                    fontWeight: 600, 
-                                    fontSize: '14px', 
-                                    border: 'none', 
-                                    cursor: isSendingOtp ? 'not-allowed' : 'pointer',
-                                    transition: 'background 0.2s ease',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
+                                    width: '100%', padding: '12px', borderRadius: '8px', 
+                                    background: isSendingOtp ? primaryBtnHover : primaryBtnBg, 
+                                    color: primaryBtnText, fontWeight: 600, fontSize: '14px', border: 'none', 
+                                    cursor: isSendingOtp ? 'not-allowed' : 'pointer', transition: 'all 0.2s ease', 
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    boxShadow: isLight ? '0 4px 12px rgba(139, 92, 246, 0.3)' : 'none'
                                 }}
-                                onMouseOver={(e) => { if(!isSendingOtp) e.currentTarget.style.background = '#8B5CF6' }}
-                                onMouseOut={(e) => { if(!isSendingOtp) e.currentTarget.style.background = '#A78BFA' }}
+                                onMouseOver={(e) => { if(!isSendingOtp) e.currentTarget.style.background = primaryBtnHover }}
+                                onMouseOut={(e) => { if(!isSendingOtp) e.currentTarget.style.background = primaryBtnBg }}
                             >
                                 {isSendingOtp ? <Loader2 size={18} className="animate-spin" /> : "Send OTP"}
                             </button>
                         </motion.form>
                     ) : forgotStep === 'otp' ? (
-                        <OTPVerification 
-                            email={forgotEmail}
-                            onBack={() => setForgotStep('email')} 
-                            onSuccess={(token) => {
-                                setResetToken(token);
-                                setForgotStep('reset');
-                            }}
-                        />
+                        <OTPVerification email={forgotEmail} onBack={() => setForgotStep('email')} onSuccess={(token) => { setResetToken(token); setForgotStep('reset'); }} />
                     ) : (
-                        <motion.form 
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
-                            onSubmit={handleResetPassword}
-                        >
+                        <motion.form initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} onSubmit={handleResetPassword}>
                             <AnimatePresence>
                                 {forgotError && (
-                                    <motion.div 
-                                        initial={{ opacity: 0, height: 0, y: -10 }}
-                                        animate={{ opacity: 1, height: 'auto', y: 0 }}
-                                        exit={{ opacity: 0, height: 0, y: -10 }}
-                                        style={{ overflow: 'hidden', marginBottom: '20px' }}
-                                    >
-                                        <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#FCA5A5', padding: '10px 14px', borderRadius: '8px', fontSize: '13px' }}>
+                                    <motion.div initial={{ opacity: 0, height: 0, y: -10 }} animate={{ opacity: 1, height: 'auto', y: 0 }} exit={{ opacity: 0, height: 0, y: -10 }} style={{ overflow: 'hidden', marginBottom: '20px' }}>
+                                        <div style={{ background: isLight ? 'rgba(239, 68, 68, 0.05)' : 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#EF4444', padding: '10px 14px', borderRadius: '8px', fontSize: '13px' }}>
                                             {forgotError}
                                         </div>
                                     </motion.div>
@@ -502,41 +505,36 @@ const Login = () => {
                             </AnimatePresence>
 
                             <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                                <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#fff', margin: '0 0 8px 0', letterSpacing: '-0.01em' }}>
+                                <h2 style={{ fontSize: '20px', fontWeight: 600, color: titleColor, margin: '0 0 8px 0', letterSpacing: '-0.01em', transition: 'color 0.3s ease' }}>
                                     Create New Password
                                 </h2>
-                                <p style={{ fontSize: '13px', color: '#888', margin: 0, lineHeight: 1.5 }}>
+                                <p style={{ fontSize: '13px', color: subColor, margin: 0, lineHeight: 1.5, transition: 'color 0.3s ease' }}>
                                     Your OTP was verified. Please enter your new password below.
                                 </p>
                             </div>
 
                             <div style={{ marginBottom: '24px' }}>
-                                <label style={{ display: 'block', fontSize: '12px', color: '#999', marginBottom: '8px' }}>New Password</label>
+                                <label style={{ display: 'block', fontSize: '12px', color: subColor, marginBottom: '8px', fontWeight: 500, transition: 'color 0.3s ease' }}>New Password</label>
                                 <div style={{ position: 'relative' }}>
-                                    <Lock size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#666', pointerEvents: 'none' }} />
+                                    <Lock size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: inactiveTabColor, pointerEvents: 'none' }} />
                                     <input 
-                                        type={showPassword ? "text" : "password"}
-                                        placeholder="Enter new password" 
-                                        value={newPassword}
-                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        type={showPassword ? "text" : "password"} placeholder="Enter new password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)}
                                         style={{ 
-                                            width: '100%', 
-                                            background: '#090A0C', 
-                                            border: '1px solid rgba(255,255,255,0.08)', 
-                                            color: '#fff', 
-                                            padding: '12px 40px', 
-                                            borderRadius: '8px', 
-                                            fontSize: '13px',
-                                            outline: 'none',
-                                            transition: 'border-color 0.2s ease'
+                                            width: '100%', background: inputBg, border: `1px solid ${inputBorder}`, color: inputText, 
+                                            padding: '12px 40px', borderRadius: '8px', fontSize: '13px', outline: 'none', transition: 'all 0.2s ease'
                                         }}
-                                        onFocus={(e) => e.target.style.borderColor = 'rgba(167, 139, 250, 0.5)'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
+                                        onFocus={(e) => {
+                                            e.target.style.borderColor = activeTabColor;
+                                            e.target.style.boxShadow = `0 0 0 3px ${isLight ? 'rgba(139, 92, 246, 0.15)' : 'rgba(167, 139, 250, 0.15)'}`;
+                                        }}
+                                        onBlur={(e) => {
+                                            e.target.style.borderColor = inputBorder;
+                                            e.target.style.boxShadow = 'none';
+                                        }}
                                     />
                                     <button 
-                                        type="button" 
-                                        onClick={() => setShowPassword(!showPassword)} 
-                                        style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: '#666', cursor: 'pointer', padding: 0, display: 'flex' }}
+                                        type="button" onClick={() => setShowPassword(!showPassword)} 
+                                        style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: inactiveTabColor, cursor: 'pointer', padding: 0, display: 'flex' }}
                                     >
                                         {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                     </button>
@@ -544,25 +542,15 @@ const Login = () => {
                             </div>
 
                             <button 
-                                type="submit" 
-                                disabled={isResetting} 
+                                type="submit" disabled={isResetting} 
                                 style={{ 
-                                    width: '100%', 
-                                    padding: '12px', 
-                                    borderRadius: '8px', 
-                                    background: isResetting ? '#8B5CF6' : '#A78BFA', 
-                                    color: '#000', 
-                                    fontWeight: 600, 
-                                    fontSize: '14px', 
-                                    border: 'none', 
-                                    cursor: isResetting ? 'not-allowed' : 'pointer',
-                                    transition: 'background 0.2s ease',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
+                                    width: '100%', padding: '12px', borderRadius: '8px', 
+                                    background: isResetting ? primaryBtnHover : primaryBtnBg, color: primaryBtnText, fontWeight: 600, fontSize: '14px', border: 'none', 
+                                    cursor: isResetting ? 'not-allowed' : 'pointer', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    boxShadow: isLight ? '0 4px 12px rgba(139, 92, 246, 0.3)' : 'none'
                                 }}
-                                onMouseOver={(e) => { if(!isResetting) e.currentTarget.style.background = '#8B5CF6' }}
-                                onMouseOut={(e) => { if(!isResetting) e.currentTarget.style.background = '#A78BFA' }}
+                                onMouseOver={(e) => { if(!isResetting) e.currentTarget.style.background = primaryBtnHover }}
+                                onMouseOut={(e) => { if(!isResetting) e.currentTarget.style.background = primaryBtnBg }}
                             >
                                 {isResetting ? <Loader2 size={18} className="animate-spin" /> : "Reset Password"}
                             </button>
@@ -572,32 +560,25 @@ const Login = () => {
 
                 {/* Google Sign In Divider */}
                 <div style={{ display: 'flex', alignItems: 'center', margin: '24px 0' }}>
-                    <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.05)' }}></div>
-                    <span style={{ margin: '0 12px', fontSize: '12px', color: '#666' }}>or continue with</span>
-                    <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.05)' }}></div>
+                    <div style={{ flex: 1, height: '1px', background: dividerColor, transition: 'background 0.3s ease' }}></div>
+                    <span style={{ margin: '0 12px', fontSize: '12px', color: inactiveTabColor, transition: 'color 0.3s ease' }}>or continue with</span>
+                    <div style={{ flex: 1, height: '1px', background: dividerColor, transition: 'background 0.3s ease' }}></div>
                 </div>
 
                 <button 
-                    type="button" 
-                    onClick={() => googleLogin()}
+                    type="button" onClick={() => googleLogin()}
                     style={{ 
-                        width: '100%', 
-                        padding: '12px', 
-                        borderRadius: '8px', 
-                        background: 'transparent', 
-                        border: '1px solid rgba(255,255,255,0.08)',
-                        color: '#ddd', 
-                        fontWeight: 500, 
-                        fontSize: '13px', 
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '10px',
-                        transition: 'background 0.2s ease'
+                        width: '100%', padding: '12px', borderRadius: '8px', background: isLight ? '#FFFFFF' : 'transparent', 
+                        border: `1px solid ${inputBorder}`, color: isLight ? '#4B5563' : '#ddd', fontWeight: 500, fontSize: '13px', 
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', transition: 'all 0.2s ease',
+                        boxShadow: isLight ? '0 1px 2px rgba(0,0,0,0.05)' : 'none'
                     }}
-                    onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
-                    onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                    onMouseOver={(e) => {
+                        e.currentTarget.style.background = isLight ? '#F9FAFB' : 'rgba(255,255,255,0.02)';
+                    }}
+                    onMouseOut={(e) => {
+                        e.currentTarget.style.background = isLight ? '#FFFFFF' : 'transparent';
+                    }}
                 >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
