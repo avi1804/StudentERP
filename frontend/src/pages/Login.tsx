@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Eye, EyeOff, User, Lock, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -24,7 +24,8 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 const Login = () => {
     const { isMobile } = useIsMobile();
     const glassRef = useRef<HTMLDivElement>(null);
-    useLiquidGlass(glassRef);
+    useLiquidGlass(glassRef as React.RefObject<any>);
+    const passwordInputRef = useRef<HTMLInputElement>(null);
     const [showPassword, setShowPassword] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
     const navigate = useNavigate();
@@ -34,6 +35,14 @@ const Login = () => {
     // Password Login Flow State
     const [loginStep, setLoginStep] = useState<'email' | 'password'>('email');
     const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+
+    useEffect(() => {
+        if (loginStep === 'password' && passwordInputRef.current) {
+            setTimeout(() => {
+                passwordInputRef.current?.focus();
+            }, 100);
+        }
+    }, [loginStep]);
 
     const handleNext = async (e: React.MouseEvent) => {
         e.preventDefault();
@@ -322,6 +331,10 @@ const Login = () => {
                                             type={showPassword ? "text" : "password"} 
                                             placeholder="Enter your password" 
                                             {...register("password")} 
+                                            ref={(e) => {
+                                                register("password").ref(e);
+                                                passwordInputRef.current = e;
+                                            }}
                                             style={{ 
                                                 width: '100%', 
                                                 background: '#090A0C', 
