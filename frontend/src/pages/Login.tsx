@@ -12,7 +12,6 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { OTPVerification } from "@/components/OTPVerification";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useLiquidGlass } from "@/hooks/useLiquidGlass";
-import BorderGlow from "@/components/BorderGlow";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Institution ID / Email is required"), 
@@ -267,14 +266,6 @@ const Login = () => {
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: '420px' }}
             >
-              <BorderGlow
-                backgroundColor="transparent"
-                borderRadius={24}
-                glowColor={isLight ? "transparent" : "268 100 76"}
-                animated={!isLight}
-                fillOpacity={0}
-                disabled={isLight}
-              >
                 <div 
                   ref={glassRef}
                   style={{
@@ -589,7 +580,6 @@ const Login = () => {
                     Sign in with Google
                 </button>
                 </div>
-              </BorderGlow>
             </motion.div>
         </div>
     );
