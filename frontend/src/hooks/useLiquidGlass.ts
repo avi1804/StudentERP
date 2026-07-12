@@ -1,4 +1,4 @@
-import { useEffect, RefObject } from 'react';
+import { useEffect, type RefObject } from 'react';
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 let uid = 0;

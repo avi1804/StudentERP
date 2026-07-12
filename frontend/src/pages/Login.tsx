@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Eye, EyeOff, User, Lock, Loader2, Sun, Moon } from "lucide-react";
+import { Eye, EyeOff, User, Lock, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { authService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/authStore";
 import { motion, AnimatePresence } from "framer-motion";
-import DotField from "@/components/DotField";
 import { useGoogleLogin } from '@react-oauth/google';
 import { OTPVerification } from "@/components/OTPVerification";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -20,45 +19,25 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-const LightBackground = () => (
-    <div style={{ 
-        position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, 
-        backgroundImage: 'url(/loginwhitebg.png)', 
-        backgroundSize: 'cover', 
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-    }} />
-);
-
 const Login = () => {
-    const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-        return (localStorage.getItem('erp-theme') as 'light' | 'dark') || 'light';
-    });
-
-    useEffect(() => {
-        localStorage.setItem('erp-theme', theme);
-    }, [theme]);
-
-    const isLight = theme === 'light';
-
-    // Theme variables
-    const bgBase = isLight ? '#FAFAFC' : '#0a0a12';
-    // Use the exact dark liquid glass aesthetic for the card on BOTH themes as requested
+    const isLight = false;
+    // Theme variables (dark mode fixed)
+    const bgBase = '#0a0a12';
     const cardBg = 'linear-gradient(180deg, rgba(14, 14, 22, 0.18), rgba(14, 14, 22, 0.32))';
     const cardShadow = '0 24px 60px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.5), inset 0 -8px 20px rgba(255, 255, 255, 0.06), inset 0 0 0 1px rgba(255, 255, 255, 0.13)';
     const cardBorder = 'none';
-    const titleColor = isLight ? '#000000' : '#fff';
-    const subColor = isLight ? '#333333' : 'rgba(245,245,247,0.65)';
-    const activeTabColor = isLight ? '#000000' : '#fff';
-    const inactiveTabColor = isLight ? '#555555' : 'rgba(255,255,255,0.4)';
-    const activeTabBg = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.09)';
-    const inputBg = isLight ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.09)';
-    const inputBorder = isLight ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.18)';
-    const inputText = isLight ? '#000000' : '#fff';
-    const primaryBtnBg = isLight ? '#ffffff' : '#f5f5f7';
-    const primaryBtnHover = isLight ? '#f3f4f6' : '#ffffff';
-    const primaryBtnText = isLight ? '#000000' : '#0a0a12';
-    const dividerColor = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)';
+    const titleColor = '#fff';
+    const subColor = 'rgba(245,245,247,0.65)';
+    const activeTabColor = '#fff';
+    const inactiveTabColor = 'rgba(255,255,255,0.4)';
+    const activeTabBg = 'rgba(255,255,255,0.09)';
+    const inputBg = 'rgba(255,255,255,0.09)';
+    const inputBorder = 'rgba(255,255,255,0.18)';
+    const inputText = '#fff';
+    const primaryBtnBg = '#f5f5f7';
+    const primaryBtnHover = '#ffffff';
+    const primaryBtnText = '#0a0a12';
+    const dividerColor = 'rgba(255,255,255,0.1)';
 
     const { isMobile } = useIsMobile();
     const glassRef = useRef<HTMLDivElement>(null);
@@ -208,57 +187,9 @@ const Login = () => {
     };
 
     return (
-        <div style={{ minHeight: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: bgBase, position: 'relative', overflow: 'hidden', fontFamily: '"Inter", sans-serif', padding: isMobile ? '24px' : '0', transition: 'background-color 0.5s ease' }}>
-            
-            {/* Theme Toggle Button */}
-            <div style={{ position: 'absolute', top: '24px', right: '24px', zIndex: 50 }}>
-                <button
-                    onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')}
-                    style={{
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        width: '44px', height: '44px', borderRadius: '22px',
-                        background: isLight ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.1)',
-                        backdropFilter: 'blur(12px)',
-                        border: isLight ? '1px solid rgba(0, 0, 0, 0.05)' : '1px solid rgba(255, 255, 255, 0.1)',
-                        boxShadow: isLight ? '0 4px 14px rgba(0,0,0,0.05)' : 'none',
-                        color: isLight ? '#6B7280' : '#D1D5DB',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease'
-                    }}
-                    onMouseOver={(e) => {
-                        e.currentTarget.style.transform = 'scale(1.05)';
-                    }}
-                    onMouseOut={(e) => {
-                        e.currentTarget.style.transform = 'scale(1)';
-                    }}
-                >
-                    <AnimatePresence mode="wait">
-                        {isLight ? (
-                            <motion.div key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                                <Sun size={20} color="#8B5CF6" />
-                            </motion.div>
-                        ) : (
-                            <motion.div key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                                <Moon size={20} color="#A78BFA" />
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </button>
-            </div>
-
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0 }}>
-                <AnimatePresence mode="wait">
-                    {isLight ? (
-                        <motion.div key="light-bg" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.8 }} style={{position: 'absolute', width: '100%', height: '100%'}}>
-                            <LightBackground />
-                        </motion.div>
-                    ) : (
-                        <motion.div key="dark-bg" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.8 }} style={{position: 'absolute', width: '100%', height: '100%'}}>
-                            <DotField dotRadius={1.5} dotSpacing={14} bulgeStrength={67} glowRadius={160} sparkle={true} waveAmplitude={0} />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
+        <div style={{ minHeight: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: bgBase, backgroundImage: "url('https://picsum.photos/1920/1080?random=1')", backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative', overflow: 'hidden', fontFamily: '"Inter", sans-serif', padding: isMobile ? '24px' : '0', transition: 'background-color 0.5s ease' }}>
+            {/* Overlay for readability */}
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(10, 10, 18, 0.85)', zIndex: 0, backdropFilter: 'blur(4px)' }} />
 
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
