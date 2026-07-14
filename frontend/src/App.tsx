@@ -76,13 +76,12 @@ function App() {
               </Route> 
             </Route>
 
-            <Route element={<ProtectedRoute allowedRoles={['student']} />}>
-              <Route path="/dashboard" element={<StudentLayout />}>
-                <Route index element={<StudentHome />} />
-                <Route path="attendance" element={<MyAttendance />} />
-                <Route path="results" element={<MyResults />} />
-                <Route path="profile" element={<MyProfile />} />
-              </Route>
+            {/* Student Routes (Visible without login) */}
+            <Route path="/dashboard" element={<StudentLayout />}>
+              <Route index element={<StudentHome />} />
+              <Route path="attendance" element={<MyAttendance />} />
+              <Route path="results" element={<MyResults />} />
+              <Route path="profile" element={<MyProfile />} />
             </Route>
             
             {/* Faculty Routes */}
