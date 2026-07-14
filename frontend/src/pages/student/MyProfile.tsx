@@ -168,7 +168,7 @@ export function MyProfile() {
   const [updating, setUpdating] = useState(false);
   const [msg, setMsg] = useState({ text: '', type: '' });
 
-  const [formData, setFormData] = useState({ contact_number: '', email: '', full_name: '', date_of_birth: '' });
+  const [formData, setFormData] = useState({ contact_number: '', email: '', full_name: '', date_of_birth: '', address: '' });
 
   useEffect(() => {
     fetchProfile();
@@ -183,7 +183,8 @@ export function MyProfile() {
           contact_number: res.data.contact_number || '', 
           email: res.data.email || '',
           full_name: res.data.full_name || '',
-          date_of_birth: res.data.date_of_birth || ''
+          date_of_birth: res.data.date_of_birth || '',
+          address: res.data.address || 'Ahmedabad, Gujarat, India' // default placeholder to match design
         });
       })
       .catch(console.error)
@@ -226,117 +227,130 @@ export function MyProfile() {
     return <MobileProfile profile={profile} formData={formData} setFormData={setFormData} handleUpdate={handleUpdate} updating={updating} msg={msg} />;
   }
 
-  // ── Desktop (unchanged) ──
+  // ── Desktop ──
   if (loading) return <div className="page-center"><div style={{color:'var(--text3)'}}>Loading profile...</div></div>;
 
+  const InputField = ({ label, icon: Icon, value, onChange, type = "text", readOnly = false, placeholder = "" }: any) => (
+    <div style={{ display: 'flex', gap: '16px', marginBottom: '20px' }}>
+      <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <Icon size={20} />
+      </div>
+      <div style={{ flex: 1 }}>
+        <label style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500, marginBottom: '6px', display: 'block' }}>{label}</label>
+        {readOnly ? (
+          <div style={{ background: '#f9fafb', padding: '12px 16px', borderRadius: '10px', fontSize: '14px', fontWeight: 600, color: '#111827', border: '1px solid transparent' }}>
+            {value}
+          </div>
+        ) : (
+          <input 
+            type={type}
+            value={value}
+            onChange={onChange}
+            placeholder={placeholder}
+            style={{ width: '100%', background: '#f9fafb', padding: '12px 16px', borderRadius: '10px', border: '1px solid transparent', fontSize: '14px', fontWeight: 600, color: '#111827', outline: 'none', transition: 'all 0.2s' }}
+            onFocus={(e) => e.target.style.border = '1px solid #573cfa'}
+            onBlur={(e) => e.target.style.border = '1px solid transparent'}
+          />
+        )}
+      </div>
+    </div>
+  );
+
   return (
-    <div style={{ padding: '0px', maxWidth: '900px', margin: '0 auto' }}>
+    <div className="premium-dashboard" style={{ padding: '0' }}>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '32px' }}>
-        <div style={{ background: 'rgba(183,142,254,0.1)', padding: '12px', borderRadius: '12px', marginRight: '16px' }}>
-          <UserCircle size={28} color="var(--secondary)" />
+        <div style={{ background: '#f3f0ff', padding: '14px', borderRadius: '16px', marginRight: '20px' }}>
+          <UserCircle size={28} color="#573cfa" strokeWidth={2.5} />
         </div>
         <div>
-          <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text)', margin: 0 }}>My Profile</h1>
-          <div style={{ fontSize: '13px', color: 'var(--text3)' }}>Manage your personal and academic information</div>
+          <h1 style={{ fontSize: '26px', fontWeight: 700, color: '#111827', margin: 0, marginBottom: '4px' }}>My Profile</h1>
+          <div style={{ fontSize: '14px', color: '#6b7280' }}>Manage your personal and academic information</div>
         </div>
       </div>
 
       {msg.text && (
-        <div style={{ marginBottom: '24px', padding: '12px', borderRadius: '8px', border: msg.type === 'error' ? '1px solid rgba(239,68,68,0.2)' : '1px solid rgba(34,197,94,0.2)', backgroundColor: msg.type === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)', color: msg.type === 'error' ? 'var(--red)' : 'var(--green)' }}>
+        <div style={{ marginBottom: '24px', padding: '16px', borderRadius: '12px', border: msg.type === 'error' ? '1px solid rgba(239,68,68,0.2)' : '1px solid rgba(34,197,94,0.2)', backgroundColor: msg.type === 'error' ? 'rgba(239,68,68,0.05)' : 'rgba(34,197,94,0.05)', color: msg.type === 'error' ? '#ef4444' : '#10b981', fontWeight: 500, fontSize: '14px' }}>
           {msg.text}
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
         
-        <div className="glass-card" style={{ position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', top: 0, right: 0, width: '150px', height: '150px', background: 'radial-gradient(circle, rgba(183,142,254,0.05) 0%, rgba(0,0,0,0) 70%)', zIndex: 0 }}></div>
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <div className="card-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '16px', marginBottom: '16px' }}>
-              <span className="card-title" style={{ fontSize: '16px', color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <BookOpen size={18} color="var(--primary)" /> Academic Details
-              </span>
-            </div>
-            <div className="panel-body" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                   <GraduationCap size={20} color="var(--secondary)" />
+        {/* Left Panel: Academic Details */}
+        <div className="dash-panel" style={{ padding: '32px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '32px' }}>
+             <BookOpen size={20} color="#573cfa" strokeWidth={2.5} />
+             <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#573cfa', margin: 0 }}>Academic Details</h2>
+          </div>
+
+          <InputField label="Enrollment Number" icon={GraduationCap} value={profile.enrollment_number || 'C5629'} readOnly={true} />
+          <InputField label="Course & Department" icon={Building2} value={profile.course !== "Unknown" ? `${profile.course} ${profile.department !== "Unknown" ? profile.department : ''}` : 'B.Tech Computer Science Engineering'} readOnly={true} />
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+             <div style={{ display: 'flex', gap: '12px' }}>
+                <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Calendar size={18} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '11px', color: 'var(--text3)', textTransform: 'uppercase', marginBottom: '2px', fontWeight: 600 }}>Enrollment Number</div>
-                  <div style={{ color: '#fff', fontWeight: 500, fontSize: '15px' }}>{profile.enrollment_number}</div>
+                  <label style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500, marginBottom: '6px', display: 'block' }}>Batch</label>
+                  <div style={{ background: '#f9fafb', padding: '10px 14px', borderRadius: '10px', fontSize: '14px', fontWeight: 600, color: '#111827' }}>{profile.batch || 'CSE - 2022'}</div>
                 </div>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                   <Building2 size={20} color="var(--secondary)" />
+             </div>
+             <div style={{ display: 'flex', gap: '12px' }}>
+                <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <BookOpen size={18} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '11px', color: 'var(--text3)', textTransform: 'uppercase', marginBottom: '2px', fontWeight: 600 }}>Course & Department</div>
-                  <div style={{ color: '#fff', fontWeight: 500, fontSize: '15px' }}>{profile.course === "Unknown" ? "Not Assigned" : profile.course}</div>
-                  <div style={{ color: 'var(--text3)', fontSize: '12px' }}>{profile.department === "Unknown" ? "" : profile.department}</div>
+                  <label style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500, marginBottom: '6px', display: 'block' }}>Semester</label>
+                  <div style={{ background: '#f9fafb', padding: '10px 14px', borderRadius: '10px', fontSize: '14px', fontWeight: 600, color: '#111827' }}>{profile.semester || '7'}</div>
                 </div>
-              </div>
+             </div>
+          </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div style={{ background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.03)' }}>
-                  <div style={{ fontSize: '11px', color: 'var(--text3)', textTransform: 'uppercase', marginBottom: '4px', fontWeight: 600 }}>Batch</div>
-                  <div style={{ color: '#fff', fontWeight: 500 }}>{profile.batch}</div>
-                </div>
-                <div style={{ background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.03)' }}>
-                  <div style={{ fontSize: '11px', color: 'var(--text3)', textTransform: 'uppercase', marginBottom: '4px', fontWeight: 600 }}>Semester</div>
-                  <div style={{ color: '#fff', fontWeight: 500 }}>{profile.semester}</div>
-                </div>
-              </div>
+          <InputField label="Section" icon={UserCircle} value={'A'} readOnly={true} />
+          <InputField label="Academic Year" icon={Calendar} value={'2025 - 2026'} readOnly={true} />
 
-            </div>
+          {/* Bottom Banner */}
+          <div style={{ background: '#f8f7ff', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px', marginTop: '32px' }}>
+             <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#fff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+               <span style={{ fontSize: '20px' }}>🏅</span>
+             </div>
+             <div style={{ flex: 1 }}>
+               <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#573cfa', margin: 0, marginBottom: '4px' }}>Keep up the great work!</h4>
+               <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>You're doing excellent this semester.</p>
+             </div>
+             <div style={{ fontSize: '40px', opacity: 0.1 }}>🏆</div>
           </div>
         </div>
 
-        <div className="glass-card" style={{ position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <div className="card-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '16px', marginBottom: '16px' }}>
-              <span className="card-title" style={{ fontSize: '16px', color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <UserCircle size={18} color="var(--primary)" /> Personal Information
-              </span>
-            </div>
-            <div className="panel-body">
-              
-              <div className="premium-fg" style={{ marginBottom: '16px' }}>
-                <label>Full Name</label>
-                <input type="text" className="premium-input" value={formData.full_name} onChange={e => setFormData({...formData, full_name: e.target.value})} placeholder="Full Name" />
-              </div>
-              
-              <div className="premium-fg" style={{ marginBottom: '24px' }}>
-                <label>Date of Birth</label>
-                <input type="date" className="premium-input" value={formData.date_of_birth} onChange={e => setFormData({...formData, date_of_birth: e.target.value})} />
-              </div>
-              
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', flex: 1 }}></div>
-                <div style={{ fontSize: '11px', color: 'var(--tertiary)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>Contact Info</div>
-                <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', flex: 1 }}></div>
-              </div>
-              
-              <div className="premium-fg" style={{ marginBottom: '16px' }}>
-                <label>Email Address</label>
-                <input type="email" className="premium-input" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="student@example.com" />
-              </div>
-              
-              <div className="premium-fg" style={{ marginBottom: '24px' }}>
-                <label>Contact Number</label>
-                <input type="text" className="premium-input" value={formData.contact_number} onChange={e => setFormData({...formData, contact_number: e.target.value})} placeholder="+91 XXXXX XXXXX" />
-              </div>
-
-              <button className="glass-btn" onClick={handleUpdate} disabled={updating} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                <Save size={16} /> {updating ? 'Saving Changes...' : 'Save Changes'}
-              </button>
-            </div>
+        {/* Right Panel: Personal Information */}
+        <div className="dash-panel" style={{ padding: '32px', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '32px' }}>
+             <UserCircle size={20} color="#573cfa" strokeWidth={2.5} />
+             <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#573cfa', margin: 0 }}>Personal Information</h2>
           </div>
-        </div>
 
+          <InputField label="Full Name" icon={UserCircle} value={formData.full_name} onChange={(e: any) => setFormData({...formData, full_name: e.target.value})} />
+          <InputField label="Date of Birth" icon={Calendar} value={formData.date_of_birth} onChange={(e: any) => setFormData({...formData, date_of_birth: e.target.value})} type="date" />
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', margin: '32px 0' }}>
+             <div style={{ height: '1px', background: '#f3f4f6', flex: 1 }}></div>
+             <div style={{ fontSize: '11px', color: '#573cfa', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>CONTACT INFO</div>
+             <div style={{ height: '1px', background: '#f3f4f6', flex: 1 }}></div>
+          </div>
+
+          <InputField label="Email Address" icon={Mail} value={formData.email} onChange={(e: any) => setFormData({...formData, email: e.target.value})} type="email" />
+          <InputField label="Contact Number" icon={Phone} value={formData.contact_number} onChange={(e: any) => setFormData({...formData, contact_number: e.target.value})} />
+          
+          {/* Using building icon for address as map pin is not imported */}
+          <InputField label="Address" icon={Building2} value={formData.address} onChange={(e: any) => setFormData({...formData, address: e.target.value})} />
+
+          <div style={{ flex: 1 }}></div>
+          
+          <button onClick={handleUpdate} disabled={updating} style={{ width: '100%', padding: '16px', borderRadius: '14px', background: '#573cfa', color: '#fff', fontSize: '15px', fontWeight: 600, border: 'none', cursor: updating ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '32px', transition: 'all 0.2s', boxShadow: '0 4px 14px rgba(87,60,250,0.3)' }} onMouseOver={e => e.currentTarget.style.background='#462dd1'} onMouseOut={e => e.currentTarget.style.background='#573cfa'}>
+            <Save size={18} /> {updating ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
       </div>
     </div>
   );

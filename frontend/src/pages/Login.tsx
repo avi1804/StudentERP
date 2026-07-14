@@ -187,7 +187,7 @@ const Login = () => {
     };
 
     return (
-        <div style={{ minHeight: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: bgBase, backgroundImage: "url('https://picsum.photos/1920/1080?random=1')", backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative', overflow: 'hidden', fontFamily: '"Inter", sans-serif', padding: isMobile ? '24px' : '0', transition: 'background-color 0.5s ease' }}>
+        <div style={{ minHeight: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: bgBase, backgroundImage: "url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')", backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative', overflow: 'hidden', fontFamily: '"Inter", sans-serif', padding: isMobile ? '24px' : '0', transition: 'background-color 0.5s ease' }}>
             {/* Overlay for readability */}
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(10, 10, 18, 0.85)', zIndex: 0, backdropFilter: 'blur(4px)' }} />
 
