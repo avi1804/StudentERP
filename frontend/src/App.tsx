@@ -11,6 +11,7 @@ const StudentLayout = React.lazy(() => import("./pages/student/StudentLayout").t
 const StudentHome = React.lazy(() => import("./pages/student/StudentHome").then(m => ({ default: m.StudentHome })));
 const MyAttendance = React.lazy(() => import("./pages/student/MyAttendance").then(m => ({ default: m.MyAttendance })));
 const MyResults = React.lazy(() => import("./pages/student/MyResults").then(m => ({ default: m.MyResults })));
+const MySubjects = React.lazy(() => import("./pages/student/MySubjects").then(m => ({ default: m.MySubjects })));
 const MyProfile = React.lazy(() => import("./pages/student/MyProfile").then(m => ({ default: m.MyProfile })));
 // Lazy Loaded Admin Dashboard Pages
 const AdminLayout = React.lazy(() => import("./pages/admin/AdminDashboard/AdminLayout").then(m => ({ default: m.AdminLayout })));
@@ -81,6 +82,7 @@ function App() {
               <Route index element={<StudentHome />} />
               <Route path="attendance" element={<MyAttendance />} />
               <Route path="results" element={<MyResults />} />
+              <Route path="subjects" element={<MySubjects />} />
               <Route path="profile" element={<MyProfile />} />
             </Route>
             

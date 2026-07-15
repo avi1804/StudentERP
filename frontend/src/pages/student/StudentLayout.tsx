@@ -55,9 +55,6 @@ export function StudentLayout() {
     { name: "Complaints", path: "/dashboard/complaints", icon: Megaphone },
     { name: "ID Card", path: "/dashboard/idcard", icon: IdCard },
     { name: "Notices", path: "/dashboard/notices", icon: Bell },
-    { name: "Library", path: "/dashboard/library", icon: Book },
-    { name: "Hostel", path: "/dashboard/hostel", icon: Building },
-    { name: "Cafeteria", path: "/dashboard/cafeteria", icon: Utensils },
     { name: "Fee Management", path: "/dashboard/fees", icon: Wallet },
     { name: "Settings", path: "/dashboard/settings", icon: Settings },
   ];

@@ -199,3 +199,64 @@ async def get_results(
         })
         
     return result
+
+from app.models.faculty import Faculty
+
+@router.get("/subjects")
+async def get_subjects(
+    semester: Optional[int] = None,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(RequireRole(["student"]))
+) -> Any:
+    student = await get_current_student(db, current_user)
+    
+    # Get student's department from their course
+    department_id = None
+    if student.course_id:
+        course = await db.scalar(select(Course).where(Course.id == student.course_id))
+        if course:
+            department_id = course.department_id
+            
+    if not department_id:
+        # Default or fallback if no course is assigned
+        return []
+
+    # If semester is not provided, we could default to 7 based on mock or fetch all. Let's fetch all matching department if None
+    query = select(Subject).where(Subject.department_id == department_id)
+    if semester:
+        query = query.where(Subject.semester == semester)
+        
+    subjects = (await db.scalars(query)).all()
+    
+    result = []
+    for sub in subjects:
+        prof_name = "Not Assigned"
+        if sub.faculty_id:
+            faculty = await db.scalar(select(Faculty).where(Faculty.id == sub.faculty_id))
+            if faculty:
+                fac_user = await db.scalar(select(User).where(User.id == faculty.user_id))
+                if fac_user and fac_user.full_name:
+                    prof_name = fac_user.full_name
+
+        # Calculate a mock or actual average grade for this subject for the student
+        marks = await db.scalar(select(Marks).where(Marks.student_id == student.id, Marks.subject_id == sub.id))
+        grade = "N/A"
+        if marks and marks.total_marks > 0:
+            pct = (marks.marks_obtained / marks.total_marks) * 100
+            if pct >= 90: grade = "A+"
+            elif pct >= 80: grade = "A"
+            elif pct >= 70: grade = "B"
+            elif pct >= 60: grade = "C"
+            elif pct >= 50: grade = "D"
+            else: grade = "F"
+            
+        result.append({
+            "id": sub.id,
+            "code": sub.code,
+            "name": sub.name,
+            "credits": sub.credits,
+            "professor": prof_name,
+            "grade": grade
+        })
+        
+    return result
