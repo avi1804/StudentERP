@@ -17,6 +17,7 @@ export function StudentLayout() {
   const navigate = useNavigate();
   const { isMobile } = useIsMobile();
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
 
   useEffect(() => {
     document.body.classList.add('light-theme');
@@ -98,9 +99,73 @@ export function StudentLayout() {
             </div>
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-              <div style={{ position: 'relative', cursor: 'pointer' }}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4b5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-                <div style={{ position: 'absolute', top: '-4px', right: '-4px', background: '#ef4444', color: '#fff', fontSize: '10px', fontWeight: 'bold', width: '16px', height: '16px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #fff' }}>3</div>
+              <div style={{ position: 'relative' }}>
+                <div 
+                  style={{ position: 'relative', cursor: 'pointer', padding: '4px' }} 
+                  onClick={() => setIsNotificationDropdownOpen(!isNotificationDropdownOpen)}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4b5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                  <div style={{ position: 'absolute', top: '0', right: '0', background: '#ef4444', color: '#fff', fontSize: '10px', fontWeight: 'bold', width: '16px', height: '16px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #fff' }}>3</div>
+                </div>
+
+                <AnimatePresence>
+                  {isNotificationDropdownOpen && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.15, ease: "easeOut" }}
+                      style={{ position: 'absolute', top: 'calc(100% + 16px)', right: '-10px', width: '320px', background: '#fff', borderRadius: '16px', boxShadow: '0 10px 40px rgba(0,0,0,0.1)', border: '1px solid #f3f4f6', overflow: 'hidden', zIndex: 50 }}
+                    >
+                      <div style={{ padding: '16px', borderBottom: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#111827' }}>Notifications</div>
+                        <div style={{ fontSize: '11px', fontWeight: 600, color: '#573cfa', cursor: 'pointer' }}>Mark all read</div>
+                      </div>
+                      
+                      <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                        {/* Notification Item 1 */}
+                        <div style={{ padding: '16px', borderBottom: '1px solid #f9fafb', display: 'flex', gap: '12px', cursor: 'pointer', transition: 'background 0.2s', background: '#f8fafc' }} onMouseEnter={(e) => e.currentTarget.style.background = '#f1f5f9'} onMouseLeave={(e) => e.currentTarget.style.background = '#f8fafc'}>
+                          <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <ClipboardList size={16} />
+                          </div>
+                          <div>
+                            <div style={{ fontSize: '12px', fontWeight: 600, color: '#111827', marginBottom: '2px' }}>New Assignment Added</div>
+                            <div style={{ fontSize: '11px', color: '#4b5563', marginBottom: '4px', lineHeight: 1.4 }}>Prof. Sharma uploaded "Data Structures Assignment 3".</div>
+                            <div style={{ fontSize: '9px', color: '#6b7280', fontWeight: 500 }}>2 hours ago</div>
+                          </div>
+                        </div>
+
+                        {/* Notification Item 2 */}
+                        <div style={{ padding: '16px', borderBottom: '1px solid #f9fafb', display: 'flex', gap: '12px', cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
+                          <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#fffbeb', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <Wallet size={16} />
+                          </div>
+                          <div>
+                            <div style={{ fontSize: '12px', fontWeight: 600, color: '#111827', marginBottom: '2px' }}>Fee Payment Reminder</div>
+                            <div style={{ fontSize: '11px', color: '#4b5563', marginBottom: '4px', lineHeight: 1.4 }}>Your tuition fee 2nd installment is due next week.</div>
+                            <div style={{ fontSize: '9px', color: '#6b7280', fontWeight: 500 }}>Yesterday</div>
+                          </div>
+                        </div>
+
+                        {/* Notification Item 3 */}
+                        <div style={{ padding: '16px', borderBottom: '1px solid #f9fafb', display: 'flex', gap: '12px', cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
+                          <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#e8f5e9', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <Bell size={16} />
+                          </div>
+                          <div>
+                            <div style={{ fontSize: '12px', fontWeight: 600, color: '#111827', marginBottom: '2px' }}>Library Book Due</div>
+                            <div style={{ fontSize: '11px', color: '#4b5563', marginBottom: '4px', lineHeight: 1.4 }}>"Introduction to Algorithms" is due for return tomorrow.</div>
+                            <div style={{ fontSize: '9px', color: '#6b7280', fontWeight: 500 }}>2 days ago</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ padding: '12px', textAlign: 'center', borderTop: '1px solid #f3f4f6' }}>
+                        <div style={{ fontSize: '12px', fontWeight: 600, color: '#573cfa', cursor: 'pointer' }} onClick={() => navigate('/dashboard/notices')}>View all notifications</div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
               <div style={{ cursor: 'pointer' }}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4b5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>

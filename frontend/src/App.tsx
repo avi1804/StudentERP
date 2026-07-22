@@ -12,6 +12,14 @@ const StudentHome = React.lazy(() => import("./pages/student/StudentHome").then(
 const MyAttendance = React.lazy(() => import("./pages/student/MyAttendance").then(m => ({ default: m.MyAttendance })));
 const MyResults = React.lazy(() => import("./pages/student/MyResults").then(m => ({ default: m.MyResults })));
 const MySubjects = React.lazy(() => import("./pages/student/MySubjects").then(m => ({ default: m.MySubjects })));
+const MyFees = React.lazy(() => import("./pages/student/MyFees").then(m => ({ default: m.MyFees })));
+const MyAssignments = React.lazy(() => import("./pages/student/MyAssignments").then(m => ({ default: m.MyAssignments })));
+const MyTimetable = React.lazy(() => import("./pages/student/MyTimetable").then(m => ({ default: m.MyTimetable })));
+const PlacementCell = React.lazy(() => import("./pages/student/PlacementCell").then(m => ({ default: m.PlacementCell })));
+const MyComplaints = React.lazy(() => import("./pages/student/MyComplaints").then(m => ({ default: m.MyComplaints })));
+const MyIdCard = React.lazy(() => import("./pages/student/MyIdCard").then(m => ({ default: m.MyIdCard })));
+const MyNotices = React.lazy(() => import("./pages/student/MyNotices").then(m => ({ default: m.MyNotices })));
+const MySettings = React.lazy(() => import("./pages/student/MySettings").then(m => ({ default: m.MySettings })));
 const MyProfile = React.lazy(() => import("./pages/student/MyProfile").then(m => ({ default: m.MyProfile })));
 // Lazy Loaded Admin Dashboard Pages
 const AdminLayout = React.lazy(() => import("./pages/admin/AdminDashboard/AdminLayout").then(m => ({ default: m.AdminLayout })));
@@ -82,7 +90,15 @@ function App() {
               <Route index element={<StudentHome />} />
               <Route path="attendance" element={<MyAttendance />} />
               <Route path="results" element={<MyResults />} />
+              <Route path="settings" element={<MySettings />} />
               <Route path="subjects" element={<MySubjects />} />
+              <Route path="assignments" element={<MyAssignments />} />
+              <Route path="timetable" element={<MyTimetable />} />
+              <Route path="placement" element={<PlacementCell />} />
+              <Route path="complaints" element={<MyComplaints />} />
+              <Route path="idcard" element={<MyIdCard />} />
+              <Route path="notices" element={<MyNotices />} />
+              <Route path="fees" element={<MyFees />} />
               <Route path="profile" element={<MyProfile />} />
             </Route>
             
