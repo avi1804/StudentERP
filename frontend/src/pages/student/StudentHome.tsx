@@ -3,8 +3,10 @@ import { useAuthStore } from "../../store/authStore";
 import { 
   Check, TrendingUp, Play, MonitorPlay, 
   User, IdCard, CheckCircle2, Calendar, 
-  BarChart2, Book, Megaphone 
+  BarChart2, Book, Megaphone, Layers, Briefcase, ArrowUpRight,
+  CheckCircle, FileText, Activity
 } from "lucide-react";
+import { motion } from "framer-motion";
 
 export function StudentHome() {
   const { user } = useAuthStore();
@@ -12,55 +14,139 @@ export function StudentHome() {
 
   return (
     <div className="premium-dashboard">
-      <div className="dash-header">
-        <h1>
-          Welcome back, <span>{firstName}!</span> 👋
-        </h1>
-        <p>Here's what's happening with your learning today.</p>
-      </div>
+      {/* ── Welcome Header (AutoML-style) ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        style={{ marginBottom: 32 }}
+      >
+        <p style={{ fontSize: 16, color: '#71717a', marginBottom: 6, fontWeight: 400 }}>Welcome back,</p>
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 14 }}>
+          <h1 style={{ fontSize: 48, fontWeight: 600, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, margin: 0 }}>
+            {user?.full_name || 'Student'}
+          </h1>
+          <span style={{ padding: '5px 14px', borderRadius: 999, background: 'rgba(99,102,241,0.12)', color: '#6366f1', fontSize: 13, fontWeight: 600, border: '1px solid rgba(99,102,241,0.25)' }}>
+            Student
+          </span>
+        </div>
+      </motion.div>
+
+      {/* ── KPI Cards Row (AutoML Studio design) ── */}
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1 } } }}
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginBottom: 36 }}
+      >
+        {/* Card 1 — Attendance */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: 28,
+            padding: 24,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: 200,
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.7)' }}>
+                <CheckCircle size={16} color="#18181b" strokeWidth={1.8} />
+              </div>
+              <span style={{ fontSize: 14, fontWeight: 500, color: '#52525b' }}>Attendance</span>
+            </div>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
+          </div>
+          <div style={{ marginTop: 'auto', paddingTop: 28 }}>
+            <div style={{ fontSize: 52, fontWeight: 600, color: '#09090b', letterSpacing: '-2px', lineHeight: 1, marginBottom: 8 }}>87%</div>
+            <div style={{ fontSize: 12, color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#10b981', fontWeight: 600 }}>+3.2%</span> from last month
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Card 2 — CGPA */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: 28,
+            padding: 24,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: 200,
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.7)' }}>
+                <FileText size={16} color="#18181b" strokeWidth={1.8} />
+              </div>
+              <span style={{ fontSize: 14, fontWeight: 500, color: '#52525b' }}>CGPA</span>
+            </div>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
+          </div>
+          <div style={{ marginTop: 'auto', paddingTop: 28 }}>
+            <div style={{ fontSize: 52, fontWeight: 600, color: '#09090b', letterSpacing: '-2px', lineHeight: 1, marginBottom: 8 }}>8.4</div>
+            <div style={{ fontSize: 12, color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#10b981', fontWeight: 600 }}>+0.3</span> from last semester
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Card 3 — Assignments (Neon accent) */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#d4ff3f',
+            border: '1.5px solid rgba(0,0,0,0.10)',
+            borderRadius: 28,
+            padding: 24,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: 200,
+            boxShadow: '0 4px 20px rgba(212,255,63,0.35)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Activity size={16} color="#09090b" strokeWidth={1.8} />
+              </div>
+              <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(0,0,0,0.75)' }}>Assignments Done</span>
+            </div>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#09090b', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}>
+              <ArrowUpRight size={15} color="#ffffff" />
+            </div>
+          </div>
+          <div style={{ marginTop: 'auto', paddingTop: 28 }}>
+            <div style={{ fontSize: 52, fontWeight: 600, color: '#09090b', letterSpacing: '-2px', lineHeight: 1, marginBottom: 8 }}>12</div>
+            <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.55)', fontWeight: 500 }}>
+              <span style={{ fontWeight: 600 }}>3 pending</span> this week
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
 
       <div className="dash-grid-main">
         {/* LEFT COLUMN */}
         <div className="dash-col-left">
-          
-          {/* Course Cards */}
-          <div className="course-cards-row">
-            <div className="course-card course-green">
-               <div className="course-card-top">
-                 <div className="avatars-group">
-                    <img src="https://i.pravatar.cc/150?u=1" alt="student" />
-                    <img src="https://i.pravatar.cc/150?u=2" alt="student" />
-                    <img src="https://i.pravatar.cc/150?u=3" alt="student" />
-                    <div className="avatars-more">+8</div>
-                 </div>
-                 <div className="course-rating">⭐ 4.8</div>
-               </div>
-               <h3 className="course-title">Data Structures</h3>
-               <div className="course-sub">
-                 <span>CSE 401</span>
-                 <button className="course-arrow">→</button>
-               </div>
-            </div>
-            
-            <div className="course-card course-pink">
-               <div className="course-card-top">
-                 <div className="avatars-group">
-                    <img src="https://i.pravatar.cc/150?u=4" alt="student" />
-                    <img src="https://i.pravatar.cc/150?u=5" alt="student" />
-                    <img src="https://i.pravatar.cc/150?u=6" alt="student" />
-                    <div className="avatars-more">+6</div>
-                 </div>
-                 <div className="course-rating">⭐ 4.4</div>
-               </div>
-               <h3 className="course-title">Machine Learning</h3>
-               <div className="course-sub">
-                 <span>CSE 402</span>
-                 <button className="course-arrow">→</button>
-               </div>
-            </div>
-          </div>
 
-          {/* Learning progress */}
+
           <div className="section-header">
             <h3>Learning progress</h3>
             <a href="#">View all &gt;</a>
