@@ -1,3 +1,4 @@
+import React, { ComponentType, SVGProps } from "react";
 import {
   Home,
   BookMarked,
@@ -12,7 +13,14 @@ import {
   ClipboardList,
   IndianRupee,
   Hourglass,
-  Building2
+  Building2,
+  Wallet,
+  Receipt,
+  FileText,
+  CreditCard,
+  Percent,
+  Banknote,
+  PieChart
 } from "lucide-react";
 
 export type IconType = ComponentType<SVGProps<SVGSVGElement>>;
@@ -80,4 +88,14 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Add Faculty", icon: UserPlus, path: "/admin/dashboard/faculty/add" },
   { label: "Add Subject", icon: BookOpen, path: "/admin/dashboard/subject/add" },
   { label: "Post Notice", icon: Megaphone, path: "/admin/dashboard/notify/student" },
+  { isCategory: true, label: "FINANCE" },
+  { label: "Fee Dashboard", icon: Wallet, path: "/admin/dashboard/fees" },
+  { label: "Fee Structure", icon: FileText, path: "/admin/dashboard/fees/structures" },
+  { label: "Student Fees", icon: Users, path: "/admin/dashboard/fees/students" },
+  { label: "Payments", icon: CreditCard, path: "/admin/dashboard/fees/payments" },
+  { label: "Scholarships", icon: GraduationCap, path: "/admin/dashboard/fees/scholarships" },
+  { label: "Discounts", icon: Percent, path: "/admin/dashboard/fees/discounts" },
+  { label: "Fine Management", icon: Hourglass, path: "/admin/dashboard/fees/fines" },
+  { label: "Receipts", icon: Receipt, path: "/admin/dashboard/fees/receipts" },
+  { label: "Reports", icon: PieChart, path: "/admin/dashboard/fees/reports" },
 ];

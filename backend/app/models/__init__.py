@@ -13,6 +13,7 @@ from app.models.communication import Notice, Notification, Complaint
 from app.models.placement import PlacementCompany, PlacementDrive, PlacementApplication
 from app.models.system import AuditLog, DashboardStat, SystemSetting, ImportExportHistory, SubstituteFacultyAssignment
 from app.models.assignment import Assignment, AssignmentSubmission
+from app.models.fee import FeeStructure, StudentFee, Scholarship, Discount, FineRule, Payment, Receipt, PaymentHistory
 
 # Export all models for Alembic and convenient imports
 __all__ = [
@@ -26,5 +27,6 @@ __all__ = [
     "Notice", "Notification", "Complaint",
     "PlacementCompany", "PlacementDrive", "PlacementApplication",
     "AuditLog", "DashboardStat", "SystemSetting", "ImportExportHistory", "SubstituteFacultyAssignment",
-    "Assignment", "AssignmentSubmission"
+    "Assignment", "AssignmentSubmission",
+    "FeeStructure", "StudentFee", "Scholarship", "Discount", "FineRule", "Payment", "Receipt", "PaymentHistory"
 ]

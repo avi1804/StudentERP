@@ -12,6 +12,7 @@ import app.models.student  # noqa
 import app.models.subject  # noqa
 import app.models.subject_assignment  # noqa
 import app.models.assignment  # noqa  - registers assignments + assignment_submissions
+import app.models.fee  # noqa
 
 app = FastAPI(
     title=settings.PROJECT_NAME,

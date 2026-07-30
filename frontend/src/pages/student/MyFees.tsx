@@ -1,43 +1,55 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { 
   Wallet, Receipt, Clock, Calendar, ChevronDown, Download,
-  FileText, ArrowRight, Bell, Headset, ArrowUpRight
+  FileText, ArrowRight, Bell, Headset, ArrowUpRight, Loader
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { motion } from "framer-motion";
 import TextType from "../../components/TextType";
+import { useFeeStore } from "../../store/useFeeStore";
 
 export function MyFees() {
+  const { studentDashboardData, fetchStudentDashboard, isLoading } = useFeeStore();
+
+  useEffect(() => {
+    fetchStudentDashboard();
+  }, [fetchStudentDashboard]);
+
+  if (isLoading || !studentDashboardData) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
+        <Loader className="animate-spin text-gray-500" size={32} />
+      </div>
+    );
+  }
+
+  const { kpis, breakdown, payment_history, upcoming_dues } = studentDashboardData;
 
   const summaryData = [
-    { name: 'Paid', value: 80000, color: '#10b981' },
-    { name: 'Pending', value: 40000, color: '#f59e0b' },
-    { name: 'Overdue', value: 5000, color: '#ef4444' }
+    { name: 'Paid', value: kpis.paid_fee, color: '#10b981' },
+    { name: 'Pending', value: kpis.pending_fee, color: '#f59e0b' }
   ];
 
-  const feeOverview = [
-    { component: "Tuition Fee", sub: "Academic Tuition Fee", total: "60,000", paid: "40,000", pending: "20,000", status: "Partial", statusColor: "yellow", pendingColor: "yellow" },
-    { component: "Development Fee", sub: "Infrastructure & Dev. Fee", total: "15,000", paid: "15,000", pending: "0", status: "Paid", statusColor: "green", pendingColor: "gray" },
-    { component: "Exam Fee", sub: "Semester Examination Fee", total: "10,000", paid: "10,000", pending: "0", status: "Paid", statusColor: "green", pendingColor: "gray" },
-    { component: "Library Fee", sub: "Library & Resource Fee", total: "5,000", paid: "5,000", pending: "0", status: "Paid", statusColor: "green", pendingColor: "gray" },
-    { component: "Laboratory Fee", sub: "Lab & Equipment Fee", total: "10,000", paid: "5,000", pending: "5,000", status: "Partial", statusColor: "yellow", pendingColor: "red" },
-    { component: "Other Charges", sub: "Miscellaneous Charges", total: "20,000", paid: "5,000", pending: "15,000", status: "Partial", statusColor: "yellow", pendingColor: "red" }
-  ];
+  const overdueAmount = upcoming_dues.filter((d: any) => d.isOverdue).reduce((acc: number, curr: any) => acc + curr.amount, 0);
+  const nextDue = upcoming_dues.length > 0 ? upcoming_dues[0] : null;
+  const paidPercentage = kpis.total_fee > 0 ? ((kpis.paid_fee / kpis.total_fee) * 100).toFixed(1) : 0;
+  
+  // Calculate days remaining or overdue days
+  let daysDiffText = "No upcoming dues";
+  if (nextDue) {
+    const today = new Date();
+    const dueDate = new Date(nextDue.due);
+    const diffTime = dueDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 0) {
+      daysDiffText = `${Math.abs(diffDays)} Days Overdue`;
+    } else {
+      daysDiffText = `${diffDays} Days Remaining`;
+    }
+  }
 
-  const paymentHistory = [
-    { id: "PAY-2024-001", date: "10 May 2024", desc: "Tuition Fee (1st Installment)", amount: "40,000", mode: "Online", modeColor: "green" },
-    { id: "PAY-2024-002", date: "15 Apr 2024", desc: "Development Fee", amount: "15,000", mode: "Online", modeColor: "green" },
-    { id: "PAY-2024-003", date: "05 Apr 2024", desc: "Exam Fee", amount: "10,000", mode: "UPI", modeColor: "purple" },
-    { id: "PAY-2024-004", date: "28 Mar 2024", desc: "Library Fee", amount: "5,000", mode: "Card", modeColor: "blue" },
-    { id: "PAY-2024-005", date: "20 Mar 2024", desc: "Laboratory Fee (Partial)", amount: "5,000", mode: "UPI", modeColor: "purple" }
-  ];
 
-  const pendingDues = [
-    { title: "Tuition Fee (2nd Installment)", due: "Due on 15 Jun 2024", amount: "20,000", iconBg: "#f3f0ff", iconColor: "#573cfa", isOverdue: false },
-    { title: "Laboratory Fee (Remaining)", due: "Due on 15 Jun 2024", amount: "5,000", iconBg: "#fffbeb", iconColor: "#f59e0b", isOverdue: false },
-    { title: "Other Charges", due: "Due on 30 Jun 2024", amount: "15,000", iconBg: "#eff6ff", iconColor: "#3b82f6", isOverdue: false },
-    { title: "Misc. Fine", due: "Overdue by 10 days", amount: "5,000", iconBg: "#fef2f2", iconColor: "#ef4444", isOverdue: true }
-  ];
 
   return (
     <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
@@ -115,7 +127,7 @@ export function MyFees() {
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
             <div style={{ fontSize: '32px', fontWeight: 700, color: '#09090b', letterSpacing: '-1px', lineHeight: 1.1, marginBottom: '6px' }}>
-              ₹ 1,20,000
+              ₹ {kpis.total_fee.toLocaleString('en-IN')}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
               <span style={{ color: '#573cfa', fontWeight: 600 }}>100%</span> · Academic Year 2024-25
@@ -151,10 +163,10 @@ export function MyFees() {
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
             <div style={{ fontSize: '32px', fontWeight: 700, color: '#09090b', letterSpacing: '-1px', lineHeight: 1.1, marginBottom: '6px' }}>
-              ₹ 80,000
+              ₹ {kpis.paid_fee.toLocaleString('en-IN')}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#22c55e', fontWeight: 600 }}>66.7%</span> · Total Paid
+              <span style={{ color: '#22c55e', fontWeight: 600 }}>{((kpis.paid_fee / kpis.total_fee) * 100 || 0).toFixed(1)}%</span> · Total Paid
             </div>
           </div>
         </motion.div>
@@ -187,10 +199,10 @@ export function MyFees() {
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
             <div style={{ fontSize: '32px', fontWeight: 700, color: '#09090b', letterSpacing: '-1px', lineHeight: 1.1, marginBottom: '6px' }}>
-              ₹ 40,000
+              ₹ {kpis.pending_fee.toLocaleString('en-IN')}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#f59e0b', fontWeight: 600 }}>33.3%</span> · Remaining Dues
+              <span style={{ color: '#f59e0b', fontWeight: 600 }}>{((kpis.pending_fee / kpis.total_fee) * 100 || 0).toFixed(1)}%</span> · Remaining Dues
             </div>
           </div>
         </motion.div>
@@ -223,10 +235,10 @@ export function MyFees() {
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
             <div style={{ fontSize: '32px', fontWeight: 700, color: '#09090b', letterSpacing: '-1px', lineHeight: 1.1, marginBottom: '6px' }}>
-              ₹ 5,000
+              ₹ {overdueAmount.toLocaleString('en-IN')}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#ef4444', fontWeight: 600 }}>Urgent</span> · Due Immediately
+              <span style={{ color: '#ef4444', fontWeight: 600 }}>{overdueAmount > 0 ? 'Urgent' : 'Clear'}</span> · {overdueAmount > 0 ? 'Due Immediately' : 'No Overdue'}
             </div>
           </div>
         </motion.div>
@@ -259,10 +271,10 @@ export function MyFees() {
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
             <div style={{ fontSize: '28px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', lineHeight: 1.1, marginBottom: '6px' }}>
-              15 Jun 2024
+              {nextDue ? new Date(nextDue.due).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#3b82f6', fontWeight: 600 }}>45 Days</span> · Remaining
+              <span style={{ color: nextDue && nextDue.isOverdue ? '#ef4444' : '#3b82f6', fontWeight: 600 }}>{daysDiffText.split(' ')[0]} Days</span> · {daysDiffText.split(' ').slice(1).join(' ')}
             </div>
           </div>
         </motion.div>
@@ -299,25 +311,25 @@ export function MyFees() {
                 </tr>
               </thead>
               <tbody>
-                {feeOverview.map((item, i) => (
+                {breakdown.map((item: any, i: number) => (
                   <tr key={i} style={{ borderBottom: '1px solid #f9fafb' }}>
                     <td style={{ padding: '16px 0' }}>
                       <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#111827', marginBottom: '2px' }}>{item.component}</div>
-                      <div style={{ fontSize: '10px', color: '#6b7280' }}>{item.sub}</div>
+                      <div style={{ fontSize: '10px', color: '#6b7280' }}>General Category</div>
                     </td>
                     <td style={{ padding: '16px 0', textAlign: 'center', fontSize: '12px', fontWeight: 600, color: '#111827' }}>
-                      ₹ {item.total}
+                      ₹ {item.total.toLocaleString('en-IN')}
                     </td>
                     <td style={{ padding: '16px 0', textAlign: 'center', fontSize: '12px', fontWeight: 600, color: '#10b981' }}>
-                      ₹ {item.paid}
+                      ₹ {item.status === 'Paid' ? item.total.toLocaleString('en-IN') : 0}
                     </td>
-                    <td style={{ padding: '16px 0', textAlign: 'center', fontSize: '12px', fontWeight: 600, color: item.pendingColor === 'red' ? '#ef4444' : item.pendingColor === 'yellow' ? '#f59e0b' : '#6b7280' }}>
-                      ₹ {item.pending}
+                    <td style={{ padding: '16px 0', textAlign: 'center', fontSize: '12px', fontWeight: 600, color: item.status === 'Pending' ? '#ef4444' : '#6b7280' }}>
+                      ₹ {item.status !== 'Paid' ? item.total.toLocaleString('en-IN') : 0}
                     </td>
                     <td style={{ padding: '16px 0', textAlign: 'center' }}>
                       <span style={{ 
-                        background: item.statusColor === 'green' ? '#e8f5e9' : '#fffbeb', 
-                        color: item.statusColor === 'green' ? '#10b981' : '#f59e0b', 
+                        background: item.status === 'Paid' ? '#e8f5e9' : '#fffbeb', 
+                        color: item.status === 'Paid' ? '#10b981' : '#f59e0b', 
                         padding: '4px 10px', borderRadius: '12px', fontSize: '10px', fontWeight: 600 
                       }}>
                         {item.status}
@@ -328,9 +340,9 @@ export function MyFees() {
                 {/* Total Row */}
                 <tr style={{ background: '#f8fafc', borderBottom: 'none' }}>
                   <td style={{ padding: '16px', fontSize: '12px', fontWeight: 'bold', color: '#573cfa', borderRadius: '8px 0 0 8px' }}>Total</td>
-                  <td style={{ padding: '16px 0', textAlign: 'center', fontSize: '12px', fontWeight: 'bold', color: '#573cfa' }}>₹ 1,20,000</td>
-                  <td style={{ padding: '16px 0', textAlign: 'center', fontSize: '12px', fontWeight: 'bold', color: '#10b981' }}>₹ 80,000</td>
-                  <td style={{ padding: '16px 0', textAlign: 'center', fontSize: '12px', fontWeight: 'bold', color: '#ef4444' }}>₹ 40,000</td>
+                  <td style={{ padding: '16px 0', textAlign: 'center', fontSize: '12px', fontWeight: 'bold', color: '#573cfa' }}>₹ {kpis.total_fee.toLocaleString('en-IN')}</td>
+                  <td style={{ padding: '16px 0', textAlign: 'center', fontSize: '12px', fontWeight: 'bold', color: '#10b981' }}>₹ {kpis.paid_fee.toLocaleString('en-IN')}</td>
+                  <td style={{ padding: '16px 0', textAlign: 'center', fontSize: '12px', fontWeight: 'bold', color: '#ef4444' }}>₹ {kpis.pending_fee.toLocaleString('en-IN')}</td>
                   <td style={{ padding: '16px', borderRadius: '0 8px 8px 0' }}></td>
                 </tr>
               </tbody>
@@ -359,16 +371,16 @@ export function MyFees() {
                   </tr>
                 </thead>
                 <tbody>
-                  {paymentHistory.map((pmt, i) => (
+                  {payment_history.map((pmt: any, i: number) => (
                     <tr key={i} style={{ borderBottom: '1px solid #f9fafb' }}>
                       <td style={{ padding: '12px 0' }}>
-                        <span style={{ background: '#f3f0ff', color: '#573cfa', padding: '2px 6px', borderRadius: '4px', fontSize: '9px', fontWeight: 700 }}>{pmt.id}</span>
+                        <span style={{ background: '#f3f0ff', color: '#573cfa', padding: '2px 6px', borderRadius: '4px', fontSize: '9px', fontWeight: 700 }}>{pmt.receipt_no}</span>
                       </td>
-                      <td style={{ padding: '12px 0', fontSize: '10px', color: '#4b5563' }}>{pmt.date}</td>
+                      <td style={{ padding: '12px 0', fontSize: '10px', color: '#4b5563' }}>{new Date(pmt.date).toLocaleDateString()}</td>
                       <td style={{ padding: '12px 0', fontSize: '10px', color: '#111827', fontWeight: 500 }}>{pmt.desc}</td>
-                      <td style={{ padding: '12px 0', fontSize: '10px', color: '#111827', fontWeight: 600 }}>₹ {pmt.amount}</td>
+                      <td style={{ padding: '12px 0', fontSize: '10px', color: '#111827', fontWeight: 600 }}>₹ {pmt.amount.toLocaleString('en-IN')}</td>
                       <td style={{ padding: '12px 0' }}>
-                        <span style={{ color: pmt.modeColor === 'green' ? '#10b981' : pmt.modeColor === 'purple' ? '#8b5cf6' : '#3b82f6', fontSize: '10px', fontWeight: 600 }}>
+                        <span style={{ color: pmt.mode === 'UPI' ? '#8b5cf6' : '#3b82f6', fontSize: '10px', fontWeight: 600 }}>
                           {pmt.mode}
                         </span>
                       </td>
@@ -389,19 +401,24 @@ export function MyFees() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {pendingDues.map((due, i) => (
+                {upcoming_dues.length === 0 && (
+                  <div style={{ fontSize: '12px', color: '#6b7280', textAlign: 'center', padding: '20px' }}>No pending dues.</div>
+                )}
+                {upcoming_dues.map((due: any, i: number) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: due.iconBg, color: due.iconColor, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: due.isOverdue ? '#fef2f2' : '#f3f0ff', color: due.isOverdue ? '#ef4444' : '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         <Wallet size={16} />
                       </div>
                       <div>
                         <div style={{ fontSize: '12px', fontWeight: 600, color: '#111827', marginBottom: '2px' }}>{due.title}</div>
-                        <div style={{ fontSize: '10px', color: due.isOverdue ? '#ef4444' : '#6b7280', fontWeight: due.isOverdue ? 600 : 400 }}>{due.due}</div>
+                        <div style={{ fontSize: '10px', color: due.isOverdue ? '#ef4444' : '#6b7280', fontWeight: due.isOverdue ? 600 : 400 }}>
+                          {due.isOverdue ? 'Overdue' : 'Due on'} {new Date(due.due).toLocaleDateString()}
+                        </div>
                       </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#111827' }}>₹ {due.amount}</div>
+                      <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#111827' }}>₹ {due.amount.toLocaleString('en-IN')}</div>
                       <div style={{ fontSize: '11px', fontWeight: 600, color: '#573cfa', cursor: 'pointer' }}>Pay Now</div>
                     </div>
                   </div>
@@ -457,7 +474,7 @@ export function MyFees() {
                   </PieChart>
                 </ResponsiveContainer>
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#111827' }}>66.67%</div>
+                  <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#111827' }}>{paidPercentage}%</div>
                   <div style={{ fontSize: '10px', color: '#6b7280' }}>Paid</div>
                 </div>
               </div>
@@ -471,7 +488,7 @@ export function MyFees() {
                     </div>
                     <div style={{ color: '#111827', fontWeight: 600 }}>
                       ₹ {d.value.toLocaleString('en-IN')} 
-                      <span style={{ color: '#9ca3af', fontWeight: 'normal', marginLeft: '4px' }}>({Math.round((d.value/125000)*100)}%)</span>
+                      <span style={{ color: '#9ca3af', fontWeight: 'normal', marginLeft: '4px' }}>({Math.round((d.value/kpis.total_fee)*100)}%)</span>
                     </div>
                   </div>
                 ))}
@@ -490,14 +507,14 @@ export function MyFees() {
                     <Calendar size={18} />
                   </div>
                   <div>
-                    <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827', marginBottom: '4px' }}>Next Installment</div>
-                    <div style={{ fontSize: '11px', color: '#4b5563', marginBottom: '8px' }}>Tuition Fee (2nd Installment)</div>
-                    <div style={{ fontSize: '10px', color: '#6b7280' }}>Due on 15 Jun 2024</div>
+                    <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827', marginBottom: '4px' }}>{upcoming_dues.length > 0 ? upcoming_dues[0].title : 'No Dues'}</div>
+                    <div style={{ fontSize: '11px', color: '#4b5563', marginBottom: '8px' }}>Semester Fee</div>
+                    <div style={{ fontSize: '10px', color: '#6b7280' }}>{upcoming_dues.length > 0 ? new Date(upcoming_dues[0].due).toLocaleDateString() : '-'}</div>
                   </div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
-                  <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#111827' }}>₹ 20,000</div>
-                  <div style={{ fontSize: '9px', fontWeight: 600, color: '#573cfa', background: '#ede9fe', padding: '4px 8px', borderRadius: '12px' }}>45 Days Left</div>
+                  <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#111827' }}>₹ {upcoming_dues.length > 0 ? upcoming_dues[0].amount.toLocaleString('en-IN') : 0}</div>
+                  <div style={{ fontSize: '9px', fontWeight: 600, color: '#573cfa', background: '#ede9fe', padding: '4px 8px', borderRadius: '12px' }}>{daysDiffText}</div>
                 </div>
               </div>
             </div>

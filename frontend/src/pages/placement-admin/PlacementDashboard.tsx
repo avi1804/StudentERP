@@ -29,11 +29,7 @@ const PKG_DATA = [
   { range: '8–12 LPA', count: 24 }, { range: '12–18 LPA', count: 12 },
   { range: '18+ LPA', count: 7 },
 ];
-const DEPT_DATA = [
-  { name: 'CSE', value: 45, color: '#3b82f6' }, { name: 'ECE', value: 22, color: '#8b5cf6' },
-  { name: 'ME', value: 15, color: '#f59e0b' }, { name: 'EE', value: 12, color: '#10b981' },
-  { name: 'Civil', value: 6, color: '#ef4444' },
-];
+
 
 interface DashboardData {
   kpis: Record<string, any>;
@@ -226,32 +222,8 @@ export function PlacementDashboard() {
         </motion.div>
       </div>
 
-      {/* Bottom Row: Dept-wise + Upcoming Drives + Recent Activity */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr 1.4fr', gap: '20px' }}>
-        {/* Dept-wise Pie */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-          style={{ background: '#ffffff', border: '1.5px solid #f4f4f5', borderRadius: '24px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
-        >
-          <div style={{ fontSize: '15px', fontWeight: 700, color: '#09090b', marginBottom: '16px' }}>Branch Breakdown</div>
-          <ResponsiveContainer width="100%" height={170}>
-            <PieChart>
-              <Pie data={DEPT_DATA} dataKey="value" cx="50%" cy="50%" innerRadius={42} outerRadius={70} paddingAngle={4}>
-                {DEPT_DATA.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-              </Pie>
-              <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e4e4e7', fontSize: '12px' }} />
-            </PieChart>
-          </ResponsiveContainer>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '10px' }}>
-            {DEPT_DATA.map(d => (
-              <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#52525b', fontWeight: 500 }}>
-                <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: d.color }} />
-                {d.name} ({d.value})
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
+      {/* Bottom Row: Upcoming Drives + Recent Activity */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
         {/* Upcoming Drives */}
         <motion.div
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
