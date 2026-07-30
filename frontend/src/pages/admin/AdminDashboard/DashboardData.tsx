@@ -1,4 +1,3 @@
-import type { ComponentType, SVGProps } from "react";
 import {
   Home,
   BookMarked,
@@ -12,7 +11,8 @@ import {
   BookText,
   ClipboardList,
   IndianRupee,
-  Hourglass
+  Hourglass,
+  Building2
 } from "lucide-react";
 
 export type IconType = ComponentType<SVGProps<SVGSVGElement>>;
@@ -70,13 +70,10 @@ export const NAV_ITEMS: NavItem[] = [
   { isCategory: true, label: "OVERVIEW" },
   { label: "Dashboard", icon: LayoutGrid, path: "/admin/dashboard" },
   { isCategory: true, label: "ACADEMIC" },
+  { label: "Departments", icon: Building2, path: "/admin/dashboard/department/manage" },
   { label: "Students", icon: Users, path: "/admin/dashboard/students/manage" },
   { label: "Faculty", icon: GraduationCap, path: "/admin/dashboard/faculty/manage" },
   { label: "Subjects", icon: BookOpen, path: "/admin/dashboard/subject/manage" },
-  { label: "Attendance", icon: BookMarked, path: "/admin/dashboard/attendance" },
-  { label: "Attendance Report", icon: BookText, path: "/admin/dashboard/attendance-report" },
-  { label: "Enter Marks", icon: BookText, path: "/admin/dashboard/marks" },
-  { label: "View Results", icon: BookText, path: "/admin/dashboard/results" },
   { label: "Notices", icon: Megaphone, path: "/admin/dashboard/notify/faculty" },
   { isCategory: true, label: "ADD NEW" },
   { label: "Add Student", icon: UserPlus, path: "/admin/dashboard/students/add" },

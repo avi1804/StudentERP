@@ -4,17 +4,19 @@ from pydantic import BaseModel
 # Department
 class DepartmentBase(BaseModel):
     name: str
+    code: Optional[str] = None
     description: Optional[str] = None
-    head_of_department_id: Optional[int] = None
 
 class DepartmentCreate(DepartmentBase):
     pass
 
 class DepartmentUpdate(DepartmentBase):
     name: Optional[str] = None
+    code: Optional[str] = None
 
 class DepartmentResponse(DepartmentBase):
     id: int
+    code: Optional[str] = None
     model_config = {"from_attributes": True}
 
 

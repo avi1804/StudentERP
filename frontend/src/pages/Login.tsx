@@ -155,6 +155,8 @@ const Login = () => {
                     navigate("/admin/dashboard");
                 } else if (user?.role === "faculty") {
                     navigate("/faculty/dashboard");
+                } else if (user?.role === "placement_admin") {
+                    navigate("/placement-admin");
                 } else {
                     navigate("/dashboard");
                 }
@@ -178,6 +180,8 @@ const Login = () => {
                 navigate("/admin/dashboard");
             } else if (user?.role === "faculty") {
                 navigate("/faculty/dashboard");
+            } else if (user?.role === "placement_admin") {
+                navigate("/placement-admin");
             } else {
                 navigate("/dashboard");
             }

@@ -6,6 +6,7 @@ const pageTitles: Record<string, string> = {
   '/faculty/dashboard': 'Faculty Dashboard',
   '/faculty/attendance': 'Attendance',
   '/faculty/attendance-report': 'Attendance Report',
+  '/faculty/assignments': 'Assignments',
   '/faculty/marks': 'Enter Marks',
   '/faculty/results': 'View Results',
 };

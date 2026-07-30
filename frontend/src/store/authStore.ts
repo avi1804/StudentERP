@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { jwtDecode } from 'jwt-decode';
 
-export type Role = 'admin' | 'faculty' | 'student';
+export type Role = 'admin' | 'faculty' | 'student' | 'placement_admin';
 
 export interface User {
   id: number;
@@ -56,7 +56,7 @@ export const useAuthStore = create<AuthState>()(
             accessToken: access,
             refreshToken: refresh,
             isAuthenticated: true,
-            user: { id: parseInt(decoded.sub), email: '', role: decoded.role },
+            user: { id: parseInt(decoded.sub), email: '', role: decoded.role as Role },
           });
         } catch (error) {
           console.error("Failed to decode token", error);

@@ -10,4 +10,8 @@ class DepartmentRepository(CRUDBase[Department, DepartmentCreate, DepartmentUpda
         result = await db.execute(select(Department).where(Department.name == name))
         return result.scalars().first()
 
+    async def get_by_code(self, db: AsyncSession, *, code: str) -> Optional[Department]:
+        result = await db.execute(select(Department).where(Department.code == code))
+        return result.scalars().first()
+
 department_repo = DepartmentRepository(Department)

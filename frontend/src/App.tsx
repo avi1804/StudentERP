@@ -36,6 +36,7 @@ const AddStudent = React.lazy(() => import("./pages/admin/AdminDashboard/AddStud
 const AddFaculty = React.lazy(() => import("./pages/admin/AdminDashboard/AddFaculty"));
 // const Attendance = React.lazy(() => import("./pages/admin/AdminDashboard/Attendance"));
 // const Marks = React.lazy(() => import("./pages/admin/AdminDashboard/Marks"));
+const ManageDepartment = React.lazy(() => import("./pages/admin/AdminDashboard/ManageDepartment").then(m => ({ default: m.ManageDepartment })));
 
 // Lazy Loaded Faculty Dashboard Pages
 const FacultyLayout = React.lazy(() => import("./pages/faculty/FacultyLayout").then(m => ({ default: m.FacultyLayout })));
@@ -45,6 +46,18 @@ const AttendanceReport = React.lazy(() => import("./pages/faculty/AttendanceRepo
 const AssignmentManager = React.lazy(() => import("./pages/faculty/AssignmentManager").then(m => ({ default: m.AssignmentManager })));
 const MarksManager = React.lazy(() => import("./pages/faculty/MarksManager").then(m => ({ default: m.MarksManager })));
 const ResultCard = React.lazy(() => import("./pages/faculty/ResultCard").then(m => ({ default: m.ResultCard })));
+
+// Lazy Loaded Placement Admin Pages
+const PlacementLayout = React.lazy(() => import("./pages/placement-admin/PlacementLayout").then(m => ({ default: m.PlacementLayout })));
+const PlacementDashboard = React.lazy(() => import("./pages/placement-admin/PlacementDashboard").then(m => ({ default: m.PlacementDashboard })));
+const Companies = React.lazy(() => import("./pages/placement-admin/Companies").then(m => ({ default: m.Companies })));
+const PlacementDrives = React.lazy(() => import("./pages/placement-admin/PlacementDrives").then(m => ({ default: m.PlacementDrives })));
+const StudentApplications = React.lazy(() => import("./pages/placement-admin/StudentApplications").then(m => ({ default: m.StudentApplications })));
+const EligibleStudents = React.lazy(() => import("./pages/placement-admin/EligibleStudents").then(m => ({ default: m.EligibleStudents })));
+const Analytics = React.lazy(() => import("./pages/placement-admin/Analytics").then(m => ({ default: m.Analytics })));
+const Reports = React.lazy(() => import("./pages/placement-admin/Reports").then(m => ({ default: m.Reports })));
+const Notifications = React.lazy(() => import("./pages/placement-admin/Notifications").then(m => ({ default: m.Notifications })));
+const PlacementSettings = React.lazy(() => import("./pages/placement-admin/Settings").then(m => ({ default: m.PlacementSettings })));
 
 // Loader Component
 const LoadingSpinner = () => (
@@ -78,10 +91,7 @@ function App() {
                 <Route path="faculty/add" element={<AddFaculty />} />
                 <Route path="students/manage" element={<ManageStudent />} />
                 <Route path="students/add" element={<AddStudent />} />
-                <Route path="attendance" element={<AttendanceManager />} />
-                <Route path="attendance-report" element={<AttendanceReport />} />
-                <Route path="marks" element={<MarksManager />} />
-                <Route path="results" element={<ResultCard />} />
+                <Route path="department/manage" element={<ManageDepartment />} />
               </Route> 
             </Route>
 
@@ -110,6 +120,21 @@ function App() {
                 <Route path="assignments" element={<AssignmentManager />} />
                 <Route path="marks" element={<MarksManager />} />
                 <Route path="results" element={<ResultCard />} />
+              </Route>
+            </Route>
+
+            {/* Placement Admin Routes */}
+            <Route element={<ProtectedRoute allowedRoles={['placement_admin']} />}>
+              <Route path="/placement-admin" element={<PlacementLayout />}>
+                <Route index element={<PlacementDashboard />} />
+                <Route path="companies" element={<Companies />} />
+                <Route path="drives" element={<PlacementDrives />} />
+                <Route path="applications" element={<StudentApplications />} />
+                <Route path="eligible" element={<EligibleStudents />} />
+                <Route path="analytics" element={<Analytics />} />
+                <Route path="reports" element={<Reports />} />
+                <Route path="notifications" element={<Notifications />} />
+                <Route path="settings" element={<PlacementSettings />} />
               </Route>
             </Route>
             

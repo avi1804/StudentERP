@@ -4,13 +4,10 @@ import { LogOut, Menu } from 'lucide-react';
 
 const pageTitles: Record<string, string> = {
   '/admin/dashboard': 'Admin Dashboard',
+  '/admin/dashboard/department/manage': 'Manage Departments',
   '/admin/dashboard/students/manage': 'Manage Students',
   '/admin/dashboard/faculty/manage': 'Manage Faculty',
   '/admin/dashboard/subject/manage': 'Manage Subjects',
-  '/admin/dashboard/attendance': 'Attendance',
-  '/admin/dashboard/attendance-report': 'Attendance Report',
-  '/admin/dashboard/marks': 'Enter Marks',
-  '/admin/dashboard/results': 'View Results',
   '/admin/dashboard/notify/faculty': 'Faculty Notices',
   '/admin/dashboard/students/add': 'Add Student',
   '/admin/dashboard/faculty/add': 'Add Faculty',

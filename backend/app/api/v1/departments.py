@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any, List
 
 from app.schemas.academic import DepartmentCreate, DepartmentResponse, DepartmentUpdate
-from app.repositories.academic import department_repo
+from app.repositories.department import department_repo
 from app.dependencies.database import get_db
 from app.dependencies.auth import get_current_active_user, RequireRole
 from app.models.user import User, Role
@@ -20,7 +20,12 @@ async def create_department(
     """
     Create new department (Admin only).
     """
-    if await department_repo.get_by_code(db, code=department_in.code):
+    if not department_in.code:
+        words = [w for w in department_in.name.split() if w.lower() not in ["and", "&", "of", "the"]]
+        department_in.code = "".join([w[0].upper() for w in words])[:10] or "DEPT"
+
+    existing = await department_repo.get_by_code(db, code=department_in.code)
+    if existing:
         raise BadRequestException("Department with this code already exists.")
 
     return await department_repo.create(db, obj_in=department_in)
