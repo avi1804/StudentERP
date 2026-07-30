@@ -705,7 +705,7 @@ export function MyAttendance() {
   const [isSubjectDropdownOpen, setIsSubjectDropdownOpen] = useState(false);
 
   useEffect(() => {
-    api.get('/student-dash/attendance')
+    api.get('/student-dash/attendance?semester=7')
       .then(res => setData(res.data))
       .catch(console.error)
       .finally(() => setLoading(false));

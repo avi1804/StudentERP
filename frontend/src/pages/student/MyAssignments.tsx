@@ -1,121 +1,79 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { apiClient as api } from "../../api/axios";
 import { 
   ClipboardList, CheckCircle2, Clock, AlertCircle,
   Filter, List, Grid, MoreVertical, 
-  ChevronLeft, ChevronRight, ChevronDown, ArrowUpRight
+  ChevronLeft, ChevronRight, ChevronDown, ArrowUpRight, FileUp, X, Download
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import TextType from "../../components/TextType";
 
 export function MyAssignments() {
+  const [loading, setLoading] = useState(true);
+  const [assignments, setAssignments] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("All Assignments");
   const [selectedSemester, setSelectedSemester] = useState("7");
+  const [submitModalAssignment, setSubmitModalAssignment] = useState<any | null>(null);
+  const [submissionUrl, setSubmissionUrl] = useState('https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf');
+  const [submissionFileName, setSubmissionFileName] = useState('Assignment_Solution.pdf');
+  const [message, setMessage] = useState({ text: '', type: '' });
+
+  useEffect(() => {
+    fetchStudentAssignments();
+  }, []);
+
+  const fetchStudentAssignments = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get('/assignments/student');
+      setAssignments(res.data || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStudentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!submitModalAssignment || !submissionUrl) return;
+
+    try {
+      await api.post(`/assignments/student/${submitModalAssignment.id}/submit`, {
+        submission_url: submissionUrl,
+        file_name: submissionFileName
+      });
+      setMessage({ text: 'Assignment submitted successfully!', type: 'success' });
+      setSubmitModalAssignment(null);
+      fetchStudentAssignments();
+    } catch (err: any) {
+      const detail = err?.response?.data?.detail || 'Failed to submit assignment';
+      setMessage({ text: detail, type: 'error' });
+    }
+  };
+
+  const totalCount = assignments.length;
+  const completedCount = assignments.filter(a => a.status === 'SUBMITTED' || a.status === 'GRADED').length;
+  const pendingCount = assignments.filter(a => a.status === 'PENDING').length;
+  const overdueCount = assignments.filter(a => a.status === 'OVERDUE').length;
 
   const pieData = [
-    { name: 'Submitted', value: 7, color: '#3b82f6' },
-    { name: 'Pending', value: 4, color: '#f59e0b' },
-    { name: 'Overdue', value: 1, color: '#ef4444' },
-    // { name: 'Graded', value: 7, color: '#10b981' } - omitting from chart to match 3 slices in image, but will show in legend
+    { name: 'Submitted', value: completedCount, color: '#3b82f6' },
+    { name: 'Pending', value: pendingCount, color: '#f59e0b' },
+    { name: 'Overdue', value: overdueCount, color: '#ef4444' },
   ];
 
-  const assignments = [
-    {
-      id: 1,
-      title: "Operating System Case Study",
-      type: "Case Study",
-      subjectCode: "CS701",
-      subjectName: "Operating Systems",
-      assignedOn: "12 May 2024",
-      dueDate: "26 May 2024",
-      dueTimeInfo: "2 Days Left",
-      dueColor: "#f59e0b",
-      status: "Pending",
-      marks: "-",
-      iconColor: "purple"
-    },
-    {
-      id: 2,
-      title: "DBMS Normalization Problems",
-      type: "Problem Set",
-      subjectCode: "CS702",
-      subjectName: "DBMS",
-      assignedOn: "10 May 2024",
-      dueDate: "25 May 2024",
-      dueTimeInfo: "1 Day Left",
-      dueColor: "#f59e0b",
-      status: "Pending",
-      marks: "-",
-      iconColor: "green"
-    },
-    {
-      id: 3,
-      title: "Computer Networks Report",
-      type: "Report",
-      subjectCode: "CS703",
-      subjectName: "Computer Networks",
-      assignedOn: "08 May 2024",
-      dueDate: "20 May 2024",
-      dueTimeInfo: "3 Days Overdue",
-      dueColor: "#ef4444",
-      status: "Overdue",
-      marks: "-",
-      iconColor: "red"
-    },
-    {
-      id: 4,
-      title: "Software Design Patterns",
-      type: "Assignment",
-      subjectCode: "CS704",
-      subjectName: "Software Engineering",
-      assignedOn: "05 May 2024",
-      dueDate: "18 May 2024",
-      dueTimeInfo: "",
-      dueColor: "",
-      status: "Submitted",
-      marks: "18 / 20",
-      iconColor: "blue"
-    },
-    {
-      id: 5,
-      title: "ML Model Implementation",
-      type: "Programming",
-      subjectCode: "CS705",
-      subjectName: "Machine Learning",
-      assignedOn: "01 May 2024",
-      dueDate: "15 May 2024",
-      dueTimeInfo: "",
-      dueColor: "",
-      status: "Graded",
-      marks: "19 / 20",
-      iconColor: "yellow"
-    }
-  ];
-
-  const getIconColor = (color: string) => {
-    switch (color) {
-      case "purple": return { bg: "#f3f0ff", text: "#573cfa" };
-      case "green": return { bg: "#e8f5e9", text: "#10b981" };
-      case "red": return { bg: "#fef2f2", text: "#ef4444" };
-      case "blue": return { bg: "#eff6ff", text: "#3b82f6" };
-      case "yellow": return { bg: "#fffbeb", text: "#f59e0b" };
-      default: return { bg: "#f3f0ff", text: "#573cfa" };
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "Pending": return { bg: "#fffbeb", text: "#f59e0b", border: "1px solid #fde68a" };
-      case "Overdue": return { bg: "#fef2f2", text: "#ef4444", border: "1px solid #fecaca" };
-      case "Submitted": return { bg: "#eff6ff", text: "#3b82f6", border: "1px solid #bfdbfe" };
-      case "Graded": return { bg: "#e8f5e9", text: "#10b981", border: "1px solid #bbf7d0" };
-      default: return { bg: "#f3f4f6", text: "#6b7280", border: "1px solid #e5e7eb" };
-    }
-  };
+  const filteredAssignments = assignments.filter(a => {
+    if (activeTab === "Pending") return a.status === 'PENDING';
+    if (activeTab === "Submitted") return a.status === 'SUBMITTED' || a.status === 'GRADED';
+    if (activeTab === "Overdue") return a.status === 'OVERDUE';
+    return true;
+  });
 
   return (
     <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
-      {/* ── Header with Animated Highlighted Text Badge (Matching Main Dashboard & Attendance) ── */}
+      {/* ── Header ── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
         <div>
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
@@ -143,7 +101,7 @@ export function MyAssignments() {
               />
             </span>
           </h1>
-          <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>View and manage all assignments assigned to you</div>
+          <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>View and submit assignments for your enrolled subjects</div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -154,7 +112,6 @@ export function MyAssignments() {
               onChange={(e) => setSelectedSemester(e.target.value)}
               style={{
                 appearance: 'none',
-                WebkitAppearance: 'none',
                 padding: '8px 36px 8px 16px',
                 background: 'white',
                 border: '1px solid #e5e7eb',
@@ -168,39 +125,35 @@ export function MyAssignments() {
               }}
             >
               <option value="7">Semester 7 (Current)</option>
-              <option value="6">Semester 6</option>
-              <option value="5">Semester 5</option>
-              <option value="4">Semester 4</option>
-              <option value="3">Semester 3</option>
-              <option value="2">Semester 2</option>
-              <option value="1">Semester 1</option>
             </select>
             <ChevronDown size={14} color="#6b7280" style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
           </div>
         </div>
       </div>
 
-      {/* ── Real-Time Top KPI Cards Row (AutoML Studio design matching Main Dashboard) ── */}
+      {message.text && (
+        <div style={{
+          marginBottom: '24px', padding: '14px 20px', borderRadius: '12px',
+          backgroundColor: message.type === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)',
+          color: message.type === 'error' ? '#ef4444' : '#22c55e',
+          border: message.type === 'error' ? '1px solid rgba(239,68,68,0.2)' : '1px solid rgba(34,197,94,0.2)',
+          fontWeight: 600, fontSize: '13px'
+        }}>
+          {message.text}
+        </div>
+      )}
+
+      {/* ── Top KPI Cards Row ── */}
       <motion.div
         initial="hidden"
         animate="show"
         variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
         style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '32px' }}
       >
-        {/* KPI 1 — Total Assignments */}
+        {/* KPI 1 — Total */}
         <motion.div
           variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
-          style={{
-            background: '#f4f4f5',
-            border: '1.5px solid rgba(0,0,0,0.07)',
-            borderRadius: '24px',
-            padding: '22px 24px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            minHeight: '185px',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-          }}
+          style={{ background: '#f4f4f5', border: '1.5px solid rgba(0,0,0,0.07)', borderRadius: '24px', padding: '22px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '185px' }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -209,34 +162,20 @@ export function MyAssignments() {
               </div>
               <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Assignments</span>
             </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <ArrowUpRight size={15} color="#18181b" />
             </div>
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              12
-            </div>
-            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#573cfa', fontWeight: 600 }}>100%</span> · Allotted This Semester
-            </div>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>{totalCount}</div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}><span style={{ color: '#573cfa', fontWeight: 600 }}>Enrolled</span> · Sem 7 Subjects</div>
           </div>
         </motion.div>
 
         {/* KPI 2 — Completed */}
         <motion.div
           variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
-          style={{
-            background: '#f4f4f5',
-            border: '1.5px solid rgba(0,0,0,0.07)',
-            borderRadius: '24px',
-            padding: '22px 24px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            minHeight: '185px',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-          }}
+          style={{ background: '#f4f4f5', border: '1.5px solid rgba(0,0,0,0.07)', borderRadius: '24px', padding: '22px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '185px' }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -245,34 +184,20 @@ export function MyAssignments() {
               </div>
               <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Completed</span>
             </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <ArrowUpRight size={15} color="#18181b" />
             </div>
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              7
-            </div>
-            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#22c55e', fontWeight: 600 }}>58%</span> · Successfully Submitted
-            </div>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>{completedCount}</div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}><span style={{ color: '#22c55e', fontWeight: 600 }}>Submitted</span> · Verified</div>
           </div>
         </motion.div>
 
         {/* KPI 3 — Pending */}
         <motion.div
           variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
-          style={{
-            background: '#f4f4f5',
-            border: '1.5px solid rgba(0,0,0,0.07)',
-            borderRadius: '24px',
-            padding: '22px 24px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            minHeight: '185px',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-          }}
+          style={{ background: '#f4f4f5', border: '1.5px solid rgba(0,0,0,0.07)', borderRadius: '24px', padding: '22px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '185px' }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -281,34 +206,20 @@ export function MyAssignments() {
               </div>
               <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Pending</span>
             </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <ArrowUpRight size={15} color="#18181b" />
             </div>
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              4
-            </div>
-            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#f59e0b', fontWeight: 600 }}>33%</span> · Pending Submission
-            </div>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>{pendingCount}</div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}><span style={{ color: '#f59e0b', fontWeight: 600 }}>Action Required</span></div>
           </div>
         </motion.div>
 
         {/* KPI 4 — Overdue */}
         <motion.div
           variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
-          style={{
-            background: '#f4f4f5',
-            border: '1.5px solid rgba(0,0,0,0.07)',
-            borderRadius: '24px',
-            padding: '22px 24px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            minHeight: '185px',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-          }}
+          style={{ background: '#f4f4f5', border: '1.5px solid rgba(0,0,0,0.07)', borderRadius: '24px', padding: '22px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '185px' }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -317,311 +228,198 @@ export function MyAssignments() {
               </div>
               <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Overdue</span>
             </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <ArrowUpRight size={15} color="#18181b" />
             </div>
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              1
-            </div>
-            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#ef4444', fontWeight: 600 }}>8%</span> · Urgent Action Required
-            </div>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>{overdueCount}</div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}><span style={{ color: '#ef4444', fontWeight: 600 }}>Expired</span></div>
           </div>
         </motion.div>
       </motion.div>
 
-      {/* Main List Section */}
-      <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #f3f4f6', marginBottom: '24px', overflow: 'hidden' }}>
-        
-        {/* Filters and Tabs */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', borderBottom: '1px solid #f3f4f6' }}>
-          <div style={{ display: 'flex', gap: '24px' }}>
-            {['All Assignments', 'Pending', 'Submitted', 'Graded', 'Overdue'].map(tab => (
-              <div 
+      {/* ── Main Section ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px' }}>
+        {/* Left Column: Assignment List */}
+        <div>
+          {/* Navigation Tabs */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px', borderBottom: '1px solid #e5e7eb', paddingBottom: '12px' }}>
+            {["All Assignments", "Pending", "Submitted", "Overdue"].map(tab => (
+              <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                style={{ 
-                  fontSize: '13px', 
-                  fontWeight: 600, 
-                  color: activeTab === tab ? '#573cfa' : '#6b7280', 
+                style={{
+                  background: activeTab === tab ? '#6366f1' : 'transparent',
+                  color: activeTab === tab ? '#ffffff' : '#64748b',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '12px',
+                  fontSize: '13px',
+                  fontWeight: 700,
                   cursor: 'pointer',
-                  position: 'relative',
-                  paddingBottom: '16px',
-                  marginBottom: '-16px'
+                  transition: 'all 0.15s ease'
                 }}
               >
                 {tab}
-                {activeTab === tab && (
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px', background: '#573cfa' }} />
-                )}
-              </div>
+              </button>
             ))}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <button style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: 'white', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '13px', fontWeight: 600, color: '#374151', cursor: 'pointer' }}>
-              <Filter size={16} /> Filter
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: 'white', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '13px', fontWeight: 600, color: '#374151', cursor: 'pointer' }}>
-              Sort by: Due Date <ChevronDown size={16} color="#6b7280" />
-            </div>
-            <div style={{ display: 'flex', background: '#f3f4f6', borderRadius: '8px', padding: '4px' }}>
-              <div style={{ padding: '6px', background: 'white', borderRadius: '6px', color: '#573cfa', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', cursor: 'pointer' }}>
-                <List size={16} />
+          {/* Assignments List Cards */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {filteredAssignments.length > 0 ? (
+              filteredAssignments.map((a) => (
+                <div key={a.id} style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.06)', borderRadius: '20px', padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#6366f1', background: 'rgba(99,102,241,0.08)', padding: '2px 8px', borderRadius: '6px' }}>
+                        {a.subject_code}
+                      </span>
+                      <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>Prof. {a.faculty_name}</span>
+                    </div>
+                    <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#09090b', margin: '6px 0 4px 0' }}>{a.title}</h3>
+                    <div style={{ fontSize: '12px', color: '#71717a' }}>{a.subject_name} • Due: {a.due_date} ({a.due_time})</div>
+                    {a.remarks && (
+                      <div style={{ marginTop: '8px', fontSize: '12px', background: '#f8fafc', padding: '6px 10px', borderRadius: '8px', borderLeft: '3px solid #6366f1', color: '#475569' }}>
+                        <strong>Feedback:</strong> {a.remarks}
+                      </div>
+                    )}
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '10px' }}>
+                    <span style={{
+                      padding: '4px 10px', borderRadius: '10px', fontSize: '12px', fontWeight: 700,
+                      background: a.status === 'GRADED' ? 'rgba(34,197,94,0.1)' : a.status === 'SUBMITTED' ? 'rgba(59,130,246,0.1)' : a.status === 'OVERDUE' ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.1)',
+                      color: a.status === 'GRADED' ? '#22c55e' : a.status === 'SUBMITTED' ? '#3b82f6' : a.status === 'OVERDUE' ? '#ef4444' : '#f59e0b'
+                    }}>
+                      {a.status} {a.marks !== '-' ? `(${a.marks})` : ''}
+                    </span>
+
+                    {a.status === 'PENDING' && (
+                      <button
+                        onClick={() => setSubmitModalAssignment(a)}
+                        style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', color: '#ffffff', border: 'none', padding: '8px 16px', borderRadius: '12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                      >
+                        <FileUp size={14} /> Submit Work
+                      </button>
+                    )}
+                    {(a.status === 'SUBMITTED' || a.status === 'GRADED') && a.submitted_file && (
+                      <a
+                        href={a.submitted_file}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{ color: '#6366f1', fontSize: '12px', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                      >
+                        <Download size={14} /> View Submission
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div style={{ padding: '32px', textAlign: 'center', color: '#71717a', fontSize: '14px', background: '#ffffff', borderRadius: '20px', border: '1.5px solid rgba(0,0,0,0.06)' }}>
+                No assignments found in this view.
               </div>
-              <div style={{ padding: '6px', color: '#9ca3af', cursor: 'pointer' }}>
-                <Grid size={16} />
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Table Header */}
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 1fr 1fr 0.5fr', gap: '16px', padding: '16px 24px', borderBottom: '1px solid #f3f4f6', fontSize: '11px', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase' }}>
-          <div>Assignment</div>
-          <div>Subject</div>
-          <div>Assigned On</div>
-          <div>Due Date</div>
-          <div>Status</div>
-          <div>Marks</div>
-          <div style={{ textAlign: 'right' }}>Actions</div>
-        </div>
-
-        {/* Table Body */}
+        {/* Right Column: Breakdown Chart */}
         <div>
-          {assignments.map((item, idx) => {
-            const iconColors = getIconColor(item.iconColor);
-            const statusBadge = getStatusBadge(item.status);
-
-            return (
-              <div key={item.id} style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 1fr 1fr 0.5fr', gap: '16px', padding: '16px 24px', borderBottom: idx === assignments.length - 1 ? 'none' : '1px solid #f3f4f6', alignItems: 'center' }}>
-                
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: iconColors.bg, color: iconColors.text, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <ClipboardList size={20} />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827', marginBottom: '2px' }}>{item.title}</div>
-                    <div style={{ fontSize: '12px', color: '#6b7280' }}>{item.type}</div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 600, color: '#573cfa', background: '#f3f0ff', padding: '2px 6px', borderRadius: '4px' }}>{item.subjectCode}</span>
-                  <span style={{ fontSize: '13px', color: '#4b5563' }}>{item.subjectName}</span>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#4b5563' }}>
-                  <Clock size={14} color="#9ca3af" /> {item.assignedOn}
-                </div>
-
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#4b5563', marginBottom: item.dueTimeInfo ? '2px' : '0' }}>
-                    <Clock size={14} color="#9ca3af" /> {item.dueDate}
-                  </div>
-                  {item.dueTimeInfo && (
-                    <div style={{ fontSize: '11px', fontWeight: 600, color: item.dueColor }}>{item.dueTimeInfo}</div>
-                  )}
-                </div>
-
-                <div>
-                  <span style={{ background: statusBadge.bg, color: statusBadge.text, border: statusBadge.border, padding: '4px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 600 }}>
-                    {item.status}
-                  </span>
-                </div>
-
-                <div style={{ fontSize: '13px', color: '#4b5563', fontWeight: item.marks !== "-" ? 600 : 400 }}>
-                  {item.marks}
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
-                  <button style={{ padding: '6px 12px', background: 'white', border: '1px solid #e5e7eb', color: '#573cfa', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>
-                    View
-                  </button>
-                  <button style={{ padding: '6px', background: 'white', border: '1px solid #e5e7eb', color: '#6b7280', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <MoreVertical size={16} />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Pagination */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', borderTop: '1px solid #f3f4f6' }}>
-          <div style={{ fontSize: '12px', color: '#6b7280' }}>
-            Showing 1 to 5 of 12 assignments
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <button style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'white', border: '1px solid #e5e7eb', borderRadius: '6px', color: '#9ca3af', cursor: 'pointer' }}>
-              <ChevronLeft size={16} />
-            </button>
-            <button style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f3f0ff', border: '1px solid #f3f0ff', borderRadius: '6px', color: '#573cfa', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}>
-              1
-            </button>
-            <button style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'white', border: '1px solid #e5e7eb', borderRadius: '6px', color: '#4b5563', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}>
-              2
-            </button>
-            <button style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'white', border: '1px solid #e5e7eb', borderRadius: '6px', color: '#4b5563', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}>
-              3
-            </button>
-            <button style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'white', border: '1px solid #e5e7eb', borderRadius: '6px', color: '#9ca3af', cursor: 'pointer' }}>
-              <ChevronRight size={16} />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom 3 Cards Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
-        
-        {/* Assignment Overview */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: '0 0 24px 0' }}>Assignment Overview</h3>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-            <div style={{ width: '120px', height: '120px', position: 'relative' }}>
+          <div style={{ background: '#ffffff', borderRadius: '20px', border: '1.5px solid rgba(0,0,0,0.06)', padding: '24px' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#09090b', marginBottom: '16px' }}>Status Breakdown</h3>
+            <div style={{ height: '180px', position: 'relative' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={pieData} innerRadius={45} outerRadius={60} paddingAngle={2} dataKey="value" stroke="none">
+                  <Pie data={pieData} innerRadius={50} outerRadius={70} dataKey="value">
                     {pieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
-              <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', lineHeight: 1 }}>12</div>
-                <div style={{ fontSize: '11px', color: '#6b7280' }}>Total</div>
-              </div>
             </div>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {[
-                { name: 'Submitted', value: '7 (58%)', color: '#3b82f6' },
-                { name: 'Pending', value: '4 (33%)', color: '#f59e0b' },
-                { name: 'Overdue', value: '1 (8%)', color: '#ef4444' },
-                { name: 'Graded', value: '7 (58%)', color: '#10b981' }
-              ].map((g, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#4b5563' }}>
-                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: g.color }}></div>
-                    {g.name}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '16px' }}>
+              {pieData.map((p, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: p.color }} />
+                    <span style={{ fontWeight: 600, color: '#3f3f46' }}>{p.name}</span>
                   </div>
-                  <div style={{ color: '#6b7280' }}>{g.value}</div>
+                  <span style={{ fontWeight: 700, color: '#09090b' }}>{p.value}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
-
-        {/* Upcoming Deadlines */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: 0 }}>Upcoming Deadlines</h3>
-            <span style={{ fontSize: '12px', color: '#573cfa', fontWeight: 600, cursor: 'pointer' }}>View all</span>
-          </div>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ width: '48px', textAlign: 'center' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#573cfa', textTransform: 'uppercase' }}>MAY</div>
-                <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#111827' }}>25</div>
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827', marginBottom: '2px' }}>DBMS Normalization Problems</div>
-                <div style={{ fontSize: '11px', color: '#6b7280' }}>CS702 - DBMS</div>
-              </div>
-              <div style={{ fontSize: '11px', fontWeight: 600, color: '#f59e0b' }}>1 Day Left</div>
-            </div>
-            
-            <div style={{ height: '1px', background: '#f3f4f6' }}></div>
-            
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ width: '48px', textAlign: 'center' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#573cfa', textTransform: 'uppercase' }}>MAY</div>
-                <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#111827' }}>26</div>
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827', marginBottom: '2px' }}>Operating System Case Study</div>
-                <div style={{ fontSize: '11px', color: '#6b7280' }}>CS701 - Operating Systems</div>
-              </div>
-              <div style={{ fontSize: '11px', fontWeight: 600, color: '#f59e0b' }}>2 Days Left</div>
-            </div>
-            
-            <div style={{ height: '1px', background: '#f3f4f6' }}></div>
-            
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ width: '48px', textAlign: 'center' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>JUN</div>
-                <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#111827' }}>02</div>
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827', marginBottom: '2px' }}>AI Project Proposal</div>
-                <div style={{ fontSize: '11px', color: '#6b7280' }}>CS706 - Artificial Intelligence</div>
-              </div>
-              <div style={{ fontSize: '11px', fontWeight: 600, color: '#9ca3af' }}>9 Days Left</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Recent Submissions */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: 0 }}>Recent Submissions</h3>
-            <span style={{ fontSize: '12px', color: '#573cfa', fontWeight: 600, cursor: 'pointer' }}>View all</span>
-          </div>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', justifyContent: 'space-between' }}>
-              <div>
-                <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827', marginBottom: '2px' }}>Software Design Patterns</div>
-                <div style={{ fontSize: '11px', color: '#6b7280' }}>CS704 - Software Engineering</div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <span style={{ background: '#e8f5e9', color: '#10b981', padding: '2px 8px', borderRadius: '10px', fontSize: '10px', fontWeight: 600, border: '1px solid #bbf7d0' }}>Graded</span>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827' }}>18/20</div>
-                  <div style={{ fontSize: '10px', color: '#9ca3af' }}>10 May 2024</div>
-                </div>
-              </div>
-            </div>
-            
-            <div style={{ height: '1px', background: '#f3f4f6' }}></div>
-            
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', justifyContent: 'space-between' }}>
-              <div>
-                <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827', marginBottom: '2px' }}>ML Model Implementation</div>
-                <div style={{ fontSize: '11px', color: '#6b7280' }}>CS705 - Machine Learning</div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <span style={{ background: '#e8f5e9', color: '#10b981', padding: '2px 8px', borderRadius: '10px', fontSize: '10px', fontWeight: 600, border: '1px solid #bbf7d0' }}>Graded</span>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827' }}>19/20</div>
-                  <div style={{ fontSize: '10px', color: '#9ca3af' }}>08 May 2024</div>
-                </div>
-              </div>
-            </div>
-            
-            <div style={{ height: '1px', background: '#f3f4f6' }}></div>
-            
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', justifyContent: 'space-between' }}>
-              <div>
-                <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827', marginBottom: '2px' }}>Software Requirements Doc</div>
-                <div style={{ fontSize: '11px', color: '#6b7280' }}>CS704 - Software Engineering</div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <span style={{ background: '#eff6ff', color: '#3b82f6', padding: '2px 8px', borderRadius: '10px', fontSize: '10px', fontWeight: 600, border: '1px solid #bfdbfe' }}>Submitted</span>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827' }}>-</div>
-                  <div style={{ fontSize: '10px', color: '#9ca3af' }}>06 May 2024</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
       </div>
+
+      {/* ── STUDENT SUBMISSION MODAL ── */}
+      <AnimatePresence>
+        {submitModalAssignment && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              style={{ background: '#ffffff', borderRadius: '24px', width: '100%', maxWidth: '500px', padding: '28px', boxShadow: '0 20px 50px rgba(0,0,0,0.2)' }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#09090b', margin: 0 }}>
+                  Upload Assignment Submission
+                </h3>
+                <button onClick={() => setSubmitModalAssignment(null)} style={{ background: '#f4f4f5', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                  <X size={16} color="#71717a" />
+                </button>
+              </div>
+
+              <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '14px', marginBottom: '20px', fontSize: '13px' }}>
+                <div style={{ fontWeight: 700, color: '#09090b' }}>{submitModalAssignment.title}</div>
+                <div style={{ color: '#64748b', marginTop: '2px' }}>Subject: {submitModalAssignment.subject_name} • Max Marks: {submitModalAssignment.max_marks}</div>
+              </div>
+
+              <form onSubmit={handleStudentSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div>
+                  <label style={{ fontSize: '13px', fontWeight: 700, color: '#3f3f46', display: 'block', marginBottom: '6px' }}>
+                    Submission File Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={submissionFileName}
+                    onChange={e => setSubmissionFileName(e.target.value)}
+                    style={{ width: '100%', padding: '12px 16px', borderRadius: '14px', border: '1.5px solid rgba(0,0,0,0.1)', fontSize: '14px', outline: 'none' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '13px', fontWeight: 700, color: '#3f3f46', display: 'block', marginBottom: '6px' }}>
+                    File URL / Document Link *
+                  </label>
+                  <input
+                    type="url"
+                    required
+                    value={submissionUrl}
+                    onChange={e => setSubmissionUrl(e.target.value)}
+                    style={{ width: '100%', padding: '12px 16px', borderRadius: '14px', border: '1.5px solid rgba(0,0,0,0.1)', fontSize: '14px', outline: 'none' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '8px' }}>
+                  <button type="button" onClick={() => setSubmitModalAssignment(null)} style={{ background: '#f4f4f5', border: 'none', padding: '10px 18px', borderRadius: '12px', fontWeight: 600, color: '#52525b', cursor: 'pointer' }}>
+                    Cancel
+                  </button>
+                  <button type="submit" style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', border: 'none', padding: '10px 22px', borderRadius: '12px', fontWeight: 700, color: '#ffffff', cursor: 'pointer', boxShadow: '0 4px 16px rgba(99,102,241,0.3)' }}>
+                    Confirm & Submit
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

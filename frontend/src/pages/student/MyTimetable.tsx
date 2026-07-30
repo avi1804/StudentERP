@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Calendar, BookOpen, Clock, ChevronDown, Download, Info,
   Utensils, ArrowUpRight
@@ -7,74 +7,71 @@ import { motion } from "framer-motion";
 import TextType from "../../components/TextType";
 
 export function MyTimetable() {
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const timetableData = [
     {
-      time: "08:00 AM\n-\n09:00 AM",
-      monday: { name: "Operating Systems", room: "Room 301", color: "purple" },
-      tuesday: { name: "Computer Networks", room: "Room 302", color: "yellow" },
-      wednesday: { name: "Operating Systems", room: "Room 301", color: "purple" },
-      thursday: { name: "Software Engineering", room: "Room 303", color: "blue" },
-      friday: { name: "Database Systems", room: "Room 301", color: "green" },
-      saturday: null
-    },
-    {
       time: "09:00 AM\n-\n10:00 AM",
-      monday: { name: "Database Systems", room: "Room 301", color: "green" },
-      tuesday: { name: "Software Engineering", room: "Room 303", color: "blue" },
-      wednesday: { name: "Computer Networks", room: "Room 302", color: "yellow" },
-      thursday: { name: "Operating Systems", room: "Room 301", color: "purple" },
-      friday: { name: "Machine Learning", room: "Room 304", color: "pink" },
+      monday: { name: "Software Group Project", prof: "Parth Nirmal", room: "Room 301", color: "purple" },
+      tuesday: { name: "Machine Learning", prof: "Babita Patel", room: "Lab 2", color: "green" },
+      wednesday: { name: "Cloud Computing", prof: "Vrushali", room: "Room 204", color: "blue" },
+      thursday: { name: "NLP", prof: "Ashwin Patni", room: "Room 302", color: "yellow" },
+      friday: { name: "Flat", prof: "Dipali Jeetya", room: "Room 105", color: "pink" },
       saturday: null
     },
     {
       time: "10:00 AM\n-\n11:00 AM",
-      monday: { name: "Machine Learning", room: "Room 304", color: "pink" },
-      tuesday: { name: "Database Systems", room: "Room 301", color: "green" },
-      wednesday: { name: "Software Engineering", room: "Room 303", color: "blue" },
-      thursday: { name: "Computer Networks", room: "Room 302", color: "yellow" },
-      friday: { name: "Operating Systems", room: "Room 301", color: "purple" },
+      monday: { name: "Machine Learning", prof: "Babita Patel", room: "Lab 2", color: "green" },
+      tuesday: { name: "NLP", prof: "Ashwin Patni", room: "Room 302", color: "yellow" },
+      wednesday: { name: "Flat", prof: "Dipali Jeetya", room: "Room 105", color: "pink" },
+      thursday: { name: "Software Group Project", prof: "Parth Nirmal", room: "Room 301", color: "purple" },
+      friday: { name: "Cloud Computing", prof: "Vrushali", room: "Room 204", color: "blue" },
       saturday: null
     },
     {
       time: "11:00 AM\n-\n12:00 PM",
-      monday: null,
-      tuesday: null,
-      wednesday: { name: "DBMS Lab", room: "Lab 2", color: "green" },
-      thursday: null,
-      friday: null,
+      monday: { name: "NLP", prof: "Ashwin Patni", room: "Room 302", color: "yellow" },
+      tuesday: { name: "Flat", prof: "Dipali Jeetya", room: "Room 105", color: "pink" },
+      wednesday: { name: "Software Group Project", prof: "Parth Nirmal", room: "Room 301", color: "purple" },
+      thursday: { name: "Machine Learning", prof: "Babita Patel", room: "Lab 2", color: "green" },
+      friday: { name: "Software Group Project", prof: "Parth Nirmal", room: "Room 301", color: "purple" },
       saturday: null
     },
     {
       time: "12:00 PM\n-\n01:00 PM",
-      isBreak: true,
-      breakName: "Lunch Break"
-    },
-    {
-      time: "01:00 PM\n-\n02:00 PM",
-      monday: { name: "Software Engineering", room: "Room 303", color: "blue" },
-      tuesday: { name: "Machine Learning", room: "Room 304", color: "pink" },
-      wednesday: { name: "Computer Networks", room: "Room 302", color: "yellow" },
-      thursday: { name: "Database Systems", room: "Room 301", color: "green" },
-      friday: { name: "DBMS Lab", room: "Lab 2", color: "green" },
+      monday: { name: "Cloud Computing", prof: "Vrushali", room: "Room 204", color: "blue" },
+      tuesday: { name: "Software Group Project", prof: "Parth Nirmal", room: "Room 301", color: "purple" },
+      wednesday: { name: "Machine Learning", prof: "Babita Patel", room: "Lab 2", color: "green" },
+      thursday: { name: "Flat", prof: "Dipali Jeetya", room: "Room 105", color: "pink" },
+      friday: { name: "NLP", prof: "Ashwin Patni", room: "Room 302", color: "yellow" },
       saturday: null
     },
     {
+      time: "01:00 PM\n-\n02:00 PM",
+      isBreak: true,
+      breakName: "Lunch Break 🍱"
+    },
+    {
       time: "02:00 PM\n-\n03:00 PM",
-      monday: { name: "DBMS Lab", room: "Lab 2", color: "green" },
-      tuesday: null,
-      wednesday: { name: "Machine Learning", room: "Room 304", color: "pink" },
-      thursday: { name: "Software Engineering", room: "Room 303", color: "blue" },
-      friday: { name: "Computer Networks", room: "Room 302", color: "yellow" },
+      monday: { name: "Flat", prof: "Dipali Jeetya", room: "Room 105", color: "pink" },
+      tuesday: { name: "Cloud Computing", prof: "Vrushali", room: "Room 204", color: "blue" },
+      wednesday: { name: "NLP", prof: "Ashwin Patni", room: "Room 302", color: "yellow" },
+      thursday: { name: "Cloud Computing", prof: "Vrushali", room: "Room 204", color: "blue" },
+      friday: { name: "Machine Learning", prof: "Babita Patel", room: "Lab 2", color: "green" },
       saturday: null
     },
     {
       time: "03:00 PM\n-\n04:00 PM",
-      monday: null,
-      tuesday: { name: "Mentorship", room: "Room 201", color: "purple" },
-      wednesday: null,
-      thursday: null,
-      friday: null,
+      monday: { name: "Software Project Lab", prof: "Parth Nirmal", room: "Lab 3", color: "purple" },
+      tuesday: { name: "Machine Learning Lab", prof: "Babita Patel", room: "Lab 2", color: "green" },
+      wednesday: { name: "NLP Practical", prof: "Ashwin Patni", room: "Lab 1", color: "yellow" },
+      thursday: { name: "Cloud Computing Lab", prof: "Vrushali", room: "Lab 4", color: "blue" },
+      friday: { name: "Flat Problem Solving", prof: "Dipali Jeetya", room: "Room 105", color: "pink" },
       saturday: null
     }
   ];
@@ -94,15 +91,103 @@ export function MyTimetable() {
     if (!cellData) return <div style={{ textAlign: 'center', color: '#d1d5db' }}>-</div>;
     const colors = getColorStyles(cellData.color);
     return (
-      <div style={{ background: colors.bg, padding: '10px 12px', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <div style={{ background: colors.bg, padding: '10px 12px', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '3px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: colors.text, flexShrink: 0 }} />
           <div style={{ fontSize: '12px', fontWeight: 700, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cellData.name}</div>
         </div>
-        <div style={{ fontSize: '11px', color: '#6b7280', paddingLeft: '12px', fontWeight: 500 }}>{cellData.room}</div>
+        {cellData.prof && (
+          <div style={{ fontSize: '11px', color: '#4b5563', paddingLeft: '12px', fontWeight: 600 }}>{cellData.prof}</div>
+        )}
+        <div style={{ fontSize: '10px', color: '#6b7280', paddingLeft: '12px', fontWeight: 500 }}>{cellData.room}</div>
       </div>
     );
   };
+
+  // Real-Time Dynamic Next Class & Stats Calculation
+  const daysMap = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const dayName = daysMap[now.getDay()];
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  const parseStartMinute = (timeStr: string) => {
+    const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if (!match) return 0;
+    let h = parseInt(match[1], 10);
+    const m = parseInt(match[2], 10);
+    const ampm = match[3].toUpperCase();
+    if (ampm === 'PM' && h < 12) h += 12;
+    if (ampm === 'AM' && h === 12) h = 0;
+    return h * 60 + m;
+  };
+
+  let nextClassInfo = {
+    time: "09:00 AM",
+    name: "Software Group Project",
+    label: "Tomorrow Morning",
+  };
+
+  if (dayName === 'saturday' || dayName === 'sunday') {
+    nextClassInfo = {
+      time: "09:00 AM",
+      name: "Software Group Project",
+      label: "Monday Morning",
+    };
+  } else {
+    const futureSlot = timetableData.find(slot => {
+      const startMin = parseStartMinute(slot.time);
+      return startMin > currentMinutes;
+    });
+
+    if (futureSlot) {
+      const timeParts = futureSlot.time.split('\n-\n');
+      const startTime = timeParts[0] || "10:00 AM";
+      
+      if (futureSlot.isBreak) {
+        nextClassInfo = {
+          time: startTime,
+          name: "Lunch Break 🍱",
+          label: "Upcoming Break",
+        };
+      } else {
+        const classObj = (futureSlot as any)[dayName];
+        if (classObj) {
+          nextClassInfo = {
+            time: startTime,
+            name: classObj.name,
+            label: `${classObj.room || 'Class'} · Next Scheduled`,
+          };
+        } else {
+          nextClassInfo = {
+            time: startTime,
+            name: "Free Slot",
+            label: "Next Scheduled",
+          };
+        }
+      }
+    } else {
+      const tomorrowIndex = (now.getDay() % 5) + 1;
+      const tomorrowName = daysMap[tomorrowIndex];
+      const firstSlotTomorrow = (timetableData[0] as any)[tomorrowName];
+
+      nextClassInfo = {
+        time: "09:00 AM",
+        name: firstSlotTomorrow ? firstSlotTomorrow.name : "Software Group Project",
+        label: "Tomorrow Morning",
+      };
+    }
+  }
+
+  let classesTodayCount = 6;
+  if (dayName === 'saturday' || dayName === 'sunday') {
+    classesTodayCount = 0;
+  } else {
+    classesTodayCount = timetableData.filter(s => !s.isBreak && (s as any)[dayName]).length;
+  }
+
+  let weeklyClassesCount = 0;
+  ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].forEach(d => {
+    weeklyClassesCount += timetableData.filter(s => !s.isBreak && (s as any)[d]).length;
+  });
 
   return (
     <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
@@ -182,10 +267,10 @@ export function MyTimetable() {
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
             <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              4
+              {classesTodayCount}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#573cfa', fontWeight: 600 }}>4 Classes</span> · Scheduled Today
+              <span style={{ color: '#573cfa', fontWeight: 600 }}>{classesTodayCount} Classes</span> · Scheduled Today
             </div>
           </div>
         </motion.div>
@@ -218,15 +303,15 @@ export function MyTimetable() {
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
             <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              24
+              {weeklyClassesCount}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#22c55e', fontWeight: 600 }}>24 Classes</span> · Weekly Schedule
+              <span style={{ color: '#22c55e', fontWeight: 600 }}>{weeklyClassesCount} Classes</span> · Weekly Schedule
             </div>
           </div>
         </motion.div>
 
-        {/* KPI 3 — Next Class */}
+        {/* KPI 3 — Real-Time Next Class */}
         <motion.div
           variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
           style={{
@@ -253,11 +338,11 @@ export function MyTimetable() {
             </div>
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '38px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              10:45 AM
+            <div style={{ fontSize: '36px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px', whiteSpace: 'nowrap' }}>
+              {nextClassInfo.time}
             </div>
-            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#3b82f6', fontWeight: 600 }}>DBMS</span> · Next Scheduled
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <span style={{ color: '#3b82f6', fontWeight: 600 }}>{nextClassInfo.name}</span> · {nextClassInfo.label}
             </div>
           </div>
         </motion.div>
@@ -310,9 +395,6 @@ export function MyTimetable() {
           </table>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '24px', color: '#71717a', fontSize: '13px', fontWeight: 500 }}>
-          <Info size={16} color="#573cfa" /> Timetable is effective from 10 May 2024
-        </div>
       </div>
     </div>
   );

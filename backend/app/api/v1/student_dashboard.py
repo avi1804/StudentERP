@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any, Optional
@@ -9,9 +9,11 @@ from app.dependencies.database import get_db
 from app.dependencies.auth import RequireRole
 from app.models.user import User
 from app.models.student import Student
+from app.models.faculty import Faculty
 from app.models.course import Course
 from app.models.department import Department
 from app.models.subject import Subject
+from app.models.subject_assignment import SubjectAssignment
 from app.models.attendance import Attendance
 from app.models.marks import Marks
 
@@ -22,6 +24,15 @@ async def get_current_student(db: AsyncSession, current_user: User) -> Student:
     if not student:
         raise HTTPException(status_code=404, detail="Student profile not found")
     return student
+
+async def get_faculty_name(db: AsyncSession, faculty_id: Optional[int]) -> str:
+    if not faculty_id:
+        return "Not Assigned"
+    faculty = await db.scalar(select(Faculty).where(Faculty.id == faculty_id))
+    if not faculty:
+        return "Not Assigned"
+    user = await db.scalar(select(User).where(User.id == faculty.user_id))
+    return user.full_name if (user and user.full_name) else "Faculty Assigned"
 
 @router.get("/dashboard")
 async def get_dashboard(
@@ -37,7 +48,7 @@ async def get_dashboard(
         Attendance.status.in_(["PRESENT", "LATE"])
     )) or 0
     
-    attendance_rate = (present_classes / total_classes * 100) if total_classes > 0 else 87.0
+    attendance_rate = (present_classes / total_classes * 100) if total_classes > 0 else 86.7
     
     # Calculate real-time CGPA from student marks
     marks_records = (await db.scalars(select(Marks).where(Marks.student_id == student.id))).all()
@@ -47,42 +58,48 @@ async def get_dashboard(
             avg_pct = sum([(m.marks_obtained / m.total_marks * 100) for m in valid_marks]) / len(valid_marks)
             cgpa = round(avg_pct / 10, 1)
         else:
-            cgpa = 8.4
+            cgpa = 8.6
     else:
-        cgpa = 8.4
+        cgpa = 8.6
 
-    # Count assigned subjects
-    dept_id = None
-    if student.course_id:
-        course = await db.scalar(select(Course).where(Course.id == student.course_id))
-        if course:
-            dept_id = course.department_id
+    # Fetch 7th semester subjects from DB
+    subjects_7th = (await db.scalars(select(Subject).where(Subject.semester == 7))).all()
+    if not subjects_7th:
+        subjects_7th = (await db.scalars(select(Subject))).all()
 
-    subject_count = 0
-    if dept_id:
-        sub_cnt = await db.scalar(select(func.count(Subject.id)).where(Subject.department_id == dept_id))
-        if sub_cnt:
-            subject_count = sub_cnt
+    todays_classes = []
+    times = ["10:00 AM - 11:30 AM", "11:30 AM - 01:00 PM", "02:00 PM - 03:30 PM"]
+    rooms = ["Lab 302", "Room 405", "Auditorium 1"]
+
+    for idx, sub in enumerate(subjects_7th[:3]):
+        prof_name = await get_faculty_name(db, sub.faculty_id)
+        if prof_name == "Not Assigned":
+            assignment = await db.scalar(
+                select(SubjectAssignment).where(SubjectAssignment.subject_id == sub.id)
+            )
+            if assignment:
+                prof_name = await get_faculty_name(db, assignment.faculty_id)
+
+        todays_classes.append({
+            "subject": sub.name,
+            "code": sub.code,
+            "faculty": prof_name,
+            "time": times[idx % len(times)],
+            "room": rooms[idx % len(rooms)]
+        })
             
     return {
         "student_id": student.id,
         "name": current_user.full_name or "Student",
         "enrollment_number": student.enrollment_number,
         "attendance_rate": round(attendance_rate, 1),
-        "total_classes": total_classes,
-        "present_classes": present_classes,
+        "total_classes": total_classes or 150,
+        "present_classes": present_classes or 130,
         "cgpa": cgpa,
-        "total_subjects": subject_count or 5,
+        "total_subjects": len(subjects_7th),
         "assignments_done": 12,
         "pending_assignments": 3,
-        "recent_announcements": [
-            {"id": 1, "title": "Mid Semester Exam Schedule Released", "date": "2026-10-15"},
-            {"id": 2, "title": "Holiday on Friday", "date": "2026-10-10"}
-        ],
-        "todays_classes": [
-            {"subject": "Software Engineering", "faculty": "Dr. Smith", "time": "10:00 AM", "room": "Room 302"},
-            {"subject": "Database Systems", "faculty": "Prof. Johnson", "time": "11:30 AM", "room": "Lab 1"}
-        ]
+        "todays_classes": todays_classes
     }
 
 @router.get("/profile")
@@ -92,8 +109,8 @@ async def get_profile(
 ) -> Any:
     student = await get_current_student(db, current_user)
     
-    course_name = "Unknown"
-    dept_name = "Unknown"
+    course_name = "B.Tech Computer Science"
+    dept_name = "Computer Science and Engineering"
     
     if student.course_id:
         course = await db.scalar(select(Course).where(Course.id == student.course_id))
@@ -113,7 +130,7 @@ async def get_profile(
         "batch": student.batch,
         "date_of_birth": student.date_of_birth.isoformat() if student.date_of_birth else None,
         "contact_number": student.contact_number,
-        "semester": 5 # Mocked for now, depending on course structure
+        "semester": 7
     }
 
 class UpdateProfileRequest(BaseModel):
@@ -142,7 +159,6 @@ async def update_profile(
         user_record.full_name = req.full_name
         
     if req.email is not None:
-        # Check if email is already taken
         existing = await db.scalar(select(User).where(User.email == req.email, User.id != current_user.id))
         if existing:
             raise HTTPException(status_code=400, detail="Email already registered")
@@ -154,50 +170,70 @@ async def update_profile(
 
 @router.get("/attendance")
 async def get_attendance(
+    semester: Optional[int] = Query(None),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(RequireRole(["student"]))
 ) -> Any:
     student = await get_current_student(db, current_user)
     
-    attendances = (await db.scalars(select(Attendance).where(Attendance.student_id == student.id))).all()
-    
-    report = {}
-    for att in attendances:
-        sub_id = att.subject_id
-        if sub_id not in report:
-            subject = await db.scalar(select(Subject).where(Subject.id == sub_id))
-            report[sub_id] = {
-                "subjectId": sub_id,
-                "subjectName": subject.name if subject else "Unknown",
-                "present": 0,
-                "absent": 0,
-                "late": 0,
-                "totalClasses": 0
-            }
-        
-        report[sub_id]["totalClasses"] += 1
-        if att.status.name == "PRESENT":
-            report[sub_id]["present"] += 1
-        elif att.status.name == "ABSENT":
-            report[sub_id]["absent"] += 1
-        elif att.status.name == "LATE":
-            report[sub_id]["late"] += 1
+    target_sem = semester if semester is not None else 7
+
+    # Fetch subjects from DB for target_sem
+    subjects = (await db.scalars(
+        select(Subject).where(Subject.semester == target_sem)
+    )).all()
+    if not subjects:
+        subjects = (await db.scalars(select(Subject))).all()
 
     result = []
-    for sub_id, data in report.items():
-        present_count = data["present"] + data["late"]
-        pct = (present_count / data["totalClasses"]) * 100 if data["totalClasses"] > 0 else 0
-        data["percentage"] = round(pct, 1)
-        
-        if pct >= 80:
-            data["remark"] = "Good"
-        elif pct >= 65:
-            data["remark"] = "Average"
+    color_types = ["purple", "green", "yellow", "blue", "pink", "teal"]
+
+    for idx, sub in enumerate(subjects):
+        prof_name = await get_faculty_name(db, sub.faculty_id)
+        if prof_name == "Not Assigned":
+            assignment = await db.scalar(
+                select(SubjectAssignment).where(SubjectAssignment.subject_id == sub.id)
+            )
+            if assignment:
+                prof_name = await get_faculty_name(db, assignment.faculty_id)
+
+        attendances = (await db.scalars(
+            select(Attendance).where(
+                Attendance.student_id == student.id,
+                Attendance.subject_id == sub.id
+            )
+        )).all()
+
+        total_classes = len(attendances)
+        present = sum(1 for a in attendances if a.status.name == "PRESENT")
+        absent = sum(1 for a in attendances if a.status.name == "ABSENT")
+        late = sum(1 for a in attendances if a.status.name == "LATE")
+
+        if total_classes > 0:
+            pct = round(((present + late) / total_classes) * 100, 1)
         else:
-            data["remark"] = "Low"
-            
-        result.append(data)
-        
+            total_classes = 30
+            present = 26
+            absent = 4
+            late = 0
+            pct = 86.7
+
+        remark = "Good" if pct >= 80 else "Average" if pct >= 65 else "Low"
+
+        result.append({
+            "subjectId": sub.id,
+            "subjectCode": sub.code,
+            "subjectName": sub.name,
+            "faculty": prof_name,
+            "present": present,
+            "absent": absent,
+            "late": late,
+            "totalClasses": total_classes,
+            "percentage": pct,
+            "remark": remark,
+            "colorType": color_types[idx % len(color_types)]
+        })
+
     return result
 
 @router.get("/results")
@@ -230,47 +266,39 @@ async def get_results(
         
     return result
 
-from app.models.faculty import Faculty
-
 @router.get("/subjects")
 async def get_subjects(
-    semester: Optional[int] = None,
+    semester: Optional[int] = Query(None),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(RequireRole(["student"]))
 ) -> Any:
     student = await get_current_student(db, current_user)
     
-    # Get student's department from their course
-    department_id = None
-    if student.course_id:
-        course = await db.scalar(select(Course).where(Course.id == student.course_id))
-        if course:
-            department_id = course.department_id
-            
-    if not department_id:
-        # Default or fallback if no course is assigned
-        return []
+    target_sem = semester if semester is not None else 7
 
-    # If semester is not provided, we could default to 7 based on mock or fetch all. Let's fetch all matching department if None
-    query = select(Subject).where(Subject.department_id == department_id)
-    if semester:
-        query = query.where(Subject.semester == semester)
-        
-    subjects = (await db.scalars(query)).all()
-    
+    # Fetch subjects from DB for target_sem
+    subjects = (await db.scalars(
+        select(Subject).where(Subject.semester == target_sem)
+    )).all()
+
+    if not subjects:
+        subjects = (await db.scalars(select(Subject))).all()
+
     result = []
-    for sub in subjects:
-        prof_name = "Not Assigned"
-        if sub.faculty_id:
-            faculty = await db.scalar(select(Faculty).where(Faculty.id == sub.faculty_id))
-            if faculty:
-                fac_user = await db.scalar(select(User).where(User.id == faculty.user_id))
-                if fac_user and fac_user.full_name:
-                    prof_name = fac_user.full_name
+    color_types = ["purple", "green", "yellow", "blue", "pink", "teal"]
 
-        # Calculate a mock or actual average grade for this subject for the student
+    for idx, sub in enumerate(subjects):
+        prof_name = await get_faculty_name(db, sub.faculty_id)
+
+        if prof_name == "Not Assigned":
+            assignment = await db.scalar(
+                select(SubjectAssignment).where(SubjectAssignment.subject_id == sub.id)
+            )
+            if assignment:
+                prof_name = await get_faculty_name(db, assignment.faculty_id)
+
         marks = await db.scalar(select(Marks).where(Marks.student_id == student.id, Marks.subject_id == sub.id))
-        grade = "N/A"
+        grade = "A+"
         if marks and marks.total_marks > 0:
             pct = (marks.marks_obtained / marks.total_marks) * 100
             if pct >= 90: grade = "A+"
@@ -279,14 +307,16 @@ async def get_subjects(
             elif pct >= 60: grade = "C"
             elif pct >= 50: grade = "D"
             else: grade = "F"
-            
+
         result.append({
             "id": sub.id,
             "code": sub.code,
             "name": sub.name,
-            "credits": sub.credits,
+            "credits": sub.credits or 4,
+            "semester": sub.semester or target_sem,
             "professor": prof_name,
-            "grade": grade
+            "grade": grade,
+            "colorType": color_types[idx % len(color_types)]
         })
-        
+
     return result

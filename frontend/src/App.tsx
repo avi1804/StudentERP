@@ -42,6 +42,7 @@ const FacultyLayout = React.lazy(() => import("./pages/faculty/FacultyLayout").t
 const FacultyDashboard = React.lazy(() => import("./pages/faculty/FacultyDashboard").then(m => ({ default: m.FacultyDashboard })));
 const AttendanceManager = React.lazy(() => import("./pages/faculty/AttendanceManager").then(m => ({ default: m.AttendanceManager })));
 const AttendanceReport = React.lazy(() => import("./pages/faculty/AttendanceReport").then(m => ({ default: m.AttendanceReport })));
+const AssignmentManager = React.lazy(() => import("./pages/faculty/AssignmentManager").then(m => ({ default: m.AssignmentManager })));
 const MarksManager = React.lazy(() => import("./pages/faculty/MarksManager").then(m => ({ default: m.MarksManager })));
 const ResultCard = React.lazy(() => import("./pages/faculty/ResultCard").then(m => ({ default: m.ResultCard })));
 
@@ -106,6 +107,7 @@ function App() {
                 <Route path="dashboard" element={<FacultyDashboard />} />
                 <Route path="attendance" element={<AttendanceManager />} />
                 <Route path="attendance-report" element={<AttendanceReport />} />
+                <Route path="assignments" element={<AssignmentManager />} />
                 <Route path="marks" element={<MarksManager />} />
                 <Route path="results" element={<ResultCard />} />
               </Route>

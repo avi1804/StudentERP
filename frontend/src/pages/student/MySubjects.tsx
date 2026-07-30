@@ -16,14 +16,15 @@ export function MySubjects() {
   const { isMobile } = useIsMobile();
   const [data, setData] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedSemester, setSelectedSemester] = useState<number>(7);
 
   useEffect(() => {
-    // Assuming semester 7 is requested
-    api.get('/student-dash/subjects?semester=7')
+    setLoading(true);
+    api.get(`/student-dash/subjects?semester=${selectedSemester}`)
       .then(res => setData(res.data))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [selectedSemester]);
 
   const pieData = [
     { name: 'Core Subjects', value: 4, color: '#10b981' },
@@ -100,9 +101,22 @@ export function MySubjects() {
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <label style={{ fontSize: '11px', fontWeight: 600, color: '#9ca3af', marginBottom: '4px' }}>Semester</label>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', fontSize: '13px', color: '#374151', cursor: 'pointer', fontWeight: 600 }}>
-            Semester 7 (Current) <ChevronDown size={14} color="#6b7280" />
-          </div>
+          <select
+            value={selectedSemester}
+            onChange={(e) => setSelectedSemester(Number(e.target.value))}
+            style={{
+              padding: '8px 16px', background: 'white',
+              border: '1px solid #e5e7eb', borderRadius: '12px',
+              fontSize: '13px', color: '#374151', cursor: 'pointer',
+              fontWeight: 600, outline: 'none',
+            }}
+          >
+            {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => (
+              <option key={sem} value={sem}>
+                Semester {sem} {sem === 7 ? '(Current)' : ''}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

@@ -14,8 +14,10 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { Users, GraduationCap, BookText, ClipboardList, IndianRupee, Hourglass } from "lucide-react";
+import { Users, GraduationCap, BookText, ClipboardList, IndianRupee, Hourglass, ArrowUpRight, Wallet } from "lucide-react";
 import { dashboardService, type AdminDashboardData } from "@/services/dashboard.service";
+import { motion } from "framer-motion";
+import TextType from "@/components/TextType";
 
 export function DashboardHome() {
   const [data, setData] = useState<AdminDashboardData | null>(null);
@@ -47,88 +49,190 @@ export function DashboardHome() {
   ];
 
   return (
-    <>
-      <div className="dash-stat-grid">
-        {STATS.map(({ label, value, colorClass, icon: Icon, sub, badge }) => {
-          let valColor = "blue";
-          if (colorClass.includes("red")) valColor = "red";
-          else if (colorClass.includes("gray") || colorClass.includes("yellow") || colorClass.includes("amber")) valColor = "amber";
-          else if (colorClass.includes("pink") || colorClass.includes("purple")) valColor = "purple";
-          else if (colorClass.includes("green")) valColor = "green";
-          else if (colorClass.includes("teal")) valColor = "teal";
+    <div style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+      {/* ── Header with Animated Highlighted Text Badge ── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
+        <div>
+          <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <span>Admin</span>
+            <span style={{
+              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+              color: '#ffffff',
+              padding: '4px 18px',
+              borderRadius: '14px',
+              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              lineHeight: 1.2,
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+            }}>
+              <TextType
+                text={["Dashboard", "Analytics", "Control Center"]}
+                typingSpeed={60}
+                deletingSpeed={35}
+                pauseDuration={2200}
+                loop={true}
+                showCursor={true}
+                cursorCharacter="|"
+                style={{ color: '#ffffff' }}
+              />
+            </span>
+          </h1>
+          <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>Monitor system performance, student enrollment, and academic metrics</div>
+        </div>
+      </div>
 
-          return (
-            <div key={label} className="dash-stat-card" style={{ position: 'relative', overflow: 'hidden' }}>
-              <div className="stat-label" style={{ textTransform: 'uppercase' }}>{label}</div>
-              <div className={`stat-val ${valColor}`}>{value}</div>
-              {sub && <div className="stat-sub">{sub}</div>}
-              {badge && (
-                <div style={{ display: 'inline-flex', alignItems: 'center', background: badge.includes('✔') ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)', color: badge.includes('✔') ? 'var(--green)' : 'var(--red)', padding: '4px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 600, marginTop: '8px', border: badge.includes('✔') ? '1px solid rgba(34,197,94,0.2)' : '1px solid rgba(239,68,68,0.2)' }}>
-                  {badge}
-                </div>
-              )}
-              <Icon style={{ position: 'absolute', bottom: '0', right: '0', width: '80px', height: '80px', color: 'rgba(255,255,255,0.02)', transform: 'translate(10%, 20%)', pointerEvents: 'none' }} />
+      {/* ── AutoML Studio Style Top KPI Cards Row ── */}
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '32px' }}
+      >
+        {/* KPI 1 — Total Students */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(59,130,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(59,130,246,0.08)' }}>
+                <Users size={18} color="#3b82f6" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Students</span>
             </div>
-          );
-        })}
-      </div>
-
-      <div className="dash-charts-top">
-        <div className="dash-chart-card card">
-          <div className="dash-chart-title">Attendance Trend</div>
-          <div className="dash-chart-sub">Daily attendance % - last 30 days</div>
-          <div className="dash-chart-wrap h260">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data.attendance_trend}>
-                <defs>
-                  <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="rgba(79,142,247,0.28)" />
-                    <stop offset="100%" stopColor="rgba(79,142,247,0)" />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                <XAxis dataKey="date" tick={{ fontSize: 12, fill: "var(--text3)" }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
-                <YAxis
-                  domain={[0, 1]}
-                  ticks={[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
-                  tick={{ fontSize: 11, fill: "var(--text3)" }}
-                  tickFormatter={(v) => `${(v * 100).toFixed(0)}%`}
-                  axisLine={{ stroke: "var(--border)" }}
-                  tickLine={false}
-                />
-                <Tooltip contentStyle={{ background: "rgba(20,24,34,0.9)", border: "1px solid var(--border)", borderRadius: 8, color: "#fff" }} itemStyle={{ color: '#b0b4cf' }} />
-                <Line type="monotone" dataKey="attendance" stroke="#4f8ef7" strokeWidth={3} dot={{ r: 4, fill: '#141822', stroke: '#4f8ef7', strokeWidth: 2 }} activeDot={{ r: 6, fill: '#4f8ef7' }} fill="url(#lineGradient)" />
-              </LineChart>
-            </ResponsiveContainer>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
           </div>
-        </div>
-      </div>
-
-      <div className="dash-charts-bottom" style={{ marginBottom: '24px' }}>
-        <div className="dash-chart-card card">
-          <div className="dash-chart-title">Subject-wise Performance</div>
-          <div className="dash-chart-sub">Average marks % and attendance % per subject</div>
-          <div className="dash-chart-wrap h260">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data.subject_performance}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                <XAxis dataKey="subject" tick={{ fontSize: 12, fill: "var(--text3)" }} axisLine={{ stroke: "var(--border)" }} tickLine={false} />
-                <YAxis
-                  domain={[0, 1]}
-                  ticks={[0, 0.2, 0.4, 0.6, 0.8, 1.0]}
-                  tick={{ fontSize: 11, fill: "var(--text3)" }}
-                  tickFormatter={(v) => `${(v * 100).toFixed(0)}%`}
-                  axisLine={{ stroke: "var(--border)" }}
-                  tickLine={false}
-                />
-                <Tooltip contentStyle={{ background: "rgba(20,24,34,0.9)", border: "1px solid var(--border)", borderRadius: 8, color: "#fff" }} itemStyle={{ color: '#b0b4cf' }} />
-                <Bar name="Attendance" dataKey="attendance" fill="#4f8ef7" radius={[4, 4, 0, 0]} barSize={20} />
-                <Bar name="Marks" dataKey="marks" fill="#b78efe" radius={[4, 4, 0, 0]} barSize={20} />
-              </BarChart>
-            </ResponsiveContainer>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              {data.total_students}
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#3b82f6', fontWeight: 600 }}>Active</span> · Enrolled Across Branches
+            </div>
           </div>
-        </div>
-      </div>
-    </>
+        </motion.div>
+
+        {/* KPI 2 — Total Faculty */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(87,60,250,0.08)' }}>
+                <GraduationCap size={18} color="#573cfa" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Faculty</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
+          </div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              {data.total_faculty}
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#573cfa', fontWeight: 600 }}>Active</span> · Faculty Members
+            </div>
+          </div>
+        </motion.div>
+
+        {/* KPI 3 — Total Subjects */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(34,197,94,0.08)' }}>
+                <BookText size={18} color="#22c55e" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Subjects</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
+          </div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              {data.total_subjects}
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#22c55e', fontWeight: 600 }}>All Semesters</span> · Active Courses
+            </div>
+          </div>
+        </motion.div>
+
+        {/* KPI 4 — Pending Fees */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(239,68,68,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(239,68,68,0.08)' }}>
+                <Wallet size={18} color="#ef4444" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Pending Fees</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
+          </div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              ₹4.25L
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#ef4444', fontWeight: 600 }}>Uncollected</span> · Outstanding Dues
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    </div>
   );
 } 

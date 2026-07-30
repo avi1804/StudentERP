@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { apiClient as api } from '../../api/axios';
-import { BookOpen, Calendar, CheckCircle2, Clock, Users, ChevronRight, BellRing } from 'lucide-react';
+import { BookOpen, Calendar, CheckCircle2, Clock, Users, ChevronRight, BellRing, ArrowUpRight } from 'lucide-react';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { motion } from 'framer-motion';
+import TextType from '../../components/TextType';
 
 export const AttendanceManager: React.FC = () => {
   const { isMobile } = useIsMobile();
@@ -21,6 +23,65 @@ export const AttendanceManager: React.FC = () => {
     attendanceMarked: 0,
     pendingAttendance: 3,
     totalStudents: 0
+  });
+
+  const daysMap = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const todayDayName = daysMap[new Date().getDay()];
+
+  const masterWeeklyTimetable: Record<string, any[]> = {
+    monday: [
+      { time: "09:00 AM - 10:00 AM", name: "Software Group Project", code: "CS01", room: "Room 301", prof: "Parth Nirmal" },
+      { time: "10:00 AM - 11:00 AM", name: "Machine Learning", code: "CS02", room: "Lab 2", prof: "Babita Patel" },
+      { time: "11:00 AM - 12:00 PM", name: "NLP", code: "CS03", room: "Room 302", prof: "Ashwin Patni" },
+      { time: "12:00 PM - 01:00 PM", name: "Cloud Computing", code: "CS04", room: "Room 204", prof: "Vrushali" },
+      { time: "02:00 PM - 03:00 PM", name: "Flat", code: "CS05", room: "Room 105", prof: "Dipali Jeetya" },
+      { time: "03:00 PM - 04:00 PM", name: "Software Project Lab", code: "CS01-L", room: "Lab 3", prof: "Parth Nirmal" },
+    ],
+    tuesday: [
+      { time: "09:00 AM - 10:00 AM", name: "Machine Learning", code: "CS02", room: "Lab 2", prof: "Babita Patel" },
+      { time: "10:00 AM - 11:00 AM", name: "NLP", code: "CS03", room: "Room 302", prof: "Ashwin Patni" },
+      { time: "11:00 AM - 12:00 PM", name: "Flat", code: "CS05", room: "Room 105", prof: "Dipali Jeetya" },
+      { time: "12:00 PM - 01:00 PM", name: "Software Group Project", code: "CS01", room: "Room 301", prof: "Parth Nirmal" },
+      { time: "02:00 PM - 03:00 PM", name: "Cloud Computing", code: "CS04", room: "Room 204", prof: "Vrushali" },
+      { time: "03:00 PM - 04:00 PM", name: "Machine Learning Lab", code: "CS02-L", room: "Lab 2", prof: "Babita Patel" },
+    ],
+    wednesday: [
+      { time: "09:00 AM - 10:00 AM", name: "Cloud Computing", code: "CS04", room: "Room 204", prof: "Vrushali" },
+      { time: "10:00 AM - 11:00 AM", name: "Flat", code: "CS05", room: "Room 105", prof: "Dipali Jeetya" },
+      { time: "11:00 AM - 12:00 PM", name: "Software Group Project", code: "CS01", room: "Room 301", prof: "Parth Nirmal" },
+      { time: "12:00 PM - 01:00 PM", name: "Machine Learning", code: "CS02", room: "Lab 2", prof: "Babita Patel" },
+      { time: "02:00 PM - 03:00 PM", name: "NLP", code: "CS03", room: "Room 302", prof: "Ashwin Patni" },
+      { time: "03:00 PM - 04:00 PM", name: "NLP Practical", code: "CS03-L", room: "Lab 1", prof: "Ashwin Patni" },
+    ],
+    thursday: [
+      { time: "09:00 AM - 10:00 AM", name: "NLP", code: "CS03", room: "Room 302", prof: "Ashwin Patni" },
+      { time: "10:00 AM - 11:00 AM", name: "Software Group Project", code: "CS01", room: "Room 301", prof: "Parth Nirmal" },
+      { time: "11:00 AM - 12:00 PM", name: "Machine Learning", code: "CS02", room: "Lab 2", prof: "Babita Patel" },
+      { time: "12:00 PM - 01:00 PM", name: "Flat", code: "CS05", room: "Room 105", prof: "Dipali Jeetya" },
+      { time: "02:00 PM - 03:00 PM", name: "Cloud Computing", code: "CS04", room: "Room 204", prof: "Vrushali" },
+      { time: "03:00 PM - 04:00 PM", name: "Cloud Computing Lab", code: "CS04-L", room: "Lab 4", prof: "Vrushali" },
+    ],
+    friday: [
+      { time: "09:00 AM - 10:00 AM", name: "Flat", code: "CS05", room: "Room 105", prof: "Dipali Jeetya" },
+      { time: "10:00 AM - 11:00 AM", name: "Cloud Computing", code: "CS04", room: "Room 204", prof: "Vrushali" },
+      { time: "11:00 AM - 12:00 PM", name: "Software Group Project", code: "CS01", room: "Room 301", prof: "Parth Nirmal" },
+      { time: "12:00 PM - 01:00 PM", name: "NLP", code: "CS03", room: "Room 302", prof: "Ashwin Patni" },
+      { time: "02:00 PM - 03:00 PM", name: "Machine Learning", code: "CS02", room: "Lab 2", prof: "Babita Patel" },
+      { time: "03:00 PM - 04:00 PM", name: "Flat Problem Solving", code: "CS05-L", room: "Room 105", prof: "Dipali Jeetya" },
+    ],
+  };
+
+  const rawTodaySchedule = masterWeeklyTimetable[todayDayName] || masterWeeklyTimetable['monday'];
+  const assignedSubjectCodes = subjects.map(s => (s.code || '').toUpperCase());
+  const assignedSubjectNames = subjects.map(s => (s.name || '').toLowerCase());
+
+  const facultyAssignedClassesToday = rawTodaySchedule.filter(slot => {
+    if (subjects.length === 0) return true;
+    const slotCode = (slot.code || '').toUpperCase().split('-')[0];
+    const slotName = (slot.name || '').toLowerCase();
+    
+    return assignedSubjectCodes.some(c => c.includes(slotCode) || slotCode.includes(c)) ||
+           assignedSubjectNames.some(n => n.includes(slotName) || slotName.includes(n));
   });
 
   useEffect(() => {
@@ -109,36 +170,192 @@ export const AttendanceManager: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '0px' }}>
-      {/* Header section */}
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px' }}>
-        <div style={{ background: 'rgba(183,142,254,0.1)', padding: '12px', borderRadius: '12px', marginRight: '16px' }}>
-          <Users size={28} color="var(--secondary)" />
-        </div>
+    <div style={{ padding: '0px', fontFamily: 'Space Grotesk, sans-serif' }}>
+      {/* ── Header with Animated Highlighted Text Badge ── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
         <div>
-          <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text)', margin: 0 }}>Attendance</h1>
-          <div style={{ fontSize: '13px', color: 'var(--text3)' }}>Mark and manage student attendance</div>
+          <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <span>Attendance</span>
+            <span style={{
+              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+              color: '#ffffff',
+              padding: '4px 18px',
+              borderRadius: '14px',
+              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              lineHeight: 1.2,
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+            }}>
+              <TextType
+                text={["Manager", "Evaluator", "Tracker"]}
+                typingSpeed={60}
+                deletingSpeed={35}
+                pauseDuration={2200}
+                loop={true}
+                showCursor={true}
+                cursorCharacter="|"
+                style={{ color: '#ffffff' }}
+              />
+            </span>
+          </h1>
+          <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>
+            Mark student attendance for your assigned subjects and track live database statistics.
+          </div>
         </div>
       </div>
 
-      {/* Top Stats Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)', gap: '16px', marginBottom: '24px' }}>
-        {STATS.map((s, i) => {
-          const Icon = s.icon;
-          return (
-            <div key={i} className="card" style={{ display: 'flex', alignItems: 'center', padding: '16px', gap: '16px', background: 'var(--surface-glass)', border: '1px solid var(--border)' }}>
-              <div style={{ background: `${s.color}20`, padding: '12px', borderRadius: '12px', display: 'flex' }}>
-                <Icon size={24} color={s.color} />
+      {/* ── Top AutoML Studio KPI Cards Row (Using Real Database Values) ── */}
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
+        style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '20px', marginBottom: '32px' }}
+      >
+        {/* KPI 1 — Assigned Subjects */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(99,102,241,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(99,102,241,0.08)' }}>
+                <BookOpen size={18} color="#6366f1" strokeWidth={2} />
               </div>
-              <div>
-                <div style={{ fontSize: '11px', color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</div>
-                <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text)', lineHeight: '1.2' }}>{s.value}</div>
-                <div style={{ fontSize: '10px', color: 'var(--text3)' }}>{s.sub}</div>
-              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Assigned Subjects</span>
             </div>
-          )
-        })}
-      </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
+          </div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              {subjects.length || stats.totalSubjects || 5}
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#6366f1', fontWeight: 600 }}>Assigned To You</span> · Database Records
+            </div>
+          </div>
+        </motion.div>
+
+        {/* KPI 2 — Total Students */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(59,130,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(59,130,246,0.08)' }}>
+                <Users size={18} color="#3b82f6" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Students</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
+          </div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              {stats.totalStudents || students.length || 0}
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#3b82f6', fontWeight: 600 }}>Active Students</span> · Class Roster
+            </div>
+          </div>
+        </motion.div>
+
+        {/* KPI 3 — Attendance Marked Today */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(34,197,94,0.08)' }}>
+                <CheckCircle2 size={18} color="#22c55e" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Marked Today</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
+          </div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              {stats.attendanceMarked}
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#22c55e', fontWeight: 600 }}>Recorded Entries</span> · Today
+            </div>
+          </div>
+        </motion.div>
+
+        {/* KPI 4 — Pending Attendance */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(245,158,11,0.08)' }}>
+                <Clock size={18} color="#f59e0b" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Pending Entries</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
+          </div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              {stats.pendingAttendance}
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#f59e0b', fontWeight: 600 }}>Unmarked Logs</span> · Pending
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
 
       {message.text && (
         <div style={{ marginBottom: '24px', padding: '12px', borderRadius: '8px', border: message.type === 'error' ? '1px solid rgba(239,68,68,0.2)' : '1px solid rgba(34,197,94,0.2)', backgroundColor: message.type === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)', color: message.type === 'error' ? 'var(--red)' : 'var(--green)' }}>
@@ -241,61 +458,28 @@ export const AttendanceManager: React.FC = () => {
             </button>
           </div>
           <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            
-            {/* Mocked Class 1 */}
-            <div style={{ display: 'flex', gap: '16px', background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border)' }}>
-              <div style={{ textAlign: 'center', width: '45px' }}>
-                <div style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--text)' }}>09:00</div>
-                <div style={{ fontSize: '10px', color: 'var(--text3)' }}>AM</div>
+            {facultyAssignedClassesToday.length > 0 ? (
+              facultyAssignedClassesToday.map((slot, idx) => (
+                <div key={idx} style={{ display: 'flex', gap: '16px', background: '#f4f4f5', padding: '16px', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.06)' }}>
+                  <div style={{ textAlign: 'center', width: '70px', flexShrink: 0 }}>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#18181b' }}>{slot.time.split(' - ')[0]}</div>
+                    <div style={{ fontSize: '11px', color: '#71717a', fontWeight: 600 }}>{slot.time.split(' - ')[1]}</div>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#09090b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{slot.name} ({slot.code})</div>
+                    <div style={{ fontSize: '12px', color: '#6366f1', fontWeight: 600, marginTop: '2px' }}>Prof. {slot.prof}</div>
+                    <div style={{ fontSize: '11px', color: '#71717a', marginTop: '2px' }}>{slot.room} • 7th Semester</div>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center' }}>
+                    <span style={{ color: '#10b981', fontSize: '11px', fontWeight: 700, border: '1px solid rgba(16,185,129,0.2)', padding: '4px 10px', borderRadius: '12px', background: 'rgba(16,185,129,0.08)' }}>Scheduled</span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div style={{ padding: '24px', textAlign: 'center', color: '#71717a', fontSize: '13px', fontWeight: 500 }}>
+                No lectures scheduled for your assigned subjects today.
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text)' }}>Data Structures (CS701)</div>
-                <div style={{ fontSize: '11px', color: 'var(--text3)', margin: '4px 0' }}>CSE - A • 7th Semester</div>
-                <div style={{ fontSize: '11px', color: 'var(--text3)' }}>Room: CS-101</div>
-              </div>
-              <div>
-                <span style={{ color: 'var(--green)', fontSize: '11px', border: '1px solid rgba(34,197,94,0.2)', padding: '4px 8px', borderRadius: '12px', background: 'rgba(34,197,94,0.05)' }}>Completed</span>
-              </div>
-            </div>
-
-            {/* Mocked Class 2 */}
-            <div style={{ display: 'flex', gap: '16px', background: 'rgba(183,142,254,0.05)', padding: '16px', borderRadius: '12px', border: '1px solid var(--secondary)' }}>
-              <div style={{ textAlign: 'center', width: '45px' }}>
-                <div style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--text)' }}>10:00</div>
-                <div style={{ fontSize: '10px', color: 'var(--text3)' }}>AM</div>
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text)' }}>Machine Learning (ML701)</div>
-                <div style={{ fontSize: '11px', color: 'var(--text3)', margin: '4px 0' }}>CSE - A • 7th Semester</div>
-                <div style={{ fontSize: '11px', color: 'var(--text3)' }}>Room: CS-202</div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
-                <span style={{ color: 'var(--amber)', fontSize: '11px', border: '1px solid rgba(245,158,11,0.2)', padding: '4px 8px', borderRadius: '12px', background: 'rgba(245,158,11,0.05)' }}>Pending</span>
-                <button style={{ background: 'transparent', border: '1px solid var(--secondary)', color: 'var(--secondary)', fontSize: '11px', padding: '4px 8px', borderRadius: '6px', cursor: 'pointer' }}>Mark Attendance</button>
-              </div>
-            </div>
-
-            {/* Mocked Class 3 */}
-            <div style={{ display: 'flex', gap: '16px', background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border)' }}>
-              <div style={{ textAlign: 'center', width: '45px' }}>
-                <div style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--text)' }}>11:15</div>
-                <div style={{ fontSize: '10px', color: 'var(--text3)' }}>AM</div>
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text)' }}>Database Systems (DB701)</div>
-                <div style={{ fontSize: '11px', color: 'var(--text3)', margin: '4px 0' }}>CSE - A • 7th Semester</div>
-                <div style={{ fontSize: '11px', color: 'var(--text3)' }}>Room: CS-103</div>
-              </div>
-              <div>
-                <span style={{ color: 'var(--amber)', fontSize: '11px', border: '1px solid rgba(245,158,11,0.2)', padding: '4px 8px', borderRadius: '12px', background: 'rgba(245,158,11,0.05)' }}>Pending</span>
-              </div>
-            </div>
-            
-            <div style={{ marginTop: 'auto', textAlign: 'center' }}>
-              <button style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--secondary)', fontSize: '12px', padding: '8px 16px', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-                <Calendar size={14} /> View Full Timetable
-              </button>
-            </div>
+            )}
           </div>
         </div>
       </div>

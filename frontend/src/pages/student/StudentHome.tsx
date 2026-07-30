@@ -6,7 +6,7 @@ import {
   Check, TrendingUp, Play, MonitorPlay, 
   User, IdCard, CheckCircle2, Calendar, 
   BarChart2, Book, Megaphone, Layers, Briefcase, ArrowUpRight,
-  CheckCircle, FileText, Activity, ChevronLeft, ChevronRight, Clock, Monitor, Database, Network, Brain
+  CheckCircle, FileText, Activity, ChevronLeft, ChevronRight, Clock, Monitor, Database, Network, Brain, Code2, Utensils, BookOpen
 } from "lucide-react";
 import { motion } from "framer-motion";
 import TextType from "../../components/TextType";
@@ -304,10 +304,13 @@ function CurrentClassCard() {
   }, []);
 
   const schedule = [
-    { name: 'Operating Systems', code: 'CS701', room: 'Room 301', prof: 'Dr. Mehul Shah', startH: 9, startM: 0, endH: 10, endM: 30, icon: Monitor, color: '#573cfa', bg: '#f0f3ff' },
-    { name: 'Database Management Systems', code: 'CS702', room: 'Lab 2', prof: 'Prof. Kinjal Patel', startH: 10, startM: 45, endH: 12, endM: 15, icon: Database, color: '#10b981', bg: '#e8f5e9' },
-    { name: 'Computer Networks', code: 'CS703', room: 'Room 302', prof: 'Prof. Jigar Sheth', startH: 13, startM: 30, endH: 15, endM: 0, icon: Network, color: '#f59e0b', bg: '#fffbeb' },
-    { name: 'Machine Learning', code: 'CS705', room: 'Room 204', prof: 'Prof. Rutvik Shah', startH: 15, startM: 15, endH: 16, endM: 45, icon: Brain, color: '#ec4899', bg: '#fdf2f8' },
+    { name: 'Software Group Project', code: 'CS01', room: 'Room 301', prof: 'Parth Nirmal', startH: 9, startM: 0, endH: 10, endM: 0, icon: Monitor, color: '#573cfa', bg: '#f0f3ff' },
+    { name: 'Machine Learning', code: 'CS02', room: 'Lab 2', prof: 'Babita Patel', startH: 10, startM: 0, endH: 11, endM: 0, icon: Brain, color: '#10b981', bg: '#e8f5e9' },
+    { name: 'NLP', code: 'CS03', room: 'Room 302', prof: 'Ashwin Patni', startH: 11, startM: 0, endH: 12, endM: 0, icon: Network, color: '#f59e0b', bg: '#fffbeb' },
+    { name: 'Cloud Computing', code: 'CS04', room: 'Room 204', prof: 'Vrushali', startH: 12, startM: 0, endH: 13, endM: 0, icon: Database, color: '#3b82f6', bg: '#eff6ff' },
+    { name: 'Lunch Break 🍱', code: 'LUNCH', room: 'Cafeteria', prof: 'Rest & Refreshment', startH: 13, startM: 0, endH: 14, endM: 0, icon: Clock, color: '#ec4899', bg: '#fdf2f8', isLunch: true },
+    { name: 'Flat', code: 'CS05', room: 'Room 105', prof: 'Dipali Jeetya', startH: 14, startM: 0, endH: 15, endM: 0, icon: Code2, color: '#8b5cf6', bg: '#f3e8ff' },
+    { name: 'Software Project Lab', code: 'CS01-L', room: 'Lab 3', prof: 'Parth Nirmal', startH: 15, startM: 0, endH: 16, endM: 0, icon: Monitor, color: '#573cfa', bg: '#f0f3ff' },
   ];
 
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
@@ -321,7 +324,9 @@ function CurrentClassCard() {
   let statusText = 'ONGOING LECTURE';
   let isLive = true;
 
-  if (!activeClass) {
+  if (activeClass && activeClass.isLunch) {
+    statusText = 'LUNCH BREAK 🍱';
+  } else if (!activeClass) {
     activeClass = schedule.find(c => (c.startH * 60 + c.startM) > currentMinutes);
     if (activeClass) {
       statusText = 'NEXT CLASS';
@@ -340,7 +345,106 @@ function CurrentClassCard() {
   const progressPct = isLive ? Math.round((elapsed / duration) * 100) : 100;
 
   const formattedTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  const IconComp = activeClass.icon;
+  const IconComp = activeClass.icon || Monitor;
+
+  if (statusText === 'CLASSES COMPLETED FOR TODAY') {
+    return (
+      <div style={{
+        background: '#ffffff',
+        border: '1.5px solid rgba(0,0,0,0.06)',
+        borderRadius: '28px',
+        padding: '26px 30px',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.03)',
+        width: '100%',
+      }}>
+        {/* Header Row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{
+              width: '10px',
+              height: '10px',
+              borderRadius: '50%',
+              background: '#10b981',
+              boxShadow: '0 0 10px #10b981',
+            }} />
+            <span style={{
+              fontSize: '12px',
+              fontWeight: 800,
+              color: '#10b981',
+              letterSpacing: '0.5px',
+            }}>
+              CLASSES COMPLETED FOR TODAY
+            </span>
+          </div>
+
+          <div style={{
+            fontSize: '13px',
+            fontWeight: 700,
+            color: '#52525b',
+            background: '#f4f4f5',
+            padding: '6px 14px',
+            borderRadius: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+          }}>
+            <Clock size={14} color="#573cfa" />
+            {formattedTime}
+          </div>
+        </div>
+
+        {/* Main Subject Content */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '18px', marginBottom: '20px' }}>
+          <div style={{
+            width: '56px',
+            height: '56px',
+            borderRadius: '18px',
+            background: '#e8f5e9',
+            color: '#10b981',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.15)',
+          }}>
+            <CheckCircle2 size={28} color="#10b981" />
+          </div>
+
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: '20px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.4px', marginBottom: '4px' }}>
+              All 6 Lectures Completed
+            </div>
+            <div style={{ fontSize: '13px', color: '#71717a', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>7th Semester</span>
+              <span>•</span>
+              <span style={{ color: '#10b981', fontWeight: 700 }}>5 Active DB Subjects</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Time & Progress Bar Row */}
+        <div style={{ background: '#f4f4f5', borderRadius: '18px', padding: '16px 20px', border: '1px solid rgba(0,0,0,0.03)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: '#18181b' }}>
+              09:00 AM - 04:00 PM (Full Day)
+            </span>
+            <span style={{ fontSize: '13px', fontWeight: 800, color: '#10b981' }}>
+              100% Completed
+            </span>
+          </div>
+
+          <div style={{ width: '100%', height: '6px', background: '#e4e4e7', borderRadius: '4px', overflow: 'hidden' }}>
+            <div style={{
+              width: '100%',
+              height: '100%',
+              background: '#10b981',
+              borderRadius: '4px',
+            }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{

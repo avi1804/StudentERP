@@ -2,6 +2,16 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.v1.api import api_router
+from app.database.session import engine
+from app.database.base import Base
+
+# Ensure all models are imported so Base.metadata knows about them
+import app.models.user  # noqa
+import app.models.faculty  # noqa
+import app.models.student  # noqa
+import app.models.subject  # noqa
+import app.models.subject_assignment  # noqa
+import app.models.assignment  # noqa  - registers assignments + assignment_submissions
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -35,6 +45,13 @@ app.add_middleware(
 app.add_middleware(AuditLogMiddleware)
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
+@app.on_event("startup")
+async def on_startup():
+    """Auto-create any missing tables on server start."""
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all, checkfirst=True)
+
 
 @app.get("/")
 def root():
