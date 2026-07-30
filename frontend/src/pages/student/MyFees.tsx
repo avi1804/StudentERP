@@ -1,9 +1,11 @@
 import React from "react";
 import { 
   Wallet, Receipt, Clock, Calendar, ChevronDown, Download,
-  FileText, ArrowRight, Bell, Headset
+  FileText, ArrowRight, Bell, Headset, ArrowUpRight
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { motion } from "framer-motion";
+import TextType from "../../components/TextType";
 
 export function MyFees() {
 
@@ -38,86 +40,233 @@ export function MyFees() {
   ];
 
   return (
-    <div style={{ padding: '32px', maxWidth: '1400px', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
+    <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
       
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '32px' }}>
-        <div style={{ width: '48px', height: '48px', background: '#f3f0ff', borderRadius: '12px', marginRight: '16px', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Wallet size={24} />
-        </div>
+      {/* ── Header with Animated Highlighted Text Badge (Matching Main Dashboard & Attendance) ── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
         <div>
-          <h1 style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827', margin: '0 0 4px 0' }}>Fee Management</h1>
-          <div style={{ fontSize: '13px', color: '#6b7280' }}>Track, manage and view your fee payments</div>
+          <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <span>Fee</span>
+            <span style={{
+              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+              color: '#ffffff',
+              padding: '4px 18px',
+              borderRadius: '14px',
+              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              lineHeight: 1.2,
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+            }}>
+              <TextType
+                text={["Management", "Payments", "Structure"]}
+                typingSpeed={60}
+                deletingSpeed={35}
+                pauseDuration={2200}
+                loop={true}
+                showCursor={true}
+                cursorCharacter="|"
+                style={{ color: '#ffffff' }}
+              />
+            </span>
+          </h1>
+          <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>Track, manage and view your fee payments</div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', fontSize: '13px', fontWeight: 600, color: '#374151', cursor: 'pointer' }}>
+            Academic Year 2024 - 25 <ChevronDown size={14} color="#6b7280" />
+          </div>
         </div>
       </div>
 
-      {/* Top Metrics Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px', marginBottom: '24px' }}>
-        
-        {/* Total Fees */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Wallet size={24} />
+      {/* ── Real-Time Top KPI Cards Row (AutoML Studio design matching Main Dashboard) ── */}
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '18px', marginBottom: '32px' }}
+      >
+        {/* KPI 1 — Total Fees */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(87,60,250,0.08)' }}>
+                <Wallet size={18} color="#573cfa" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '13px', fontWeight: 500, color: '#52525b' }}>Total Fees</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '11px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Total Fees</div>
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>₹ 1,20,000</div>
-            <div style={{ fontSize: '10px', color: '#9ca3af', marginTop: '2px' }}>This Academic Year</div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '32px', fontWeight: 700, color: '#09090b', letterSpacing: '-1px', lineHeight: 1.1, marginBottom: '6px' }}>
+              ₹ 1,20,000
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#573cfa', fontWeight: 600 }}>100%</span> · Academic Year 2024-25
+            </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Paid Fees */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#e8f5e9', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Receipt size={24} />
+        {/* KPI 2 — Paid Fees */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(34,197,94,0.08)' }}>
+                <Receipt size={18} color="#22c55e" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '13px', fontWeight: 500, color: '#52525b' }}>Paid Fees</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '11px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Paid Fees</div>
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>₹ 80,000</div>
-            <div style={{ fontSize: '10px', color: '#111827', fontWeight: 600, marginTop: '2px' }}>66.67% of total</div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '32px', fontWeight: 700, color: '#09090b', letterSpacing: '-1px', lineHeight: 1.1, marginBottom: '6px' }}>
+              ₹ 80,000
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#22c55e', fontWeight: 600 }}>66.7%</span> · Total Paid
+            </div>
           </div>
-          <div style={{ position: 'absolute', bottom: 0, left: '24px', right: '24px', height: '3px', background: '#10b981', borderRadius: '3px 3px 0 0' }} />
-        </div>
+        </motion.div>
 
-        {/* Pending Fees */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fffbeb', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Wallet size={24} />
+        {/* KPI 3 — Pending Fees */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(245,158,11,0.08)' }}>
+                <Wallet size={18} color="#f59e0b" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '13px', fontWeight: 500, color: '#52525b' }}>Pending Fees</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '11px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Pending Fees</div>
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>₹ 40,000</div>
-            <div style={{ fontSize: '10px', color: '#111827', fontWeight: 600, marginTop: '2px' }}>33.33% of total</div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '32px', fontWeight: 700, color: '#09090b', letterSpacing: '-1px', lineHeight: 1.1, marginBottom: '6px' }}>
+              ₹ 40,000
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#f59e0b', fontWeight: 600 }}>33.3%</span> · Remaining Dues
+            </div>
           </div>
-          <div style={{ position: 'absolute', bottom: 0, left: '24px', right: '24px', height: '3px', background: '#f59e0b', borderRadius: '3px 3px 0 0' }} />
-        </div>
+        </motion.div>
 
-        {/* Overdue Amount */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fef2f2', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Clock size={24} />
+        {/* KPI 4 — Overdue Amount */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(239,68,68,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(239,68,68,0.08)' }}>
+                <Clock size={18} color="#ef4444" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '13px', fontWeight: 500, color: '#52525b' }}>Overdue Amount</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '11px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Overdue Amount</div>
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>₹ 5,000</div>
-            <div style={{ fontSize: '10px', color: '#ef4444', fontWeight: 600, marginTop: '2px' }}>Due Immediately</div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '32px', fontWeight: 700, color: '#09090b', letterSpacing: '-1px', lineHeight: 1.1, marginBottom: '6px' }}>
+              ₹ 5,000
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#ef4444', fontWeight: 600 }}>Urgent</span> · Due Immediately
+            </div>
           </div>
-          <div style={{ position: 'absolute', bottom: 0, left: '24px', right: '24px', height: '3px', background: '#ef4444', borderRadius: '3px 3px 0 0' }} />
-        </div>
+        </motion.div>
 
-        {/* Next Due Date */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Calendar size={24} />
+        {/* KPI 5 — Next Due Date */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(59,130,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(59,130,246,0.08)' }}>
+                <Calendar size={18} color="#3b82f6" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '13px', fontWeight: 500, color: '#52525b' }}>Next Due Date</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '11px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Next Due Date</div>
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>15 Jun 2024</div>
-            <div style={{ fontSize: '10px', color: '#9ca3af', marginTop: '2px' }}>45 Days Left</div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '28px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', lineHeight: 1.1, marginBottom: '6px' }}>
+              15 Jun 2024
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#3b82f6', fontWeight: 600 }}>45 Days</span> · Remaining
+            </div>
           </div>
-        </div>
-
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Main Layout (2 Columns) */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '24px' }}>

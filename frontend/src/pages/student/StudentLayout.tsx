@@ -125,7 +125,6 @@ export function StudentLayout() {
     { name: "ID Card", path: "/dashboard/idcard", icon: IdCard },
     { name: "Notices", path: "/dashboard/notices", icon: Bell },
     { name: "Fee Management", path: "/dashboard/fees", icon: Wallet },
-    { name: "Settings", path: "/dashboard/settings", icon: Settings },
   ];
 
   return (
@@ -423,25 +422,8 @@ export function StudentLayout() {
                     </div>
                   </button>
 
-                  {/* Actions: Settings SVG | Logout SVG */}
+                  {/* Action: Logout SVG */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    {/* Settings SVG Button */}
-                    <button
-                      onClick={() => navigate('/dashboard/settings')}
-                      title="Settings"
-                      style={{
-                        width: 36, height: 36, borderRadius: '50%',
-                        background: '#F3F4F6', border: '1px solid rgba(0,0,0,0.05)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer', color: '#374151',
-                        transition: 'all 0.15s ease',
-                      }}
-                      onMouseEnter={e => { e.currentTarget.style.background = '#E5E7EB'; e.currentTarget.style.transform = 'scale(1.06)'; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = '#F3F4F6'; e.currentTarget.style.transform = 'scale(1)'; }}
-                    >
-                      <Settings size={17} strokeWidth={2} color="#374151" />
-                    </button>
-
                     {/* Logout SVG Button */}
                     <button
                       onClick={handleLogout}

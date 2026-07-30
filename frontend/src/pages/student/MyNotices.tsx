@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { 
   Bell, Filter, Megaphone, Send, Pin, Calendar, 
   BookOpen, ClipboardList, Users, Library, FlaskConical, Bookmark,
-  ChevronDown, MailCheck, Download, Settings, Volume2
+  ChevronDown, MailCheck, Download, Settings, Volume2, ArrowUpRight
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { motion } from "framer-motion";
+import TextType from "../../components/TextType";
 
 export function MyNotices() {
 
@@ -76,76 +78,195 @@ export function MyNotices() {
   ];
 
   return (
-    <div style={{ padding: '32px', maxWidth: '1400px', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
+    <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
       
-      {/* Header */}
+      {/* ── Header with Animated Highlighted Text Badge (Matching Main Dashboard & Attendance) ── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div style={{ width: '48px', height: '48px', background: '#f3f0ff', borderRadius: '12px', marginRight: '16px', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Bell size={24} />
-          </div>
-          <div>
-            <h1 style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827', margin: '0 0 4px 0' }}>Notices</h1>
-            <div style={{ fontSize: '13px', color: '#6b7280' }}>Stay updated with important announcements and notifications</div>
-          </div>
+        <div>
+          <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <span>My</span>
+            <span style={{
+              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+              color: '#ffffff',
+              padding: '4px 18px',
+              borderRadius: '14px',
+              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              lineHeight: 1.2,
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+            }}>
+              <TextType
+                text={["Notices", "Circulars", "Announcements"]}
+                typingSpeed={60}
+                deletingSpeed={35}
+                pauseDuration={2200}
+                loop={true}
+                showCursor={true}
+                cursorCharacter="|"
+                style={{ color: '#ffffff' }}
+              />
+            </span>
+          </h1>
+          <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>Stay updated with important announcements and notifications</div>
         </div>
-        <button style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: '#573cfa', color: 'white', borderRadius: '8px', fontSize: '13px', fontWeight: 600, border: 'none', cursor: 'pointer' }}>
-          <Filter size={16} /> Filter & Sort
+
+        <button style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 22px', background: '#573cfa', color: 'white', borderRadius: '14px', fontSize: '14px', fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(87, 60, 250, 0.3)' }}>
+          <Filter size={18} /> Filter & Sort
         </button>
       </div>
 
-      {/* Top Metrics Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
-        
-        {/* Total Notices */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Megaphone size={24} />
+      {/* ── Real-Time Top KPI Cards Row (AutoML Studio design matching Main Dashboard) ── */}
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '32px' }}
+      >
+        {/* KPI 1 — Total Notices */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(87,60,250,0.08)' }}>
+                <Megaphone size={18} color="#573cfa" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Notices</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Total Notices</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>24</div>
-            <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '2px' }}>This Semester</div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              24
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#573cfa', fontWeight: 600 }}>100%</span> · Issued This Semester
+            </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Unread Notices */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#e8f5e9', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Send size={24} />
+        {/* KPI 2 — Unread Notices */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(34,197,94,0.08)' }}>
+                <Send size={18} color="#22c55e" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Unread Notices</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Unread Notices</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>7</div>
-            <div style={{ fontSize: '11px', color: '#10b981', marginTop: '2px', fontWeight: 500 }}>New updates</div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              7
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#22c55e', fontWeight: 600 }}>7 New</span> · Unread Updates
+            </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Important Notices */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fffbeb', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Pin size={24} />
+        {/* KPI 3 — Important Notices */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(245,158,11,0.08)' }}>
+                <Pin size={18} color="#f59e0b" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Important Notices</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Important Notices</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>5</div>
-            <div style={{ fontSize: '11px', color: '#f59e0b', marginTop: '2px', fontWeight: 500 }}>High Priority</div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              5
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#f59e0b', fontWeight: 600 }}>Pinned</span> · High Priority
+            </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* This Week */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Calendar size={24} />
+        {/* KPI 4 — This Week */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(59,130,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(59,130,246,0.08)' }}>
+                <Calendar size={18} color="#3b82f6" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>This Week</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>This Week</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>8</div>
-            <div style={{ fontSize: '11px', color: '#3b82f6', marginTop: '2px', fontWeight: 500 }}>New Notices</div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              8
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#3b82f6', fontWeight: 600 }}>+33%</span> · New Notices
+            </div>
           </div>
-        </div>
-
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Main Layout (2 Columns) */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '24px' }}>

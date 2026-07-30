@@ -19,7 +19,6 @@ const PlacementCell = React.lazy(() => import("./pages/student/PlacementCell").t
 const MyComplaints = React.lazy(() => import("./pages/student/MyComplaints").then(m => ({ default: m.MyComplaints })));
 const MyIdCard = React.lazy(() => import("./pages/student/MyIdCard").then(m => ({ default: m.MyIdCard })));
 const MyNotices = React.lazy(() => import("./pages/student/MyNotices").then(m => ({ default: m.MyNotices })));
-const MySettings = React.lazy(() => import("./pages/student/MySettings").then(m => ({ default: m.MySettings })));
 const MyProfile = React.lazy(() => import("./pages/student/MyProfile").then(m => ({ default: m.MyProfile })));
 // Lazy Loaded Admin Dashboard Pages
 const AdminLayout = React.lazy(() => import("./pages/admin/AdminDashboard/AdminLayout").then(m => ({ default: m.AdminLayout })));
@@ -90,7 +89,6 @@ function App() {
               <Route index element={<StudentHome />} />
               <Route path="attendance" element={<MyAttendance />} />
               <Route path="results" element={<MyResults />} />
-              <Route path="settings" element={<MySettings />} />
               <Route path="subjects" element={<MySubjects />} />
               <Route path="assignments" element={<MyAssignments />} />
               <Route path="timetable" element={<MyTimetable />} />

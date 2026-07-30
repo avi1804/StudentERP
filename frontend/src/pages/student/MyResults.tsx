@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { apiClient as api } from "../../api/axios";
 import { useAuthStore } from "../../store/authStore";
-import { UserCircle, GraduationCap, Building2, Library, CheckCircle2, Award, FileText, ClipboardList, TrendingUp, ChevronDown, Eye, Trophy } from 'lucide-react';
+import { 
+  UserCircle, GraduationCap, Building2, Library, CheckCircle2, Award, 
+  FileText, ClipboardList, TrendingUp, ChevronDown, Eye, Trophy, ArrowUpRight
+} from 'lucide-react';
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { motion } from "framer-motion";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import TextType from "../../components/TextType";
 
 // ── Mobile Results ──
 function MobileResults({ data, totalObtained, totalMax, overallPercentage }: any) {
@@ -98,13 +102,15 @@ export function MyResults() {
   const { isMobile } = useIsMobile();
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedSemester, setSelectedSemester] = useState("7");
 
   useEffect(() => {
-    api.get('/student-dash/results')
+    setLoading(true);
+    api.get(`/student-dash/results?semester=${selectedSemester}`)
       .then(res => setData(res.data))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [selectedSemester]);
 
   let totalObtained = 0;
   let totalMax = 0;
@@ -159,97 +165,187 @@ export function MyResults() {
   ];
 
   return (
-    <div className="premium-dashboard" style={{ padding: '0' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px' }}>
-        <div style={{ background: '#f3f0ff', padding: '12px', borderRadius: '12px', marginRight: '16px', color: '#573cfa' }}>
-          <TrendingUp size={24} />
-        </div>
+    <div className="premium-dashboard" style={{ padding: '0', fontFamily: 'Space Grotesk, sans-serif' }}>
+      {/* ── Header with Animated Highlighted Text Badge (Matching Main Dashboard & Attendance) ── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
         <div>
-          <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', margin: 0 }}>My Exam Results</h1>
-          <div style={{ fontSize: '13px', color: '#6b7280' }}>View your examination scores and overall academic performance</div>
+          <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <span>My</span>
+            <span style={{
+              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+              color: '#ffffff',
+              padding: '4px 18px',
+              borderRadius: '14px',
+              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              lineHeight: 1.2,
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+            }}>
+              <TextType
+                text={["Exam Results", "Grade Card", "Academic Marks"]}
+                typingSpeed={60}
+                deletingSpeed={35}
+                pauseDuration={2200}
+                loop={true}
+                showCursor={true}
+                cursorCharacter="|"
+                style={{ color: '#ffffff' }}
+              />
+            </span>
+          </h1>
+          <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>View your examination scores and overall academic performance</div>
         </div>
-      </div>
 
-      {/* Top Summary Card */}
-      <div className="res-card" style={{ marginBottom: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#f3f0ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#573cfa' }}>
-              <UserCircle size={40} />
-            </div>
-            <div>
-              <h2 style={{ fontSize: '18px', fontWeight: 'bold', color: '#111827', margin: '0 0 4px 0' }}>{user?.full_name || "Student"}</h2>
-              <div style={{ fontSize: '12px', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
-                <GraduationCap size={14} /> B.Tech Computer Science Engineering
-              </div>
-              <div style={{ fontSize: '12px', color: '#6b7280', paddingLeft: '20px' }}>
-                Enrollment No. CS629
-              </div>
-            </div>
-          </div>
-          <div>
-            <div style={{ fontSize: '11px', fontWeight: 600, color: '#9ca3af', marginBottom: '4px' }}>Semester</div>
-            <select className="res-select">
-              <option>Semester 7 (Current)</option>
-              <option>Semester 6</option>
-              <option>Semester 5</option>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <label style={{ fontSize: '11px', fontWeight: 600, color: '#9ca3af', marginBottom: '4px' }}>Semester</label>
+          <div style={{ position: 'relative' }}>
+            <select
+              value={selectedSemester}
+              onChange={(e) => setSelectedSemester(e.target.value)}
+              style={{
+                appearance: 'none',
+                WebkitAppearance: 'none',
+                padding: '8px 36px 8px 16px',
+                background: 'white',
+                border: '1px solid #e5e7eb',
+                borderRadius: '12px',
+                fontSize: '13px',
+                color: '#374151',
+                fontWeight: 600,
+                cursor: 'pointer',
+                outline: 'none',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              }}
+            >
+              <option value="7">Semester 7 (Current)</option>
+              <option value="6">Semester 6</option>
+              <option value="5">Semester 5</option>
+              <option value="4">Semester 4</option>
+              <option value="3">Semester 3</option>
+              <option value="2">Semester 2</option>
+              <option value="1">Semester 1</option>
             </select>
-          </div>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
-          {/* SGPA */}
-          <div className="res-metric-box">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <ClipboardList size={20} />
-              </div>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#4b5563' }}>SGPA</div>
-            </div>
-            <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#111827' }}>9.02</div>
-            <div style={{ fontSize: '12px', color: '#9ca3af' }}>Out of 10</div>
-          </div>
-
-          {/* Total Subjects */}
-          <div className="res-metric-box" style={{ background: '#f8fafc', borderColor: '#e2e8f0' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#e8f5e9', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <FileText size={20} />
-              </div>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#4b5563' }}>Total Subjects</div>
-            </div>
-            <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#111827' }}>{data.length || 6}</div>
-            <div style={{ fontSize: '12px', color: '#9ca3af' }}>Evaluated</div>
-          </div>
-
-          {/* Total Marks */}
-          <div className="res-metric-box" style={{ background: '#f8fafc', borderColor: '#e2e8f0' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <CheckCircle2 size={20} />
-              </div>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#4b5563' }}>Total Marks Obtained</div>
-            </div>
-            <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#111827' }}>{totalObtained || 541}</div>
-            <div style={{ fontSize: '12px', color: '#9ca3af' }}>Out of {totalMax || 600}</div>
-          </div>
-
-          {/* Overall Result */}
-          <div className="res-metric-box" style={{ background: '#fffbeb', borderColor: '#fde68a' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#fef3c7', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Award size={20} />
-              </div>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#b45309' }}>Overall Result</div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#111827' }}>{overallPercentage || 90}%</div>
-              <div className="res-badge light-green" style={{ background: '#dcfce7', border: '1px solid #86efac' }}>Excellent</div>
-            </div>
+            <ChevronDown size={14} color="#6b7280" style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
           </div>
         </div>
       </div>
+
+      {/* ── Real-Time Top KPI Cards Row (AutoML Studio design matching Main Dashboard) ── */}
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '32px' }}
+      >
+        {/* KPI 1 — SGPA */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(87,60,250,0.08)' }}>
+                <Award size={18} color="#573cfa" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>SGPA</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
+          </div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              8.75
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#573cfa', fontWeight: 600 }}>+0.25</span> · Semester 7 Grade Point
+            </div>
+          </div>
+        </motion.div>
+
+        {/* KPI 2 — Total Subject */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(34,197,94,0.08)' }}>
+                <FileText size={18} color="#22c55e" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Subjects</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
+          </div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              {data.length || 6}
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#22c55e', fontWeight: 600 }}>100%</span> · Subjects Evaluated
+            </div>
+          </div>
+        </motion.div>
+
+        {/* KPI 3 — Overall Result */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(59,130,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(59,130,246,0.08)' }}>
+                <CheckCircle2 size={18} color="#3b82f6" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Overall Result</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
+          </div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '38px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              {overallPercentage || 90}%
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#3b82f6', fontWeight: 600 }}>PASSED</span> · First Class Distinction
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
 
       {/* 2-Column Layout */}
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', marginBottom: '24px' }}>
@@ -393,35 +489,6 @@ export function MyResults() {
 
       </div>
 
-      {/* Past Results */}
-      <div className="res-card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <h3 style={{ fontSize: '16px', fontWeight: 'bold', color: '#573cfa', margin: 0 }}>Past Results</h3>
-          <ChevronDown size={20} color="#9ca3af" style={{ cursor: 'pointer' }} />
-        </div>
-        
-        <div className="res-past-header">
-          <div>SEMESTER</div>
-          <div style={{ textAlign: 'center' }}>SGPA</div>
-          <div style={{ textAlign: 'center' }}>TOTAL MARKS</div>
-          <div style={{ textAlign: 'center' }}>PERCENTAGE</div>
-          <div style={{ textAlign: 'center' }}>RESULT</div>
-          <div style={{ textAlign: 'center' }}>VIEW</div>
-        </div>
-
-        <div className="res-past-row">
-          <div style={{ fontSize: '13px', fontWeight: 600, color: '#111827' }}>Semester 6</div>
-          <div style={{ textAlign: 'center', fontSize: '13px', fontWeight: 'bold', color: '#111827' }}>8.45</div>
-          <div style={{ textAlign: 'center', fontSize: '13px', color: '#4b5563' }}>502 / 600</div>
-          <div style={{ textAlign: 'center', fontSize: '13px', fontWeight: 600, color: '#111827' }}>83.67%</div>
-          <div style={{ textAlign: 'center' }}>
-            <span className="res-badge light-green" style={{ border: '1px solid #86efac' }}>Passed</span>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <Eye size={18} color="#573cfa" style={{ cursor: 'pointer' }} />
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

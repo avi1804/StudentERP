@@ -2,12 +2,15 @@ import React, { useState } from "react";
 import { 
   ClipboardList, CheckCircle2, Clock, AlertCircle,
   Filter, List, Grid, MoreVertical, 
-  ChevronLeft, ChevronRight, ChevronDown
+  ChevronLeft, ChevronRight, ChevronDown, ArrowUpRight
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { motion } from "framer-motion";
+import TextType from "../../components/TextType";
 
 export function MyAssignments() {
   const [activeTab, setActiveTab] = useState("All Assignments");
+  const [selectedSemester, setSelectedSemester] = useState("7");
 
   const pieData = [
     { name: 'Submitted', value: 7, color: '#3b82f6' },
@@ -111,79 +114,223 @@ export function MyAssignments() {
   };
 
   return (
-    <div style={{ padding: '32px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
-      {/* Header */}
+    <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
+      {/* ── Header with Animated Highlighted Text Badge (Matching Main Dashboard & Attendance) ── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div style={{ width: '48px', height: '48px', background: '#f3f0ff', borderRadius: '12px', marginRight: '16px', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <ClipboardList size={24} />
-          </div>
-          <div>
-            <h1 style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827', margin: '0 0 4px 0' }}>My Assignments</h1>
-            <div style={{ fontSize: '13px', color: '#6b7280' }}>View and manage all assignments assigned to you</div>
-          </div>
+        <div>
+          <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <span>My</span>
+            <span style={{
+              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+              color: '#ffffff',
+              padding: '4px 18px',
+              borderRadius: '14px',
+              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              lineHeight: 1.2,
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+            }}>
+              <TextType
+                text={["Assignments", "Homework", "Submissions"]}
+                typingSpeed={60}
+                deletingSpeed={35}
+                pauseDuration={2200}
+                loop={true}
+                showCursor={true}
+                cursorCharacter="|"
+                style={{ color: '#ffffff' }}
+              />
+            </span>
+          </h1>
+          <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>View and manage all assignments assigned to you</div>
         </div>
+
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <label style={{ fontSize: '11px', fontWeight: 600, color: '#9ca3af', marginBottom: '4px' }}>Semester</label>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: 'white', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '13px', color: '#374151', cursor: 'pointer' }}>
-            Semester 7 (Current) <ChevronDown size={14} color="#6b7280" />
+          <div style={{ position: 'relative' }}>
+            <select
+              value={selectedSemester}
+              onChange={(e) => setSelectedSemester(e.target.value)}
+              style={{
+                appearance: 'none',
+                WebkitAppearance: 'none',
+                padding: '8px 36px 8px 16px',
+                background: 'white',
+                border: '1px solid #e5e7eb',
+                borderRadius: '12px',
+                fontSize: '13px',
+                color: '#374151',
+                fontWeight: 600,
+                cursor: 'pointer',
+                outline: 'none',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              }}
+            >
+              <option value="7">Semester 7 (Current)</option>
+              <option value="6">Semester 6</option>
+              <option value="5">Semester 5</option>
+              <option value="4">Semester 4</option>
+              <option value="3">Semester 3</option>
+              <option value="2">Semester 2</option>
+              <option value="1">Semester 1</option>
+            </select>
+            <ChevronDown size={14} color="#6b7280" style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
           </div>
         </div>
       </div>
 
-      {/* Top Metrics Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
-        {/* Total Assignments */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <ClipboardList size={24} />
+      {/* ── Real-Time Top KPI Cards Row (AutoML Studio design matching Main Dashboard) ── */}
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '32px' }}
+      >
+        {/* KPI 1 — Total Assignments */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(87,60,250,0.08)' }}>
+                <ClipboardList size={18} color="#573cfa" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Assignments</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Total Assignments</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>12</div>
-            <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px' }}>This Semester</div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              12
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#573cfa', fontWeight: 600 }}>100%</span> · Allotted This Semester
+            </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Completed */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#e8f5e9', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <CheckCircle2 size={24} />
+        {/* KPI 2 — Completed */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(34,197,94,0.08)' }}>
+                <CheckCircle2 size={18} color="#22c55e" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Completed</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Completed</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>7</div>
-            <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px' }}>58% Completed</div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              7
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#22c55e', fontWeight: 600 }}>58%</span> · Successfully Submitted
+            </div>
           </div>
-          <div style={{ position: 'absolute', bottom: 0, left: '20px', right: '20px', height: '3px', background: '#10b981', borderRadius: '3px 3px 0 0' }} />
-        </div>
+        </motion.div>
 
-        {/* Pending */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fffbeb', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Clock size={24} />
+        {/* KPI 3 — Pending */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(245,158,11,0.08)' }}>
+                <Clock size={18} color="#f59e0b" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Pending</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Pending</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>4</div>
-            <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px' }}>33% Pending</div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              4
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#f59e0b', fontWeight: 600 }}>33%</span> · Pending Submission
+            </div>
           </div>
-          <div style={{ position: 'absolute', bottom: 0, left: '20px', right: '20px', height: '3px', background: '#f59e0b', borderRadius: '3px 3px 0 0' }} />
-        </div>
+        </motion.div>
 
-        {/* Overdue */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fef2f2', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <AlertCircle size={24} />
+        {/* KPI 4 — Overdue */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(239,68,68,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(239,68,68,0.08)' }}>
+                <AlertCircle size={18} color="#ef4444" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Overdue</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Overdue</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>1</div>
-            <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px' }}>8% Overdue</div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              1
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#ef4444', fontWeight: 600 }}>8%</span> · Urgent Action Required
+            </div>
           </div>
-          <div style={{ position: 'absolute', bottom: 0, left: '20px', right: '20px', height: '3px', background: '#ef4444', borderRadius: '3px 3px 0 0' }} />
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Main List Section */}
       <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #f3f4f6', marginBottom: '24px', overflow: 'hidden' }}>
