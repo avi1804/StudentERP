@@ -1,23 +1,77 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { useAuthStore } from "../../store/authStore";
+import { apiClient as api } from "../../api/axios";
 import { 
   Home, User, CheckCircle, BookOpen, Calendar, 
   FileText, ClipboardList, Briefcase, Megaphone, 
   IdCard, Bell, Wallet, 
-  Settings, GraduationCap, Search, X, LogOut
+  Settings, GraduationCap, Search, X, LogOut,
+  ChevronUp, ChevronDown
 } from "lucide-react";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { MobileTopBar } from "../../components/mobile/MobileTopBar";
 import { MobileBottomNav } from "../../components/mobile/MobileBottomNav";
 import { motion, AnimatePresence } from "framer-motion";
+import GradualBlur from "../../components/GradualBlur";
 
 export function StudentLayout() {
-  const { user, logout } = useAuthStore();
+  const { user, setUser, logout } = useAuthStore();
   const navigate = useNavigate();
   const { isMobile } = useIsMobile();
   const [activeState, setActiveState] = useState<'idle' | 'search' | 'notifications' | 'profile'>('idle');
+  const [notifIndex, setNotifIndex] = useState(0);
   const navbarRef = useRef<HTMLDivElement>(null);
+
+  const notificationsList = [
+    { id: 1, type: 'Assignment', badge: 'NEW', title: 'Data Structures Assignment 3 Uploaded', subtitle: 'Prof. Sharma uploaded new task', time: '2h ago' },
+    { id: 2, type: 'Attendance', badge: 'UPDATE', title: 'Computer Networks Attendance Marked', subtitle: 'You were marked Present for lecture', time: 'Yesterday' },
+    { id: 3, type: 'Circular', badge: 'NOTICE', title: 'Mid-Semester Exam Timetable Out', subtitle: 'Check schedule in Timetable tab', time: '2 days ago' },
+  ];
+
+  const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Fetch full student profile if missing in auth store
+  useEffect(() => {
+    if (!user?.full_name) {
+      api.get('/student-dash/profile')
+        .then(res => {
+          if (res.data?.full_name && user) {
+            setUser({ ...user, full_name: res.data.full_name, email: res.data.email || user.email });
+          }
+        })
+        .catch(() => {});
+    }
+  }, [user]);
+
+  // Auto-close Dynamic Island on 5s inactivity
+  useEffect(() => {
+    if (activeState === 'search' || activeState === 'notifications' || activeState === 'profile') {
+      const startTimer = () => {
+        if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+        inactivityTimerRef.current = setTimeout(() => {
+          setActiveState('idle');
+        }, 5000);
+      };
+
+      startTimer();
+
+      const handleActivity = () => {
+        startTimer();
+      };
+
+      window.addEventListener('mousemove', handleActivity);
+      window.addEventListener('keydown', handleActivity);
+
+      return () => {
+        if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+        window.removeEventListener('mousemove', handleActivity);
+        window.removeEventListener('keydown', handleActivity);
+      };
+    } else {
+      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+    }
+  }, [activeState, notifIndex]);
 
   // Click-outside and Escape key to close
   useEffect(() => {
@@ -75,9 +129,24 @@ export function StudentLayout() {
   ];
 
   return (
-    <>
-      {/* ── Sidebar ── */}
-      <div className="premium-student-sidebar">
+    <div style={{ height: '100vh', width: '100vw', overflow: 'hidden', background: '#f4f5f8', position: 'relative' }}>
+      {/* ── Fixed Sidebar Card (Left) ── */}
+      <div 
+        className="premium-student-sidebar" 
+        style={{ 
+          position: 'fixed', 
+          top: '20px', 
+          left: '20px', 
+          width: '280px',
+          height: 'calc(100vh - 40px)', 
+          background: '#ffffff',
+          borderRadius: '28px',
+          boxShadow: '0 10px 40px rgba(0,0,0,0.03)',
+          border: '1px solid rgba(0,0,0,0.06)',
+          zIndex: 40,
+          margin: 0,
+        }}
+      >
         <div className="logo-area">
           <div className="logo-icon"><GraduationCap size={28} /></div>
           <div className="logo-text">
@@ -100,276 +169,351 @@ export function StudentLayout() {
         </div>
       </div>
 
-      {/* ── Main content area ── */}
-      <div id="main" className="premium-main">
+      {/* ── Permanently Fixed Dynamic Island Navbar ── */}
+      <div
+        id="topbar"
+        style={{
+          position: 'fixed',
+          top: '16px',
+          left: 'calc(320px + (100vw - 340px) / 2)',
+          transform: 'translateX(-50%)',
+          zIndex: 9999,
+          pointerEvents: 'auto',
+        }}
+      >
+        {/* Outer reference div for click-outside detection */}
+        <div ref={navbarRef} style={{ position: 'relative' }}>
 
-        {/* ── Top Bar ── */}
-        <div
-          id="topbar"
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-            padding: '28px 40px 16px',
-            position: 'relative',
-            zIndex: 50,
-          }}
-        >
-          {/* Outer reference div for click-outside detection */}
-          <div ref={navbarRef} style={{ position: 'relative' }}>
+          {/* ── The pill / Dynamic Island capsule (Frosted Glass backdrop blur) ── */}
+          <motion.div
+            layout
+            transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+            style={{
+              background: 'rgba(255, 255, 255, 0.88)',
+              backdropFilter: 'blur(18px)',
+              WebkitBackdropFilter: 'blur(18px)',
+              border: '1px solid rgba(0,0,0,0.08)',
+              boxShadow: '0 10px 35px rgba(0,0,0,0.08)',
+              borderRadius: 9999,
+              overflow: 'hidden',
+            }}
+          >
+            <AnimatePresence mode="popLayout" initial={false}>
 
-            {/* ── The pill / Dynamic Island capsule (SEARCH ONLY morphs) ── */}
-            <motion.div
-              layout
-              transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-              style={{
-                background: '#ffffff',
-                border: '1px solid rgba(0,0,0,0.07)',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.07)',
-                borderRadius: 9999,
-                overflow: 'hidden',
-              }}
-            >
-              <AnimatePresence mode="popLayout" initial={false}>
-
-                {/* ─── IDLE STATE: three round buttons in an oval pill ─── */}
-                {activeState !== 'search' && (
-                  <motion.div
-                    key="idle-buttons"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.12 }}
-                    style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px' }}
-                  >
-                    {/* Search circle */}
-                    <button
-                      onClick={() => setActiveState('search')}
-                      title="Search"
-                      style={{
-                        width: 46, height: 46, borderRadius: '50%',
-                        background: '#F5F5F5', border: '1px solid rgba(0,0,0,0.06)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer', flexShrink: 0,
-                        transition: 'transform 0.18s ease',
-                      }}
-                      onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.07)')}
-                      onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
-                    >
-                      <Search size={20} color="#333" strokeWidth={1.6} />
-                    </button>
-
-                    {/* Notification circle */}
-                    <button
-                      onClick={() => setActiveState(activeState === 'notifications' ? 'idle' : 'notifications')}
-                      title="Notifications"
-                      style={{
-                        width: 46, height: 46, borderRadius: '50%',
-                        background: '#F5F5F5', border: '1px solid rgba(0,0,0,0.06)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer', flexShrink: 0,
-                        transition: 'transform 0.18s ease',
-                        position: 'relative',
-                      }}
-                      onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.07)')}
-                      onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
-                    >
-                      <Bell size={20} color="#333" strokeWidth={1.6} />
-                      {/* Unread dot */}
-                      <span style={{
-                        position: 'absolute', top: 9, right: 9,
-                        width: 9, height: 9, borderRadius: '50%',
-                        background: '#ef4444', border: '2px solid #F5F5F5',
-                      }} />
-                    </button>
-
-                    {/* Profile circle */}
-                    <button
-                      onClick={() => setActiveState(activeState === 'profile' ? 'idle' : 'profile')}
-                      title="Profile"
-                      style={{
-                        width: 46, height: 46, borderRadius: '50%',
-                        background: '#F5F5F5', border: '1px solid rgba(0,0,0,0.06)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer', flexShrink: 0,
-                        transition: 'transform 0.18s ease',
-                      }}
-                      onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.07)')}
-                      onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
-                    >
-                      <User size={20} color="#333" strokeWidth={1.6} />
-                    </button>
-                  </motion.div>
-                )}
-
-                {/* ─── SEARCH EXPANDED: Dynamic Island morph ─── */}
-                {activeState === 'search' && (
-                  <motion.div
-                    key="search-expanded"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.15 }}
+              {/* ─── IDLE STATE: three round buttons in an oval pill ─── */}
+              {activeState === 'idle' && (
+                <motion.div
+                  key="idle-buttons"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.12 }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px' }}
+                >
+                  {/* Search circle */}
+                  <button
+                    onClick={() => setActiveState('search')}
+                    title="Search"
                     style={{
-                      display: 'flex', alignItems: 'center',
-                      width: 400, height: 66,
-                      padding: '0 16px', gap: 10,
+                      width: 44, height: 44, borderRadius: '50%',
+                      background: 'rgba(245,245,245,0.9)', border: '1px solid rgba(0,0,0,0.06)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      cursor: 'pointer', flexShrink: 0,
+                      transition: 'transform 0.18s ease',
                     }}
+                    onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.07)')}
+                    onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
                   >
-                    <Search size={19} color="#9CA3AF" strokeWidth={1.6} style={{ flexShrink: 0 }} />
-                    <input
-                      autoFocus
-                      type="text"
-                      placeholder="Search anything..."
-                      style={{
-                        flex: 1, background: 'transparent',
-                        border: 'none', outline: 'none',
-                        fontSize: 15, fontWeight: 500,
-                        color: '#111', fontFamily: 'Inter, sans-serif',
-                        caretColor: '#555',
-                      }}
-                    />
-                    <button
-                      onClick={() => setActiveState('idle')}
-                      style={{
-                        width: 28, height: 28, borderRadius: '50%',
-                        background: '#F3F4F6', border: 'none',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer', flexShrink: 0,
-                        transition: 'background 0.15s',
-                      }}
-                      onMouseEnter={e => (e.currentTarget.style.background = '#E5E7EB')}
-                      onMouseLeave={e => (e.currentTarget.style.background = '#F3F4F6')}
-                    >
-                      <X size={13} color="#6B7280" strokeWidth={2.5} />
-                    </button>
-                  </motion.div>
-                )}
+                    <Search size={19} color="#333" strokeWidth={1.6} />
+                  </button>
 
-              </AnimatePresence>
-            </motion.div>
+                  {/* Notification circle */}
+                  <button
+                    onClick={() => setActiveState('notifications')}
+                    title="Notifications"
+                    style={{
+                      width: 44, height: 44, borderRadius: '50%',
+                      background: 'rgba(245,245,245,0.9)', border: '1px solid rgba(0,0,0,0.06)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      cursor: 'pointer', flexShrink: 0,
+                      transition: 'transform 0.18s ease',
+                      position: 'relative',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.07)')}
+                    onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+                  >
+                    <Bell size={19} color="#333" strokeWidth={1.6} />
+                    {/* Unread dot */}
+                    <span style={{
+                      position: 'absolute', top: 8, right: 8,
+                      width: 8, height: 8, borderRadius: '50%',
+                      background: '#ef4444', border: '2px solid #F5F5F5',
+                    }} />
+                  </button>
 
-            {/* ── Notification floating dropdown ── */}
-            <AnimatePresence>
+                  {/* Profile circle */}
+                  <button
+                    onClick={() => setActiveState(activeState === 'profile' ? 'idle' : 'profile')}
+                    title="Profile"
+                    style={{
+                      width: 44, height: 44, borderRadius: '50%',
+                      background: 'rgba(245,245,245,0.9)', border: '1px solid rgba(0,0,0,0.06)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      cursor: 'pointer', flexShrink: 0,
+                      transition: 'transform 0.18s ease',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.07)')}
+                    onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+                  >
+                    <User size={19} color="#333" strokeWidth={1.6} />
+                  </button>
+                </motion.div>
+              )}
+
+              {/* ─── SEARCH EXPANDED: Dynamic Island morph (No X button, auto-closes on inactivity) ─── */}
+              {activeState === 'search' && (
+                <motion.div
+                  key="search-expanded"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  style={{
+                    display: 'flex', alignItems: 'center',
+                    width: 380, height: 60,
+                    padding: '0 20px', gap: 10,
+                  }}
+                >
+                  <Search size={18} color="#9CA3AF" strokeWidth={1.6} style={{ flexShrink: 0 }} />
+                  <input
+                    autoFocus
+                    type="text"
+                    placeholder="Search anything..."
+                    style={{
+                      flex: 1, background: 'transparent',
+                      border: 'none', outline: 'none',
+                      fontSize: 15, fontWeight: 500,
+                      color: '#111', fontFamily: 'Space Grotesk, sans-serif',
+                      caretColor: '#555',
+                    }}
+                  />
+                </motion.div>
+              )}
+
+              {/* ─── NOTIFICATION EXPANDED: Dynamic Island morph (No X button, auto-closes on inactivity) ─── */}
               {activeState === 'notifications' && (
                 <motion.div
-                  key="notif-panel"
-                  initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                  transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+                  key="notification-expanded"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
                   style={{
-                    position: 'absolute',
-                    top: 'calc(100% + 10px)',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: 340,
-                    background: '#fff',
-                    borderRadius: 20,
-                    boxShadow: '0 12px 40px rgba(0,0,0,0.10)',
-                    border: '1px solid rgba(0,0,0,0.06)',
-                    overflow: 'hidden',
-                    zIndex: 200,
+                    display: 'flex', alignItems: 'center',
+                    width: 440, height: 60,
+                    padding: '0 16px', gap: 12,
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 12px', borderBottom: '1px solid #f3f4f6' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600, color: '#111' }}>
-                      <Bell size={14} strokeWidth={2} />Notifications
+                  {/* Green Highlighted Button / Badge (First) */}
+                  <button
+                    onClick={() => navigate('/dashboard/notices')}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      background: '#10b981', color: '#ffffff',
+                      padding: '7px 13px', borderRadius: 9999, border: 'none',
+                      fontSize: 12, fontWeight: 700, letterSpacing: '0.04em',
+                      boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)',
+                      flexShrink: 0, cursor: 'pointer',
+                      transition: 'transform 0.15s, background 0.15s',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.04)')}
+                    onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+                  >
+                    <Bell size={13} color="#fff" strokeWidth={2.5} />
+                    <span>{notificationsList[notifIndex].badge}</span>
+                  </button>
+
+                  {/* Single Notification Content (Middle) */}
+                  <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {notificationsList[notifIndex].title}
                     </div>
-                    <button onClick={() => setActiveState('idle')} style={{ padding: 4, border: 'none', background: 'transparent', cursor: 'pointer', borderRadius: '50%', display: 'flex' }}>
-                      <X size={14} color="#9CA3AF" />
+                    <div style={{ fontSize: 11, color: '#6B7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {notificationsList[notifIndex].subtitle} · <span style={{ color: '#9CA3AF', fontWeight: 500 }}>{notificationsList[notifIndex].time}</span>
+                    </div>
+                  </div>
+
+                  {/* Top & Down Switcher Buttons (Right) */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, background: '#f3f4f6', borderRadius: 999, padding: '3px 6px' }}>
+                    <button
+                      onClick={() => setNotifIndex(prev => (prev > 0 ? prev - 1 : notificationsList.length - 1))}
+                      title="Previous Notification"
+                      style={{
+                        width: 24, height: 24, borderRadius: '50%', border: 'none',
+                        background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', color: '#374151', transition: 'background 0.15s',
+                      }}
+                      onMouseEnter={e => (e.currentTarget.style.background = '#e5e7eb')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      <ChevronUp size={14} strokeWidth={2.5} />
+                    </button>
+
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#4b5563', padding: '0 2px', userSelect: 'none' }}>
+                      {notifIndex + 1}/{notificationsList.length}
+                    </span>
+
+                    <button
+                      onClick={() => setNotifIndex(prev => (prev < notificationsList.length - 1 ? prev + 1 : 0))}
+                      title="Next Notification"
+                      style={{
+                        width: 24, height: 24, borderRadius: '50%', border: 'none',
+                        background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', color: '#374151', transition: 'background 0.15s',
+                      }}
+                      onMouseEnter={e => (e.currentTarget.style.background = '#e5e7eb')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      <ChevronDown size={14} strokeWidth={2.5} />
                     </button>
                   </div>
-                  <div style={{ maxHeight: 280, overflowY: 'auto' }}>
-                    {[
-                      { icon: <ClipboardList size={14} />, bg: '#EEF2FF', ic: '#6366F1', title: 'Assignment Uploaded', desc: 'Prof. Sharma uploaded "Data Structures Assignment 3".', time: '2 hours ago' },
-                      { icon: <CheckCircle size={14} />, bg: '#FFFBEB', ic: '#F59E0B', title: 'Attendance Updated', desc: 'Computer Networks attendance marked present.', time: 'Yesterday' },
-                      { icon: <Bell size={14} />, bg: '#F0FDF4', ic: '#22C55E', title: 'New Circular Posted', desc: 'Library timings updated for the semester.', time: '2 days ago' },
-                    ].map((n, i) => (
-                      <div key={i}
-                        style={{ padding: '12px 16px', borderBottom: '1px solid #fafafa', display: 'flex', gap: 12, cursor: 'pointer', transition: 'background 0.15s' }}
-                        onMouseEnter={e => (e.currentTarget.style.background = '#fafafa')}
-                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                      >
-                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: n.bg, color: n.ic, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{n.icon}</div>
-                        <div>
-                          <div style={{ fontSize: 12, fontWeight: 600, color: '#111', marginBottom: 2 }}>{n.title}</div>
-                          <div style={{ fontSize: 11, color: '#6B7280', lineHeight: 1.45, marginBottom: 3 }}>{n.desc}</div>
-                          <div style={{ fontSize: 10, color: '#9CA3AF', fontWeight: 500 }}>{n.time}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div style={{ padding: '10px 16px', textAlign: 'center', borderTop: '1px solid #f3f4f6' }}>
-                    <span onClick={() => navigate('/dashboard/notices')} style={{ fontSize: 12, fontWeight: 600, color: '#6366F1', cursor: 'pointer' }}>View all notifications</span>
-                  </div>
                 </motion.div>
               )}
-            </AnimatePresence>
 
-            {/* ── Profile floating dropdown ── */}
-            <AnimatePresence>
+              {/* ─── PROFILE EXPANDED: Dynamic Island morph (Display picture | Settings SVG | Logout SVG) ─── */}
               {activeState === 'profile' && (
                 <motion.div
-                  key="profile-panel"
-                  initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                  transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+                  key="profile-expanded"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
                   style={{
-                    position: 'absolute',
-                    top: 'calc(100% + 10px)',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: 260,
-                    background: '#fff',
-                    borderRadius: 20,
-                    boxShadow: '0 12px 40px rgba(0,0,0,0.10)',
-                    border: '1px solid rgba(0,0,0,0.06)',
-                    overflow: 'hidden',
-                    zIndex: 200,
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    width: 320, height: 60,
+                    padding: '0 14px', gap: 12,
                   }}
                 >
-                  <div style={{ padding: '16px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'linear-gradient(135deg, #f9a8d4, #f472b6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
+                  {/* Display Picture Avatar (Clickable to MyProfile) */}
+                  <button
+                    onClick={() => navigate('/dashboard/profile')}
+                    title="View Profile"
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      background: 'transparent', border: 'none',
+                      cursor: 'pointer', padding: 0,
+                    }}
+                  >
+                    <div style={{
+                      width: 38, height: 38, borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #6366f1, #a855f7)',
+                      color: '#ffffff', fontWeight: 700, fontSize: 13,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      boxShadow: '0 2px 10px rgba(99, 102, 241, 0.3)', flexShrink: 0
+                    }}>
                       {user?.full_name?.substring(0, 2).toUpperCase() || 'ST'}
                     </div>
-                    <div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#111' }}>{user?.full_name || 'Student User'}</div>
-                      <div style={{ fontSize: 11, color: '#6B7280', marginTop: 1 }}>B.Tech CSE · 4th Year</div>
+                    <div style={{ textAlign: 'left' }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', lineHeight: 1.2 }}>
+                        {user?.full_name || 'Student'}
+                      </div>
+                      <div style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>
+                        Student Profile
+                      </div>
                     </div>
-                  </div>
-                  <div style={{ padding: '8px' }}>
-                    {[
-                      { icon: <User size={15} />, label: 'My Profile', action: () => navigate('/dashboard/profile') },
-                      { icon: <Settings size={15} />, label: 'Settings', action: () => navigate('/dashboard/settings') },
-                    ].map((item, i) => (
-                      <button key={i} onClick={item.action}
-                        style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '9px 12px', background: 'transparent', border: 'none', borderRadius: 12, fontSize: 13, fontWeight: 500, color: '#374151', cursor: 'pointer', transition: 'background 0.15s' }}
-                        onMouseEnter={e => (e.currentTarget.style.background = '#f9fafb')}
-                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                      >{item.icon}{item.label}</button>
-                    ))}
-                    <div style={{ height: 1, background: '#f3f4f6', margin: '4px 0' }} />
-                    <button onClick={handleLogout}
-                      style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '9px 12px', background: 'transparent', border: 'none', borderRadius: 12, fontSize: 13, fontWeight: 500, color: '#ef4444', cursor: 'pointer', transition: 'background 0.15s' }}
-                      onMouseEnter={e => (e.currentTarget.style.background = '#fef2f2')}
-                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                    ><LogOut size={15} />Logout</button>
+                  </button>
+
+                  {/* Actions: Settings SVG | Logout SVG */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {/* Settings SVG Button */}
+                    <button
+                      onClick={() => navigate('/dashboard/settings')}
+                      title="Settings"
+                      style={{
+                        width: 36, height: 36, borderRadius: '50%',
+                        background: '#F3F4F6', border: '1px solid rgba(0,0,0,0.05)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', color: '#374151',
+                        transition: 'all 0.15s ease',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = '#E5E7EB'; e.currentTarget.style.transform = 'scale(1.06)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = '#F3F4F6'; e.currentTarget.style.transform = 'scale(1)'; }}
+                    >
+                      <Settings size={17} strokeWidth={2} color="#374151" />
+                    </button>
+
+                    {/* Logout SVG Button */}
+                    <button
+                      onClick={handleLogout}
+                      title="Logout"
+                      style={{
+                        width: 36, height: 36, borderRadius: '50%',
+                        background: '#FEF2F2', border: '1px solid rgba(239, 68, 68, 0.15)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', color: '#EF4444',
+                        transition: 'all 0.15s ease',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = '#FEE2E2'; e.currentTarget.style.transform = 'scale(1.06)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = '#FEF2F2'; e.currentTarget.style.transform = 'scale(1)'; }}
+                    >
+                      <LogOut size={17} strokeWidth={2} color="#EF4444" />
+                    </button>
                   </div>
                 </motion.div>
               )}
+
             </AnimatePresence>
+          </motion.div>
 
-          </div>{/* end navbarRef */}
-        </div>
+        </div>{/* end navbarRef */}
+      </div>
 
-        {/* ── Page Content ── */}
-        <div id="content" style={{ paddingTop: '40px', paddingLeft: '40px', paddingRight: '40px', paddingBottom: '40px' }}>
+      {/* ── Main Professional White Box Container (Starts BELOW Dynamic Island, Scrolls ONLY Inside) ── */}
+      <div
+        style={{
+          position: 'fixed',
+          top: '84px',
+          bottom: '20px',
+          left: '320px',
+          right: '20px',
+          background: '#ffffff',
+          borderRadius: '28px',
+          boxShadow: '0 10px 40px rgba(0, 0, 0, 0.03)',
+          border: '1px solid rgba(0, 0, 0, 0.06)',
+          overflow: 'hidden',
+          zIndex: 10,
+        }}
+      >
+        {/* ── Scrollable Dashboard Content Area ── */}
+        <div
+          id="dashboard-scroll-area"
+          style={{
+            height: '100%',
+            width: '100%',
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            scrollBehavior: 'smooth',
+            paddingTop: '36px',
+            paddingBottom: '40px',
+            paddingLeft: '40px',
+            paddingRight: '40px',
+          }}
+        >
           <Outlet />
         </div>
 
+        {/* ── Bottom Gradual Blur ── */}
+        <GradualBlur
+          target="parent"
+          position="bottom"
+          height="4rem"
+          strength={1.5}
+          divCount={5}
+          curve="bezier"
+          exponential={true}
+          opacity={0.9}
+        />
       </div>
-    </>
+    </div>
   );
 }

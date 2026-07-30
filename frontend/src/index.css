@@ -1,5 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 @import "./ref-styles.css";
+
+@theme {
+  --font-sans: 'Space Grotesk', sans-serif;
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-mono: 'Space Grotesk', monospace;
+}
+
+*, html, body, button, input, select, textarea {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* Space Grotesk Typography & Spacing Enhancements */
+h1, h2, h3, h4, h5, h6, .card-title, .dash-chart-title {
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
+}
+
+p, span, label, td, th, div {
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+button, input, select, textarea {
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.nav-lbl, .stat-label, .rstat-lbl, .qr-timer-label, th {
+  letter-spacing: 0.06em;
+}
 
 html {
   scroll-behavior: smooth;
@@ -168,7 +200,7 @@ body {
   background-color: #09090B;
   position: relative;
   overflow: hidden;
-  font-family: "Inter", sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 .premium-login-card {
@@ -555,7 +587,7 @@ body {
     letter-spacing: 0.05em;
   }
   .mobile-list-card-row span:last-child {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Space Grotesk', sans-serif;
     color: var(--text);
   }
   .mobile-list-card-actions {

@@ -187,7 +187,7 @@ const Login = () => {
     };
 
     return (
-        <div style={{ minHeight: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: bgBase, position: 'relative', overflow: 'hidden', fontFamily: '"Inter", sans-serif', padding: isMobile ? '24px' : '0', transition: 'background-color 0.5s ease' }}>
+        <div style={{ minHeight: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: bgBase, position: 'relative', overflow: 'hidden', fontFamily: '"Space Grotesk", sans-serif', padding: isMobile ? '24px' : '0', transition: 'background-color 0.5s ease' }}>
             {/* Background Video */}
             <video 
                 autoPlay 

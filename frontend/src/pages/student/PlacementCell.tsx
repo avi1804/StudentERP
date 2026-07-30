@@ -25,7 +25,7 @@ export function PlacementCell() {
   ];
 
   return (
-    <div style={{ padding: '32px', maxWidth: '1400px', margin: '0 auto', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ padding: '32px', maxWidth: '1400px', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
       
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '32px' }}>

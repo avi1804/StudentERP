@@ -5,10 +5,12 @@ import {
   BookOpen, ClipboardList, TrendingUp, Award, 
   ChevronRight, CalendarDays, CheckCircle2,
   Monitor, Database, Network, Code2, Brain, BarChart2,
-  ChevronDown
+  ChevronDown, ArrowUpRight
 } from "lucide-react";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { motion } from "framer-motion";
+import TextType from "../../components/TextType";
 
 export function MySubjects() {
   const { isMobile } = useIsMobile();
@@ -42,6 +44,11 @@ export function MySubjects() {
 
   const subjectsList = data.length > 0 ? data : defaultSubjects;
 
+  // Real-time metric calculations
+  const totalSubjects = subjectsList.length;
+  const totalCredits = subjectsList.reduce((acc: number, curr: any) => acc + (Number(curr.credits) || 4), 0);
+  const completedSubjects = subjectsList.filter((s: any) => s.grade || s.status === 'Completed' || s.completed).length || (totalSubjects > 0 ? totalSubjects - 1 : 5);
+
   const getColorStyles = (type: string) => {
     switch(type) {
       case "purple": return { bg: "#f3f0ff", text: "#573cfa" };
@@ -59,81 +66,161 @@ export function MySubjects() {
   }
 
   return (
-    <div style={{ padding: '32px', maxWidth: '1200px', margin: '0 auto' }}>
-      {/* Header */}
+    <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto' }}>
+      {/* ── Header with Animated Highlighted Text Badge (Matching Dashboard & Attendance) ── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div style={{ width: '48px', height: '48px', background: '#f3f0ff', borderRadius: '12px', marginRight: '16px', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <BookOpen size={24} />
-          </div>
-          <div>
-            <h1 style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827', margin: '0 0 4px 0' }}>My Subjects</h1>
-            <div style={{ fontSize: '13px', color: '#6b7280' }}>View and manage all subjects you are enrolled in</div>
-          </div>
+        <div>
+          <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <span>My</span>
+            <span style={{
+              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+              color: '#ffffff',
+              padding: '4px 18px',
+              borderRadius: '14px',
+              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              lineHeight: 1.2,
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+            }}>
+              <TextType
+                text={["Subjects", "Courses", "Curriculum"]}
+                typingSpeed={60}
+                deletingSpeed={35}
+                pauseDuration={2200}
+                loop={true}
+                showCursor={true}
+                cursorCharacter="|"
+                style={{ color: '#ffffff' }}
+              />
+            </span>
+          </h1>
+          <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>View and manage all subjects you are enrolled in</div>
         </div>
+
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <label style={{ fontSize: '11px', fontWeight: 600, color: '#9ca3af', marginBottom: '4px' }}>Semester</label>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: 'white', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '13px', color: '#374151', cursor: 'pointer' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', fontSize: '13px', color: '#374151', cursor: 'pointer', fontWeight: 600 }}>
             Semester 7 (Current) <ChevronDown size={14} color="#6b7280" />
           </div>
         </div>
       </div>
 
-      {/* Top Metrics Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
-        {/* Total Subjects */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <ClipboardList size={24} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Total Subjects</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>6</div>
-            <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px' }}>This Semester</div>
-          </div>
-        </div>
-
-        {/* Total Credits */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#e8f5e9', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <ClipboardList size={24} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Total Credits</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>24</div>
-            <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px' }}>Out of 24</div>
-          </div>
-          <div style={{ position: 'absolute', bottom: 0, left: '20px', right: '20px', height: '3px', background: '#10b981', borderRadius: '3px 3px 0 0' }} />
-        </div>
-
-        {/* Average Grade */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <TrendingUp size={24} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Average Grade</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>A</div>
-              <div style={{ fontSize: '12px', color: '#10b981', fontWeight: 600 }}>↑ 0.3 <span style={{ color: '#9ca3af', fontWeight: 'normal' }}>vs last sem</span></div>
+      {/* ── Real-Time KPI Cards Row (AutoML Studio design matching Dashboard & Attendance) ── */}
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '32px' }}
+      >
+        {/* KPI 1 — Total Subjects */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(87,60,250,0.08)' }}>
+                <BookOpen size={18} color="#573cfa" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Subjects</span>
             </div>
-            <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px' }}>Excellent</div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
           </div>
-        </div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              {totalSubjects}
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#573cfa', fontWeight: 600 }}>100%</span> · Enrolled Curriculum
+            </div>
+          </div>
+        </motion.div>
 
-        {/* Completed Subjects */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fffbeb', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Award size={24} />
+        {/* KPI 2 — Total Credits */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(34,197,94,0.08)' }}>
+                <Award size={18} color="#22c55e" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Credits</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Completed Subjects</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>18</div>
-            <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px' }}>Till Now</div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              {totalCredits}
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#22c55e', fontWeight: 600 }}>{totalCredits} / {totalCredits}</span> · Semester Credits
+            </div>
           </div>
-          <div style={{ position: 'absolute', bottom: 0, left: '20px', right: '20px', height: '3px', background: '#f59e0b', borderRadius: '3px 3px 0 0' }} />
-        </div>
-      </div>
+        </motion.div>
+
+        {/* KPI 3 — Completed Subjects */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(59,130,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(59,130,246,0.08)' }}>
+                <CheckCircle2 size={18} color="#3b82f6" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Completed Subjects</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
+          </div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              {completedSubjects}
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#3b82f6', fontWeight: 600 }}>{totalSubjects > 0 ? Math.round((completedSubjects / totalSubjects) * 100) : 100}%</span> · Completion Progress
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
 
       {/* Subjects Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
@@ -166,23 +253,43 @@ export function MySubjects() {
         )}
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '32px' }}>
-        <button style={{ background: '#f3f0ff', color: '#573cfa', border: 'none', padding: '10px 20px', borderRadius: '8px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
-          View All Subjects <ChevronDown size={14} />
-        </button>
-      </div>
 
-      {/* Bottom Charts Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+
+      {/* ── 50-50 Split: Subject Overview | Credits Summary (Modern UI/UX Design) ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '28px', alignItems: 'stretch' }}>
         
-        {/* Subject Overview */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: '0 0 24px 0' }}>Subject Overview</h3>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '24px', marginBottom: '24px' }}>
-            <div style={{ width: '140px', height: '140px', position: 'relative' }}>
+        {/* Subject Overview Card */}
+        <div style={{
+          background: '#ffffff',
+          border: '1.5px solid rgba(0,0,0,0.06)',
+          borderRadius: '28px',
+          padding: '28px 32px',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.03)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}>
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: 'rgba(87,60,250,0.08)', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <BookOpen size={20} color="#573cfa" strokeWidth={2} />
+              </div>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#09090b', margin: 0, letterSpacing: '-0.3px' }}>
+                Subject Overview
+              </h3>
+            </div>
+            <span style={{ fontSize: '12px', color: '#573cfa', fontWeight: 700, background: '#e8e5ff', padding: '5px 14px', borderRadius: '16px' }}>
+              {totalSubjects} Enrolled
+            </span>
+          </div>
+
+          {/* Donut Chart & Legend Row */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: 1, marginY: '12px' }}>
+            <div style={{ width: '150px', height: '150px', position: 'relative', flexShrink: 0 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={pieData} innerRadius={50} outerRadius={70} paddingAngle={2} dataKey="value" stroke="none">
+                  <Pie data={pieData} innerRadius={52} outerRadius={72} paddingAngle={4} dataKey="value" stroke="none">
                     {pieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
@@ -190,103 +297,91 @@ export function MySubjects() {
                 </PieChart>
               </ResponsiveContainer>
               <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', lineHeight: 1 }}>6</div>
-                <div style={{ fontSize: '11px', color: '#6b7280' }}>Subjects</div>
+                <div style={{ fontSize: '28px', fontWeight: 800, color: '#09090b', lineHeight: 1 }}>{totalSubjects}</div>
+                <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 600, marginTop: '2px' }}>Subjects</div>
               </div>
             </div>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {pieData.map((g, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#4b5563' }}>
-                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: g.color }}></div>
+                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 14px', background: '#f4f4f5', borderRadius: '14px', border: '1px solid rgba(0,0,0,0.03)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: 600, color: '#27272a' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: g.color }} />
                     {g.name}
                   </div>
-                  <div style={{ color: '#111827', fontWeight: 'bold' }}>{g.value}</div>
+                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#09090b' }}>{g.value}</div>
                 </div>
               ))}
             </div>
           </div>
-          <div style={{ fontSize: '12px', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '16px', borderTop: '1px solid #f3f4f6' }}>
-            <CalendarDays size={14} /> 6/6 subjects enrolled this semester
+
+          {/* Footer Note */}
+          <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '16px', borderTop: '1px solid #f4f4f5' }}>
+            <CalendarDays size={14} color="#573cfa" /> All {totalSubjects} subjects actively tracked for Semester 7
           </div>
         </div>
 
-        {/* Credits Summary */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', flexDirection: 'column' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: '0 0 32px 0' }}>Credits Summary</h3>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
-            {/* SVG Semi-Circle */}
-            <div style={{ position: 'relative', width: '200px', height: '100px' }}>
+        {/* Credits Summary Card */}
+        <div style={{
+          background: '#ffffff',
+          border: '1.5px solid rgba(0,0,0,0.06)',
+          borderRadius: '28px',
+          padding: '28px 32px',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.03)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}>
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Award size={20} color="#22c55e" strokeWidth={2} />
+              </div>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#09090b', margin: 0, letterSpacing: '-0.3px' }}>
+                Credits Summary
+              </h3>
+            </div>
+            <span style={{ fontSize: '12px', color: '#16a34a', fontWeight: 700, background: '#dcfce7', padding: '5px 14px', borderRadius: '16px' }}>
+              On Track
+            </span>
+          </div>
+
+          {/* Semi-Circle Progress Gauge */}
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginY: '8px' }}>
+            <div style={{ position: 'relative', width: '220px', height: '110px' }}>
               <svg viewBox="0 0 200 100" style={{ width: '100%', height: '100%' }}>
-                {/* Background arc */}
-                <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#eef2ff" strokeWidth="20" strokeLinecap="round" />
-                {/* Progress arc */}
-                <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#a78bfa" strokeWidth="20" strokeLinecap="round" strokeDasharray="251.2" strokeDashoffset="0" />
+                <defs>
+                  <linearGradient id="creditGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#573cfa" />
+                    <stop offset="100%" stopColor="#10b981" />
+                  </linearGradient>
+                </defs>
+                {/* Background Track Arc */}
+                <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#f4f4f5" strokeWidth="18" strokeLinecap="round" />
+                {/* Active Progress Arc */}
+                <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#creditGradient)" strokeWidth="18" strokeLinecap="round" strokeDasharray="251.2" strokeDashoffset="0" />
               </svg>
-              <div style={{ position: 'absolute', bottom: '0', left: 0, width: '100%', textAlign: 'center', paddingBottom: '8px' }}>
-                <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#111827' }}>24 <span style={{ fontSize: '14px', color: '#9ca3af', fontWeight: 'normal' }}>/ 24</span></div>
-                <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>Credits Completed</div>
+              <div style={{ position: 'absolute', bottom: '0', left: 0, width: '100%', textAlign: 'center' }}>
+                <div style={{ fontSize: '30px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.8px', lineHeight: 1 }}>
+                  {totalCredits} <span style={{ fontSize: '15px', color: '#71717a', fontWeight: 600 }}>/ {totalCredits}</span>
+                </div>
+                <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 600, marginTop: '4px' }}>Credits Completed</div>
               </div>
-            </div>
-          </div>
-          <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
-            <div style={{ flex: 1, background: '#f8fafc', padding: '16px', borderRadius: '12px', textAlign: 'center' }}>
-              <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#3b82f6' }}>24</div>
-              <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>Registered</div>
-            </div>
-            <div style={{ flex: 1, background: '#f8fafc', padding: '16px', borderRadius: '12px', textAlign: 'center' }}>
-              <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827' }}>24</div>
-              <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>Completed</div>
-            </div>
-          </div>
-          <div style={{ fontSize: '13px', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontWeight: 600, marginTop: 'auto' }}>
-            <CheckCircle2 size={16} /> You are on track!
-          </div>
-        </div>
-
-        {/* Upcoming Classes */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: 0 }}>Upcoming Classes</h3>
-            <span style={{ fontSize: '12px', color: '#573cfa', fontWeight: 600, cursor: 'pointer' }}>View Timetable &rarr;</span>
-          </div>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: '#573cfa', width: '60px', marginTop: '2px' }}>09:00 AM</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#111827', marginBottom: '4px' }}>Operating Systems</div>
-                <div style={{ fontSize: '12px', color: '#6b7280' }}>Room 301</div>
-              </div>
-              <div style={{ fontSize: '11px', fontWeight: 600, color: '#573cfa', background: '#f3f0ff', padding: '4px 10px', borderRadius: '6px' }}>Today</div>
-            </div>
-            
-            <div style={{ height: '1px', background: '#f3f4f6' }}></div>
-            
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: '#573cfa', width: '60px', marginTop: '2px' }}>11:00 AM</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#111827', marginBottom: '4px' }}>Database Management Systems</div>
-                <div style={{ fontSize: '12px', color: '#6b7280' }}>Lab 2</div>
-              </div>
-              <div style={{ fontSize: '11px', fontWeight: 600, color: '#10b981', background: '#e8f5e9', padding: '4px 10px', borderRadius: '6px' }}>Today</div>
-            </div>
-            
-            <div style={{ height: '1px', background: '#f3f4f6' }}></div>
-            
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: '#573cfa', width: '60px', marginTop: '2px' }}>02:00 PM</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#111827', marginBottom: '4px' }}>Machine Learning</div>
-                <div style={{ fontSize: '12px', color: '#6b7280' }}>Room 204</div>
-              </div>
-              <div style={{ fontSize: '11px', fontWeight: 600, color: '#f59e0b', background: '#fffbeb', padding: '4px 10px', borderRadius: '6px' }}>Tomorrow</div>
             </div>
           </div>
 
-          <button style={{ width: '100%', background: 'white', border: '1px solid #e5e7eb', color: '#573cfa', padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, marginTop: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-            <CalendarDays size={16} /> View Full Timetable
-          </button>
+          {/* Registered vs Completed Stats Row */}
+          <div style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
+            <div style={{ flex: 1, background: '#f4f4f5', padding: '14px 18px', borderRadius: '18px', border: '1px solid rgba(0,0,0,0.03)', textAlign: 'center' }}>
+              <div style={{ fontSize: '20px', fontWeight: 800, color: '#573cfa' }}>{totalCredits}</div>
+              <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 600, marginTop: '2px' }}>Registered</div>
+            </div>
+            <div style={{ flex: 1, background: '#f4f4f5', padding: '14px 18px', borderRadius: '18px', border: '1px solid rgba(0,0,0,0.03)', textAlign: 'center' }}>
+              <div style={{ fontSize: '20px', fontWeight: 800, color: '#16a34a' }}>{totalCredits}</div>
+              <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 600, marginTop: '2px' }}>Completed</div>
+            </div>
+          </div>
         </div>
 
       </div>

@@ -1,8 +1,10 @@
 import React from "react";
 import { 
   Calendar, BookOpen, Clock, ChevronDown, Download, Info,
-  ChevronLeft, ChevronRight, Utensils
+  Utensils, ArrowUpRight
 } from "lucide-react";
+import { motion } from "framer-motion";
+import TextType from "../../components/TextType";
 
 export function MyTimetable() {
 
@@ -92,259 +94,224 @@ export function MyTimetable() {
     if (!cellData) return <div style={{ textAlign: 'center', color: '#d1d5db' }}>-</div>;
     const colors = getColorStyles(cellData.color);
     return (
-      <div style={{ background: colors.bg, padding: '8px', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <div style={{ background: colors.bg, padding: '10px 12px', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: colors.text, flexShrink: 0 }} />
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cellData.name}</div>
+          <div style={{ fontSize: '12px', fontWeight: 700, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cellData.name}</div>
         </div>
-        <div style={{ fontSize: '10px', color: '#6b7280', paddingLeft: '12px' }}>{cellData.room}</div>
+        <div style={{ fontSize: '11px', color: '#6b7280', paddingLeft: '12px', fontWeight: 500 }}>{cellData.room}</div>
       </div>
     );
   };
 
   return (
-    <div style={{ padding: '32px', maxWidth: '1400px', margin: '0 auto', fontFamily: 'Inter, sans-serif' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '32px' }}>
-        <div style={{ width: '48px', height: '48px', background: '#f3f0ff', borderRadius: '12px', marginRight: '16px', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Calendar size={24} />
-        </div>
+    <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
+      {/* ── Header with Animated Highlighted Text Badge (Matching Attendance & Dashboard) ── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
         <div>
-          <h1 style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827', margin: '0 0 4px 0' }}>My Timetable</h1>
-          <div style={{ fontSize: '13px', color: '#6b7280' }}>View your class schedule and stay updated</div>
+          <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <span>My</span>
+            <span style={{
+              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+              color: '#ffffff',
+              padding: '4px 18px',
+              borderRadius: '14px',
+              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              lineHeight: 1.2,
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+            }}>
+              <TextType
+                text={["Timetable", "Schedule", "Routine"]}
+                typingSpeed={60}
+                deletingSpeed={35}
+                pauseDuration={2200}
+                loop={true}
+                showCursor={true}
+                cursorCharacter="|"
+                style={{ color: '#ffffff' }}
+              />
+            </span>
+          </h1>
+          <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>View your weekly class schedule and stay updated</div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', fontSize: '13px', fontWeight: 600, color: '#374151', cursor: 'pointer' }}>
+            Week View <ChevronDown size={14} color="#6b7280" />
+          </div>
+          <button style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 18px', background: 'white', border: '1.5px solid #573cfa', borderRadius: '12px', fontSize: '13px', fontWeight: 700, color: '#573cfa', cursor: 'pointer' }}>
+            <Download size={14} /> Export
+          </button>
         </div>
       </div>
 
-      {/* Top Metrics Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
-        {/* Classes Today */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Calendar size={24} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Classes Today</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>4</div>
-            <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px' }}>2 Completed</div>
-          </div>
-        </div>
-
-        {/* Total Subjects */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#e8f5e9', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <BookOpen size={24} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Total Subjects</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>6</div>
-            <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px' }}>This Semester</div>
-          </div>
-        </div>
-
-        {/* Total Classes / Week */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Clock size={24} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Total Classes / Week</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>28</div>
-            <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px' }}>Across all subjects</div>
-          </div>
-        </div>
-
-        {/* Next Class */}
-        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fffbeb', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Clock size={24} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Next Class</div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>11:00 AM</div>
-            <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px' }}>DBMS (Lab 2)</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Layout */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2.5fr 1fr', gap: '24px' }}>
-        
-        {/* Left Column: Weekly Timetable */}
-        <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #f3f4f6', padding: '24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 'bold', color: '#573cfa', margin: 0 }}>Weekly Timetable</h3>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: 'white', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '13px', fontWeight: 600, color: '#374151', cursor: 'pointer' }}>
-                Week View <ChevronDown size={14} color="#6b7280" />
+      {/* ── Top Real-Time KPI Cards Row (AutoML Studio design matching Main Dashboard) ── */}
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '32px' }}
+      >
+        {/* KPI 1 — Classes Today */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(87,60,250,0.08)' }}>
+                <Calendar size={18} color="#573cfa" strokeWidth={2} />
               </div>
-              <button style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: 'white', border: '1px solid #573cfa', borderRadius: '8px', fontSize: '13px', fontWeight: 600, color: '#573cfa', cursor: 'pointer' }}>
-                <Download size={16} /> Export
-              </button>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Classes Today</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
             </div>
           </div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              4
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#573cfa', fontWeight: 600 }}>4 Classes</span> · Scheduled Today
+            </div>
+          </div>
+        </motion.div>
 
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
-              <thead>
-                <tr>
-                  <th style={{ width: '100px', padding: '12px', fontSize: '12px', fontWeight: 700, color: '#111827', textAlign: 'center' }}>Time</th>
-                  <th style={{ padding: '12px', fontSize: '12px', fontWeight: 700, color: '#111827', textAlign: 'center' }}>Monday</th>
-                  <th style={{ padding: '12px', fontSize: '12px', fontWeight: 700, color: '#111827', textAlign: 'center' }}>Tuesday</th>
-                  <th style={{ padding: '12px', fontSize: '12px', fontWeight: 700, color: '#111827', textAlign: 'center' }}>Wednesday</th>
-                  <th style={{ padding: '12px', fontSize: '12px', fontWeight: 700, color: '#111827', textAlign: 'center' }}>Thursday</th>
-                  <th style={{ padding: '12px', fontSize: '12px', fontWeight: 700, color: '#111827', textAlign: 'center' }}>Friday</th>
-                  <th style={{ padding: '12px', fontSize: '12px', fontWeight: 700, color: '#111827', textAlign: 'center' }}>Saturday</th>
-                </tr>
-              </thead>
-              <tbody>
-                {timetableData.map((row, i) => (
-                  <tr key={i} style={{ borderTop: '1px solid #f3f4f6' }}>
-                    <td style={{ padding: '16px 8px', fontSize: '11px', fontWeight: 600, color: '#4b5563', textAlign: 'center', whiteSpace: 'pre-line' }}>
-                      {row.time}
+        {/* KPI 2 — Total Classes / Week */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(34,197,94,0.08)' }}>
+                <Clock size={18} color="#22c55e" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Classes / Week</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
+          </div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              24
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#22c55e', fontWeight: 600 }}>24 Classes</span> · Weekly Schedule
+            </div>
+          </div>
+        </motion.div>
+
+        {/* KPI 3 — Next Class */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#f4f4f5',
+            border: '1.5px solid rgba(0,0,0,0.07)',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: '185px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(59,130,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(59,130,246,0.08)' }}>
+                <BookOpen size={18} color="#3b82f6" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Next Class</span>
+            </div>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <ArrowUpRight size={15} color="#18181b" />
+            </div>
+          </div>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+            <div style={{ fontSize: '38px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              10:45 AM
+            </div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
+              <span style={{ color: '#3b82f6', fontWeight: 600 }}>DBMS</span> · Next Scheduled
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+
+      {/* ── Full Width Weekly Timetable Panel ── */}
+      <div style={{ background: 'white', borderRadius: '28px', border: '1.5px solid rgba(0,0,0,0.06)', padding: '28px 32px', boxShadow: '0 4px 24px rgba(0,0,0,0.03)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+          <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#09090b', margin: 0, letterSpacing: '-0.3px' }}>Weekly Schedule Overview</h3>
+        </div>
+
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
+            <thead>
+              <tr>
+                <th style={{ width: '110px', padding: '14px 12px', fontSize: '13px', fontWeight: 700, color: '#52525b', textAlign: 'center', background: '#f4f4f5', borderRadius: '12px 0 0 12px' }}>Time</th>
+                <th style={{ padding: '14px 12px', fontSize: '13px', fontWeight: 700, color: '#52525b', textAlign: 'center', background: '#f4f4f5' }}>Monday</th>
+                <th style={{ padding: '14px 12px', fontSize: '13px', fontWeight: 700, color: '#52525b', textAlign: 'center', background: '#f4f4f5' }}>Tuesday</th>
+                <th style={{ padding: '14px 12px', fontSize: '13px', fontWeight: 700, color: '#52525b', textAlign: 'center', background: '#f4f4f5' }}>Wednesday</th>
+                <th style={{ padding: '14px 12px', fontSize: '13px', fontWeight: 700, color: '#52525b', textAlign: 'center', background: '#f4f4f5' }}>Thursday</th>
+                <th style={{ padding: '14px 12px', fontSize: '13px', fontWeight: 700, color: '#52525b', textAlign: 'center', background: '#f4f4f5' }}>Friday</th>
+                <th style={{ padding: '14px 12px', fontSize: '13px', fontWeight: 700, color: '#52525b', textAlign: 'center', background: '#f4f4f5', borderRadius: '0 12px 12px 0' }}>Saturday</th>
+              </tr>
+            </thead>
+            <tbody>
+              {timetableData.map((row, i) => (
+                <tr key={i} style={{ borderTop: '1px solid #f4f4f5' }}>
+                  <td style={{ padding: '16px 8px', fontSize: '12px', fontWeight: 700, color: '#52525b', textAlign: 'center', whiteSpace: 'pre-line' }}>
+                    {row.time}
+                  </td>
+                  {row.isBreak ? (
+                    <td colSpan={6} style={{ padding: '16px 8px' }}>
+                      <div style={{ background: '#fffbeb', color: '#f59e0b', padding: '14px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '13px', fontWeight: 700 }}>
+                        <Utensils size={16} /> {row.breakName}
+                      </div>
                     </td>
-                    {row.isBreak ? (
-                      <td colSpan={6} style={{ padding: '16px 8px' }}>
-                        <div style={{ background: '#fffbeb', color: '#f59e0b', padding: '12px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '12px', fontWeight: 600 }}>
-                          <Utensils size={16} /> {row.breakName}
-                        </div>
-                      </td>
-                    ) : (
-                      <>
-                        <td style={{ padding: '12px 8px' }}>{renderCell(row.monday)}</td>
-                        <td style={{ padding: '12px 8px' }}>{renderCell(row.tuesday)}</td>
-                        <td style={{ padding: '12px 8px' }}>{renderCell(row.wednesday)}</td>
-                        <td style={{ padding: '12px 8px' }}>{renderCell(row.thursday)}</td>
-                        <td style={{ padding: '12px 8px' }}>{renderCell(row.friday)}</td>
-                        <td style={{ padding: '12px 8px' }}>{renderCell(row.saturday)}</td>
-                      </>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '24px', color: '#6b7280', fontSize: '12px' }}>
-            <Info size={16} /> Timetable is effective from 10 May 2024
-          </div>
+                  ) : (
+                    <>
+                      <td style={{ padding: '12px 8px' }}>{renderCell(row.monday)}</td>
+                      <td style={{ padding: '12px 8px' }}>{renderCell(row.tuesday)}</td>
+                      <td style={{ padding: '12px 8px' }}>{renderCell(row.wednesday)}</td>
+                      <td style={{ padding: '12px 8px' }}>{renderCell(row.thursday)}</td>
+                      <td style={{ padding: '12px 8px' }}>{renderCell(row.friday)}</td>
+                      <td style={{ padding: '12px 8px' }}>{renderCell(row.saturday)}</td>
+                    </>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
-        {/* Right Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          
-          {/* Calendar Widget */}
-          <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #f3f4f6', padding: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-              <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: 0 }}>Calendar</h3>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid #e5e7eb', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', cursor: 'pointer' }}><ChevronLeft size={16} /></button>
-                <button style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid #e5e7eb', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', cursor: 'pointer' }}><ChevronRight size={16} /></button>
-              </div>
-            </div>
-            
-            <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#111827', marginBottom: '16px' }}>May 2024</div>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px', textAlign: 'center', fontSize: '12px' }}>
-              <div style={{ color: '#6b7280', fontWeight: 600, paddingBottom: '8px' }}>Mo</div>
-              <div style={{ color: '#6b7280', fontWeight: 600, paddingBottom: '8px' }}>Tu</div>
-              <div style={{ color: '#6b7280', fontWeight: 600, paddingBottom: '8px' }}>We</div>
-              <div style={{ color: '#6b7280', fontWeight: 600, paddingBottom: '8px' }}>Th</div>
-              <div style={{ color: '#6b7280', fontWeight: 600, paddingBottom: '8px' }}>Fr</div>
-              <div style={{ color: '#6b7280', fontWeight: 600, paddingBottom: '8px' }}>Sa</div>
-              <div style={{ color: '#6b7280', fontWeight: 600, paddingBottom: '8px' }}>Su</div>
-              
-              <div style={{ color: '#d1d5db', padding: '4px' }}>29</div>
-              <div style={{ color: '#d1d5db', padding: '4px' }}>30</div>
-              <div style={{ color: '#111827', padding: '4px' }}>1</div>
-              <div style={{ color: '#111827', padding: '4px' }}>2</div>
-              <div style={{ color: '#111827', padding: '4px' }}>3</div>
-              <div style={{ color: '#111827', padding: '4px' }}>4</div>
-              <div style={{ color: '#111827', padding: '4px' }}>5</div>
-              
-              <div style={{ color: '#111827', padding: '4px' }}>6</div>
-              <div style={{ color: '#111827', padding: '4px' }}>7</div>
-              <div style={{ color: '#111827', padding: '4px' }}>8</div>
-              <div style={{ color: '#111827', padding: '4px' }}>9</div>
-              <div style={{ color: '#111827', padding: '4px' }}>10</div>
-              <div style={{ color: '#111827', padding: '4px' }}>11</div>
-              <div style={{ color: '#111827', padding: '4px' }}>12</div>
-              
-              <div style={{ color: '#111827', padding: '4px' }}>13</div>
-              <div style={{ color: '#111827', padding: '4px' }}>14</div>
-              <div style={{ background: '#573cfa', color: 'white', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>15</div>
-              <div style={{ color: '#111827', padding: '4px' }}>16</div>
-              <div style={{ color: '#111827', padding: '4px' }}>17</div>
-              <div style={{ color: '#111827', padding: '4px' }}>18</div>
-              <div style={{ color: '#111827', padding: '4px' }}>19</div>
-              
-              <div style={{ color: '#111827', padding: '4px' }}>20</div>
-              <div style={{ color: '#111827', padding: '4px' }}>21</div>
-              <div style={{ color: '#111827', padding: '4px' }}>22</div>
-              <div style={{ color: '#111827', padding: '4px' }}>23</div>
-              <div style={{ color: '#111827', padding: '4px' }}>24</div>
-              <div style={{ color: '#111827', padding: '4px' }}>25</div>
-              <div style={{ color: '#111827', padding: '4px' }}>26</div>
-              
-              <div style={{ color: '#111827', padding: '4px' }}>27</div>
-              <div style={{ color: '#111827', padding: '4px' }}>28</div>
-              <div style={{ color: '#111827', padding: '4px' }}>29</div>
-              <div style={{ color: '#111827', padding: '4px' }}>30</div>
-              <div style={{ color: '#111827', padding: '4px' }}>31</div>
-              <div style={{ color: '#d1d5db', padding: '4px' }}>1</div>
-              <div style={{ color: '#d1d5db', padding: '4px' }}>2</div>
-            </div>
-          </div>
-
-          {/* Upcoming Classes Widget */}
-          <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #f3f4f6', padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-              <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#573cfa', margin: 0 }}>Upcoming Classes</h3>
-              <span style={{ fontSize: '12px', color: '#573cfa', fontWeight: 600, cursor: 'pointer' }}>View all</span>
-            </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ background: '#eff6ff', color: '#3b82f6', padding: '6px 10px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, width: '70px', textAlign: 'center' }}>11:00 AM</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#111827', marginBottom: '2px' }}>Database Management Systems</div>
-                  <div style={{ fontSize: '11px', color: '#6b7280' }}>Lab 2</div>
-                </div>
-                <div style={{ background: '#e8f5e9', color: '#10b981', padding: '4px 8px', borderRadius: '10px', fontSize: '10px', fontWeight: 600 }}>In 45 min</div>
-              </div>
-              
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ background: '#eff6ff', color: '#3b82f6', padding: '6px 10px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, width: '70px', textAlign: 'center' }}>01:00 PM</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#111827', marginBottom: '2px' }}>Machine Learning</div>
-                  <div style={{ fontSize: '11px', color: '#6b7280' }}>Room 304</div>
-                </div>
-                <div style={{ background: '#fffbeb', color: '#f59e0b', padding: '4px 8px', borderRadius: '10px', fontSize: '10px', fontWeight: 600 }}>In 2h 45m</div>
-              </div>
-              
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ background: '#eff6ff', color: '#3b82f6', padding: '6px 10px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, width: '70px', textAlign: 'center' }}>02:00 PM</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#111827', marginBottom: '2px' }}>Software Engineering</div>
-                  <div style={{ fontSize: '11px', color: '#6b7280' }}>Room 303</div>
-                </div>
-                <div style={{ background: '#fffbeb', color: '#f59e0b', padding: '4px 8px', borderRadius: '10px', fontSize: '10px', fontWeight: 600 }}>In 3h 45m</div>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ background: '#eff6ff', color: '#3b82f6', padding: '6px 10px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, width: '70px', textAlign: 'center' }}>03:30 PM</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#111827', marginBottom: '2px' }}>Mentorship Session</div>
-                  <div style={{ fontSize: '11px', color: '#6b7280' }}>Room 201</div>
-                </div>
-                <div style={{ background: '#f3f0ff', color: '#573cfa', padding: '4px 8px', borderRadius: '10px', fontSize: '10px', fontWeight: 600 }}>In 5h 15m</div>
-              </div>
-            </div>
-
-            <button style={{ width: '100%', background: '#f3f0ff', border: 'none', color: '#573cfa', padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, marginTop: 'auto', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-              <Calendar size={16} /> View Full Timetable
-            </button>
-          </div>
-
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '24px', color: '#71717a', fontSize: '13px', fontWeight: 500 }}>
+          <Info size={16} color="#573cfa" /> Timetable is effective from 10 May 2024
         </div>
       </div>
     </div>
