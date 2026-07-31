@@ -19,8 +19,10 @@ export function Payments() {
   };
 
   const filteredPayments = (payments || []).filter(p => 
-    p.receipt_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.payment_mode?.toLowerCase().includes(searchTerm.toLowerCase())
+    (p.receipt_no || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (p.payment_mode || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (p.student_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (p.enrollment_number || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -28,10 +30,10 @@ export function Payments() {
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
         <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.5px' }}>
-          Payment Transactions Log
+          Payment Transactions & Audit Log
         </h1>
         <p style={{ fontSize: '13px', color: '#71717a', marginTop: '4px' }}>
-          Real-time incoming transaction queue and manual audit verification panel
+          Real-time incoming payment stream, student audit history, and verification panel
         </p>
       </div>
 
@@ -65,7 +67,7 @@ export function Payments() {
           <Search size={16} color="#71717a" />
           <input
             type="text"
-            placeholder="Search by receipt no or payment mode..."
+            placeholder="Search by student name, receipt no, or mode..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '13px', width: '100%' }}
@@ -79,24 +81,35 @@ export function Payments() {
           <thead>
             <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e4e4e7' }}>
               <th style={{ padding: '14px 20px', fontWeight: 600, color: '#475569' }}>Receipt No</th>
+              <th style={{ padding: '14px 20px', fontWeight: 600, color: '#475569' }}>Student Info</th>
               <th style={{ padding: '14px 20px', fontWeight: 600, color: '#475569' }}>Amount</th>
               <th style={{ padding: '14px 20px', fontWeight: 600, color: '#475569' }}>Payment Mode</th>
-              <th style={{ padding: '14px 20px', fontWeight: 600, color: '#475569' }}>Date</th>
+              <th style={{ padding: '14px 20px', fontWeight: 600, color: '#475569' }}>Date & Time</th>
               <th style={{ padding: '14px 20px', fontWeight: 600, color: '#475569' }}>Status</th>
               <th style={{ padding: '14px 20px', fontWeight: 600, color: '#475569', textAlign: 'right' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredPayments.length === 0 ? (
+            {isLoading ? (
               <tr>
-                <td colSpan={6} style={{ padding: '32px', textAlign: 'center', color: '#94a3b8' }}>
+                <td colSpan={7} style={{ padding: '32px', textAlign: 'center', color: '#94a3b8' }}>
+                  Loading transaction log...
+                </td>
+              </tr>
+            ) : filteredPayments.length === 0 ? (
+              <tr>
+                <td colSpan={7} style={{ padding: '32px', textAlign: 'center', color: '#94a3b8' }}>
                   No payment transactions found.
                 </td>
               </tr>
             ) : (
               filteredPayments.map((pmt) => (
                 <tr key={pmt.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={{ padding: '16px 20px', fontWeight: 600, color: '#0f172a' }}>{pmt.receipt_no}</td>
+                  <td style={{ padding: '16px 20px', fontWeight: 700, color: '#573cfa' }}>{pmt.receipt_no}</td>
+                  <td style={{ padding: '16px 20px' }}>
+                    <div style={{ fontWeight: 600, color: '#0f172a' }}>{pmt.student_name || 'Student'}</div>
+                    <div style={{ fontSize: '11px', color: '#64748b' }}>{pmt.enrollment_number || ''}</div>
+                  </td>
                   <td style={{ padding: '16px 20px', fontWeight: 700, color: '#16a34a' }}>₹ {pmt.amount?.toLocaleString('en-IN')}</td>
                   <td style={{ padding: '16px 20px' }}>
                     <span style={{ background: '#f1f5f9', color: '#334155', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 600 }}>
@@ -104,7 +117,7 @@ export function Payments() {
                     </span>
                   </td>
                   <td style={{ padding: '16px 20px', color: '#64748b' }}>
-                    {pmt.payment_date ? new Date(pmt.payment_date).toLocaleDateString() : 'Today'}
+                    {pmt.payment_date ? new Date(pmt.payment_date).toLocaleString() : 'Today'}
                   </td>
                   <td style={{ padding: '16px 20px' }}>
                     <span style={{
@@ -116,7 +129,7 @@ export function Payments() {
                     </span>
                   </td>
                   <td style={{ padding: '16px 20px', textAlign: 'right' }}>
-                    {pmt.status !== 'VERIFIED' && (
+                    {pmt.status !== 'VERIFIED' ? (
                       <button
                         onClick={() => handleVerify(pmt.id)}
                         style={{
@@ -127,6 +140,8 @@ export function Payments() {
                       >
                         <ShieldCheck size={14} /> Verify
                       </button>
+                    ) : (
+                      <span style={{ fontSize: '11px', color: '#16a34a', fontWeight: 700 }}>Verified ✓</span>
                     )}
                   </td>
                 </tr>

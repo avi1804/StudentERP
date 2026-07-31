@@ -27,9 +27,18 @@ class FeeStructureCreate(FeeStructureBase):
     pass
 
 class FeeStructureUpdate(BaseModel):
+    academic_year: Optional[str] = None
+    semester: Optional[int] = None
     category: Optional[str] = None
     tuition_fee: Optional[float] = None
     exam_fee: Optional[float] = None
+    library_fee: Optional[float] = None
+    sports_fee: Optional[float] = None
+    development_fee: Optional[float] = None
+    laboratory_fee: Optional[float] = None
+    hostel_fee: Optional[float] = None
+    bus_fee: Optional[float] = None
+    miscellaneous_fee: Optional[float] = None
     total_amount: Optional[float] = None
     scholarship_allowed: Optional[bool] = None
     installments_allowed: Optional[bool] = None
@@ -127,6 +136,35 @@ class StudentFeeUpdate(BaseModel):
     status: Optional[FeeStatus] = None
     fine_amount: Optional[float] = None
 
+class AssignFeeCreate(BaseModel):
+    student_id: Optional[int] = None
+    enrollment_number: Optional[str] = None
+    bulk_semester: Optional[int] = None  # Assign to all students of this semester
+    fee_structure_id: Optional[int] = None
+    academic_year: Optional[str] = "2024-2025"
+    semester: Optional[int] = 1
+    category: Optional[str] = "General"
+    
+    # Categorical fee breakdown
+    tuition_fee: float = 0.0
+    exam_fee: float = 0.0
+    library_fee: float = 0.0
+    development_fee: float = 0.0
+    laboratory_fee: float = 0.0
+    hostel_fee: float = 0.0
+    sports_fee: float = 0.0
+    late_fine: float = 0.0
+    miscellaneous_fee: float = 0.0
+    
+    due_date: date
+
+class StudentPayFeeCreate(BaseModel):
+    student_fee_id: int
+    amount: float
+    payment_mode: PaymentMode = PaymentMode.UPI
+    transaction_id: Optional[str] = None
+    fee_category: Optional[str] = "Full Outstanding Dues"
+
 class StudentFeeResponse(StudentFeeBase):
     id: int
     total_fee: float
@@ -138,6 +176,8 @@ class StudentFeeResponse(StudentFeeBase):
     fine_amount: float
     created_at: datetime
     updated_at: datetime
+    student_name: Optional[str] = None
+    enrollment_number: Optional[str] = None
     
     model_config = ConfigDict(from_attributes=True)
 
@@ -148,6 +188,7 @@ class PaymentBase(BaseModel):
     amount: float
     payment_mode: PaymentMode
     transaction_id: Optional[str] = None
+    fee_category: Optional[str] = "Full Outstanding Dues"
 
 class PaymentCreate(PaymentBase):
     pass
@@ -162,6 +203,9 @@ class PaymentResponse(PaymentBase):
     payment_date: datetime
     status: PaymentStatus
     verified_by: Optional[int] = None
+    student_name: Optional[str] = None
+    enrollment_number: Optional[str] = None
+    fee_category: Optional[str] = "Full Outstanding Dues"
     
     model_config = ConfigDict(from_attributes=True)
 

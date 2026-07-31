@@ -66,6 +66,8 @@ class Complaint(Base):
     student_id: Mapped[int] = mapped_column(ForeignKey("students.id", ondelete="CASCADE"), index=True)
     subject: Mapped[str] = mapped_column(String(255))
     description: Mapped[str] = mapped_column(Text)
+    category: Mapped[Optional[str]] = mapped_column(String(100), default="General", nullable=True)
+    resolution: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     status: Mapped[ComplaintStatus] = mapped_column(SQLEnum(ComplaintStatus), default=ComplaintStatus.OPEN)
     priority: Mapped[ComplaintPriority] = mapped_column(SQLEnum(ComplaintPriority), default=ComplaintPriority.MEDIUM)
     assigned_to: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)

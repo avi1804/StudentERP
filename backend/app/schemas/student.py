@@ -5,6 +5,7 @@ from datetime import date
 class StudentBase(BaseModel):
     enrollment_number: str
     course_id: Optional[int] = None
+    semester: Optional[int] = 1
     batch: str
     date_of_birth: Optional[date] = None
     contact_number: Optional[str] = None
@@ -14,6 +15,7 @@ class StudentCreate(StudentBase):
 
 class StudentUpdate(BaseModel):
     course_id: Optional[int] = None
+    semester: Optional[int] = None
     batch: Optional[str] = None
     date_of_birth: Optional[date] = None
     contact_number: Optional[str] = None
@@ -29,6 +31,7 @@ class UserNested(BaseModel):
 class StudentResponse(StudentBase):
     id: int
     user_id: int
+    semester: int = 1
     user: Optional[UserNested] = None
     
     model_config = {"from_attributes": True}
@@ -39,5 +42,5 @@ class StudentEnroll(BaseModel):
     password: str
     enrollment_number: str
     branch: str
-    semester: str
+    semester: int
     phone: Optional[str] = None

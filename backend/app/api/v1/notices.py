@@ -30,6 +30,8 @@ async def create_notice(
     return db_obj
 
 
+from app.models.user import User
+
 @router.get("/", response_model=List[NoticeResponse])
 async def read_active_notices(
     skip: int = 0,
@@ -38,9 +40,28 @@ async def read_active_notices(
     current_user: User = Depends(get_current_active_user)
 ) -> Any:
     """
-    Retrieve all active notices.
+    Retrieve all active notices with author names.
     """
-    return await notice_repo.get_active_notices(db, skip=skip, limit=limit)
+    from sqlalchemy import select
+    from app.models.communication import Notice
+
+    stmt = (
+        select(Notice, User)
+        .outerjoin(User, Notice.author_id == User.id)
+        .where(Notice.is_active == True)
+        .order_by(Notice.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+    )
+    rows = (await db.execute(stmt)).all()
+
+    result = []
+    for notice, author in rows:
+        item = NoticeResponse.model_validate(notice)
+        item.author_name = author.full_name if (author and author.full_name) else "Admin"
+        result.append(item)
+
+    return result
 
 
 @router.put("/{id}", response_model=NoticeResponse)

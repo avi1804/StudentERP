@@ -20,7 +20,8 @@ import {
   CreditCard,
   Percent,
   Banknote,
-  PieChart
+  PieChart,
+  AlertCircle
 } from "lucide-react";
 
 export type IconType = ComponentType<SVGProps<SVGSVGElement>>;
@@ -77,6 +78,7 @@ export const SUBJECT_DATA = [
 export const NAV_ITEMS: NavItem[] = [
   { isCategory: true, label: "OVERVIEW" },
   { label: "Dashboard", icon: LayoutGrid, path: "/admin/dashboard" },
+  { label: "Student Complaints", icon: AlertCircle, path: "/admin/dashboard/complaints" },
   { isCategory: true, label: "ACADEMIC" },
   { label: "Departments", icon: Building2, path: "/admin/dashboard/department/manage" },
   { label: "Students", icon: Users, path: "/admin/dashboard/students/manage" },
@@ -93,9 +95,5 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Fee Structure", icon: FileText, path: "/admin/dashboard/fees/structures" },
   { label: "Student Fees", icon: Users, path: "/admin/dashboard/fees/students" },
   { label: "Payments", icon: CreditCard, path: "/admin/dashboard/fees/payments" },
-  { label: "Scholarships", icon: GraduationCap, path: "/admin/dashboard/fees/scholarships" },
-  { label: "Discounts", icon: Percent, path: "/admin/dashboard/fees/discounts" },
-  { label: "Fine Management", icon: Hourglass, path: "/admin/dashboard/fees/fines" },
-  { label: "Receipts", icon: Receipt, path: "/admin/dashboard/fees/receipts" },
   { label: "Reports", icon: PieChart, path: "/admin/dashboard/fees/reports" },
 ];

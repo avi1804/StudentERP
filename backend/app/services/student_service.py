@@ -42,7 +42,8 @@ class StudentService:
         new_student = StudentCreate(
             user_id=new_user.id,
             enrollment_number=student_data.enrollment_number,
-            batch=f"{student_data.branch} - Sem {student_data.semester}",
+            semester=student_data.semester,
+            batch=student_data.branch,
             contact_number=student_data.phone
         )
         

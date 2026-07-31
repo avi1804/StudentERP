@@ -1,35 +1,65 @@
-import React from "react";
-import { 
-  Badge, Calendar, Clock, Tag, Download, User, Droplets, Phone, Mail,
-  BookOpen, Utensils, FlaskConical, Building, Ticket, CheckCircle2,
-  AlertTriangle, Camera, Headset, FileText, ArrowUpRight
-} from "lucide-react";
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import React, { useEffect, useState } from "react";
+import { Download, User, Calendar, Droplets, Phone, Mail, GraduationCap, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { apiClient } from "../../api/axios";
+import { useAuthStore } from "../../store/authStore";
 import TextType from "../../components/TextType";
 
 export function MyIdCard() {
+  const currentUser = useAuthStore((state) => state.user);
+  const [profile, setProfile] = useState<any>(null);
 
-  const validityData = [
-    { name: 'Elapsed', value: 290, color: '#e5e7eb' },
-    { name: 'Remaining', value: 75, color: '#573cfa' }
-  ];
+  useEffect(() => {
+    apiClient.get("/students/me")
+      .then(res => setProfile(res.data))
+      .catch(err => console.error("Failed to fetch student profile:", err));
+  }, []);
 
-  const activities = [
-    { date: "28 May 2024, 10:45 AM", location: "Central Library", locIcon: <BookOpen size={14}/>, locColor: "purple", purpose: "Entry", status: "Success" },
-    { date: "27 May 2024, 01:20 PM", location: "Cafeteria", locIcon: <Utensils size={14}/>, locColor: "green", purpose: "Payment", status: "Success" },
-    { date: "27 May 2024, 09:15 AM", location: "Computer Lab 3", locIcon: <FlaskConical size={14}/>, locColor: "purple", purpose: "Lab Access", status: "Success" },
-    { date: "26 May 2024, 04:30 PM", location: "Workshop Hall", locIcon: <FileText size={14}/>, locColor: "purple", purpose: "Event Entry", status: "Success" }
-  ];
+  const studentName = profile?.user?.full_name || currentUser?.full_name || "Student Name";
+  const email = profile?.user?.email || currentUser?.email || "student@college.edu";
+  const enrollmentNumber = profile?.enrollment_number || "CS629";
+  const semester = profile?.semester || 7;
+  const branch = profile?.batch || "Computer Science & Engineering";
+  const phone = profile?.contact_number || "+91 98765 43210";
+  const initials = studentName.split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2);
+
+  const handlePrintDownload = () => {
+    window.print();
+  };
 
   return (
-    <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
+    <div style={{ padding: '32px 24px', maxWidth: '1000px', margin: '0 auto', fontFamily: 'Inter, sans-serif' }}>
       
-      {/* ── Header with Animated Highlighted Text Badge (Matching Main Dashboard & Attendance) ── */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
+      {/* Printable Styles for Clean PDF Download */}
+      <style>{`
+        @media print {
+          body * {
+            visibility: hidden !important;
+          }
+          #printable-id-card-wrapper, #printable-id-card-wrapper * {
+            visibility: visible !important;
+          }
+          #printable-id-card-wrapper {
+            position: absolute !important;
+            left: 50% !important;
+            top: 40% !important;
+            transform: translate(-50%, -50%) !important;
+            width: 100% !important;
+            max-width: 680px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          .no-print {
+            display: none !important;
+          }
+        }
+      `}</style>
+
+      {/* Header Row */}
+      <div className="no-print" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '40px' }}>
         <div>
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-            <span>My</span>
+            <span>Digital</span>
             <span style={{
               background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
               color: '#ffffff',
@@ -52,486 +82,222 @@ export function MyIdCard() {
                 style={{ color: '#ffffff' }}
               />
             </span>
+            <span style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '20px', background: '#dcfce7', color: '#15803d', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <ShieldCheck size={14} /> Official & Verified
+            </span>
           </h1>
-          <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>Manage and view your student ID card</div>
+          <p style={{ fontSize: '13px', color: '#71717a', marginTop: '6px', margin: 0 }}>
+            Official digital identity card for academic access and campus verification
+          </p>
         </div>
 
-        <button style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 22px', background: '#573cfa', color: 'white', borderRadius: '14px', fontSize: '14px', fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(87, 60, 250, 0.3)' }}>
-          <Download size={18} /> Download Digital Pass
+        <button
+          onClick={handlePrintDownload}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '12px 24px',
+            background: '#573cfa',
+            color: '#ffffff',
+            borderRadius: '14px',
+            fontSize: '14px',
+            fontWeight: 700,
+            border: 'none',
+            cursor: 'pointer',
+            boxShadow: '0 6px 20px rgba(87, 60, 250, 0.35)',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
+        >
+          <Download size={18} /> Download ID Card (PDF)
         </button>
       </div>
 
-      {/* ── Real-Time Top KPI Cards Row (AutoML Studio design matching Main Dashboard) ── */}
-      <motion.div
-        initial="hidden"
-        animate="show"
-        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
-        style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '32px' }}
-      >
-        {/* KPI 1 — ID Card Status */}
+      {/* ── CENTERED DIGITAL ID CARD SHOWCASE ── */}
+      <div id="printable-id-card-wrapper" style={{ display: 'flex', justifyContent: 'center' }}>
         <motion.div
-          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
           style={{
-            background: '#f4f4f5',
-            border: '1.5px solid rgba(0,0,0,0.07)',
+            width: '100%',
+            maxWidth: '720px',
+            background: '#ffffff',
             borderRadius: '24px',
-            padding: '22px 24px',
+            border: '1.5px solid #e4e4e7',
+            boxShadow: '0 20px 40px -10px rgba(0,0,0,0.12)',
+            overflow: 'hidden',
             display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            minHeight: '185px',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+            minHeight: '380px'
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(87,60,250,0.08)' }}>
-                <Badge size={18} color="#573cfa" strokeWidth={2} />
+          {/* Left Gradient Banner (Avatar & Basic Info) */}
+          <div
+            style={{
+              width: '38%',
+              background: 'linear-gradient(145deg, #4f46e5 0%, #6366f1 50%, #8b5cf6 100%)',
+              padding: '32px 20px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              position: 'relative',
+              color: '#ffffff',
+              textAlign: 'center'
+            }}
+          >
+            {/* Background Wavy Decoration */}
+            <svg viewBox="0 0 1440 320" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', opacity: 0.15, pointerEvents: 'none' }} preserveAspectRatio="none">
+              <path fill="#ffffff" d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+            </svg>
+
+            {/* Top College Info */}
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(8px)', padding: '6px 14px', borderRadius: '20px', fontSize: '11px', fontWeight: 800, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                <GraduationCap size={15} /> Indus University
               </div>
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>ID Card Status</span>
-            </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <ArrowUpRight size={15} color="#18181b" />
-            </div>
-          </div>
-          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '40px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              Active
-            </div>
-            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#22c55e', fontWeight: 600 }}>Valid</span> · Till 30 Jun 2025
-            </div>
-          </div>
-        </motion.div>
-
-        {/* KPI 2 — Date of Issue */}
-        <motion.div
-          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
-          style={{
-            background: '#f4f4f5',
-            border: '1.5px solid rgba(0,0,0,0.07)',
-            borderRadius: '24px',
-            padding: '22px 24px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            minHeight: '185px',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(34,197,94,0.08)' }}>
-                <Calendar size={18} color="#22c55e" strokeWidth={2} />
+              <div style={{ fontSize: '10px', opacity: 0.85, marginTop: '4px', fontWeight: 600 }}>
+                Ahmedabad, Gujarat
               </div>
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Date of Issue</span>
             </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <ArrowUpRight size={15} color="#18181b" />
-            </div>
-          </div>
-          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '32px', fontWeight: 700, color: '#09090b', letterSpacing: '-1px', lineHeight: 1.1, marginBottom: '6px' }}>
-              15 Aug 2024
-            </div>
-            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#22c55e', fontWeight: 600 }}>2024-25</span> · Academic Year
-            </div>
-          </div>
-        </motion.div>
 
-        {/* KPI 3 — Total Downloads */}
-        <motion.div
-          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
-          style={{
-            background: '#f4f4f5',
-            border: '1.5px solid rgba(0,0,0,0.07)',
-            borderRadius: '24px',
-            padding: '22px 24px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            minHeight: '185px',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(245,158,11,0.08)' }}>
-                <Clock size={18} color="#f59e0b" strokeWidth={2} />
+            {/* Avatar Circle with Initials */}
+            <div style={{ position: 'relative', zIndex: 1, margin: '20px 0' }}>
+              <div
+                style={{
+                  width: '96px',
+                  height: '96px',
+                  borderRadius: '50%',
+                  background: '#ffffff',
+                  color: '#4f46e5',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 900,
+                  fontSize: '32px',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+                  border: '4px solid rgba(255,255,255,0.4)'
+                }}
+              >
+                {initials}
               </div>
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Downloads</span>
             </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <ArrowUpRight size={15} color="#18181b" />
-            </div>
-          </div>
-          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              5
-            </div>
-            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#f59e0b', fontWeight: 600 }}>5 Downloads</span> · This Semester
-            </div>
-          </div>
-        </motion.div>
 
-        {/* KPI 4 — Card Type */}
-        <motion.div
-          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
-          style={{
-            background: '#f4f4f5',
-            border: '1.5px solid rgba(0,0,0,0.07)',
-            borderRadius: '24px',
-            padding: '22px 24px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            minHeight: '185px',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(59,130,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(59,130,246,0.08)' }}>
-                <Tag size={18} color="#3b82f6" strokeWidth={2} />
+            {/* Name & Semester */}
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <div style={{ fontSize: '19px', fontWeight: 800, letterSpacing: '-0.3px', lineHeight: 1.2 }}>
+                {studentName}
               </div>
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Card Type</span>
-            </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <ArrowUpRight size={15} color="#18181b" />
-            </div>
-          </div>
-          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '32px', fontWeight: 700, color: '#09090b', letterSpacing: '-1px', lineHeight: 1.1, marginBottom: '6px' }}>
-              Student ID
-            </div>
-            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#3b82f6', fontWeight: 600 }}>Regular</span> · Full Access
+              <div style={{ fontSize: '11px', opacity: 0.9, marginTop: '4px', fontWeight: 600 }}>
+                {branch}
+              </div>
+              <div style={{ marginTop: '12px', display: 'inline-block', background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(8px)', padding: '4px 14px', borderRadius: '12px', fontSize: '11px', fontWeight: 700 }}>
+                Semester {semester}
+              </div>
             </div>
           </div>
-        </motion.div>
-      </motion.div>
 
-      {/* Main Layout (2 Columns) */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '24px' }}>
-        
-        {/* Left Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          
-          {/* Your ID Card Section */}
-          <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #f3f4f6', padding: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-              <h3 style={{ fontSize: '16px', fontWeight: 'bold', color: '#573cfa', margin: 0 }}>Your ID Card</h3>
-              <button style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: '#573cfa', color: 'white', borderRadius: '8px', fontSize: '12px', fontWeight: 600, border: 'none', cursor: 'pointer' }}>
-                <Download size={16} /> Download ID Card
-              </button>
-            </div>
-
-            {/* ID Card Visual */}
-            <div style={{ display: 'flex', borderRadius: '16px', overflow: 'hidden', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', background: 'white' }}>
-              {/* Left Purple Side */}
-              <div style={{ width: '40%', background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', padding: '24px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
-                {/* Wavy bottom effect */}
-                <svg viewBox="0 0 1440 320" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', opacity: 0.2 }} preserveAspectRatio="none">
-                  <path fill="#ffffff" d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-                </svg>
-                
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', zIndex: 1, width: '100%', justifyContent: 'center' }}>
-                  <div style={{ width: '30px', height: '30px', background: 'white', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Badge size={18} color="#573cfa" />
-                  </div>
-                  <div style={{ color: 'white' }}>
-                    <div style={{ fontSize: '12px', fontWeight: 'bold' }}>Indus University</div>
-                    <div style={{ fontSize: '9px', opacity: 0.9 }}>Ahmedabad, Gujarat</div>
-                  </div>
-                </div>
-
-                <div style={{ width: '90px', height: '90px', borderRadius: '50%', border: '4px solid rgba(255,255,255,0.3)', overflow: 'hidden', marginBottom: '16px', zIndex: 1 }}>
-                  {/* Placeholder for avatar, simulating with a gradient for now, normally an img tag */}
-                  <div style={{ width: '100%', height: '100%', background: '#d1d5db', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}>
-                    <User size={40} />
-                  </div>
-                </div>
-
-                <div style={{ color: 'white', textAlign: 'center', zIndex: 1 }}>
-                  <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '4px' }}>Student User</div>
-                  <div style={{ fontSize: '11px', opacity: 0.9, marginBottom: '12px' }}>B.Tech Computer Science</div>
-                  <div style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: '12px', fontSize: '10px', display: 'inline-block' }}>4th Year</div>
+          {/* Right Column: Detailed Credentials & Barcode */}
+          <div style={{ width: '62%', padding: '32px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: '#ffffff' }}>
+            
+            {/* Header Badge Row */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '16px', borderBottom: '1px solid #f4f4f5' }}>
+              <div>
+                <span style={{ fontSize: '10px', fontWeight: 800, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+                  STUDENT CREDENTIAL PASS
+                </span>
+                <div style={{ fontSize: '14px', fontWeight: 800, color: '#09090b', marginTop: '2px' }}>
+                  Academic Session 2024–2025
                 </div>
               </div>
-
-              {/* Right Details Side */}
-              <div style={{ width: '60%', padding: '24px', display: 'flex', flexDirection: 'column' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '32px' }}>
-                  
-                  <div style={{ display: 'flex', gap: '12px' }}>
-                    <div style={{ color: '#3b82f6', marginTop: '2px' }}><User size={16} /></div>
-                    <div>
-                      <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '2px' }}>Enrollment No.</div>
-                      <div style={{ fontSize: '12px', fontWeight: 600, color: '#111827' }}>IU/2021/CS/12345</div>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '12px' }}>
-                    <div style={{ color: '#3b82f6', marginTop: '2px' }}><Calendar size={16} /></div>
-                    <div>
-                      <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '2px' }}>Date of Birth</div>
-                      <div style={{ fontSize: '12px', fontWeight: 600, color: '#111827' }}>15 Jan 2003</div>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '12px' }}>
-                    <div style={{ color: '#573cfa', marginTop: '2px' }}><Droplets size={16} /></div>
-                    <div>
-                      <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '2px' }}>Blood Group</div>
-                      <div style={{ fontSize: '12px', fontWeight: 600, color: '#111827' }}>B+</div>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '12px' }}>
-                    <div style={{ color: '#573cfa', marginTop: '2px' }}><Phone size={16} /></div>
-                    <div>
-                      <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '2px' }}>Contact No.</div>
-                      <div style={{ fontSize: '12px', fontWeight: 600, color: '#111827' }}>+91 98765 43210</div>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '12px', gridColumn: '1 / -1' }}>
-                    <div style={{ color: '#573cfa', marginTop: '2px' }}><Mail size={16} /></div>
-                    <div>
-                      <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '2px' }}>Email</div>
-                      <div style={{ fontSize: '12px', fontWeight: 600, color: '#111827' }}>student.user@indusuni.ac.in</div>
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* Barcode area */}
-                <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  {/* Mock Barcode lines using borders */}
-                  <div style={{ display: 'flex', height: '40px', gap: '2px', alignItems: 'center', marginBottom: '8px' }}>
-                    {[...Array(30)].map((_, i) => (
-                      <div key={i} style={{ width: [2,3,1,4,2][i%5] + 'px', height: '100%', background: '#111827' }}></div>
-                    ))}
-                  </div>
-                  <div style={{ fontSize: '10px', color: '#111827', fontWeight: 600, letterSpacing: '2px' }}>IU/2021/CS/12345</div>
-                </div>
-              </div>
+              <span style={{ fontSize: '11px', fontWeight: 700, padding: '4px 10px', borderRadius: '12px', background: '#ecfdf5', color: '#047857', border: '1px solid #a7f3d0' }}>
+                ACTIVE PASS
+              </span>
             </div>
-          </div>
 
-          {/* ID Card Usage */}
-          <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #f3f4f6', padding: '24px' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: '0 0 20px 0' }}>ID Card Usage</h3>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            {/* Grid of Credentials */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', margin: '20px 0' }}>
               
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><BookOpen size={20} /></div>
-                <div>
-                  <div style={{ fontSize: '10px', color: '#6b7280' }}>Library Access</div>
-                  <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#111827' }}>12 <span style={{ fontSize: '10px', fontWeight: 'normal', color: '#6b7280' }}>Times</span></div>
+              <div>
+                <div style={{ fontSize: '10px', fontWeight: 700, color: '#a1a1aa', textTransform: 'uppercase', marginBottom: '3px' }}>
+                  Enrollment No
+                </div>
+                <div style={{ fontSize: '13px', fontWeight: 800, color: '#4f46e5', fontFamily: 'monospace' }}>
+                  {enrollmentNumber}
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#e8f5e9', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Utensils size={20} /></div>
-                <div>
-                  <div style={{ fontSize: '10px', color: '#6b7280' }}>Cafeteria Access</div>
-                  <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#111827' }}>28 <span style={{ fontSize: '10px', fontWeight: 'normal', color: '#6b7280' }}>Times</span></div>
+              <div>
+                <div style={{ fontSize: '10px', fontWeight: 700, color: '#a1a1aa', textTransform: 'uppercase', marginBottom: '3px' }}>
+                  Current Semester
+                </div>
+                <div style={{ fontSize: '13px', fontWeight: 800, color: '#09090b' }}>
+                  Semester {semester}
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#fffbeb', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><FlaskConical size={20} /></div>
-                <div>
-                  <div style={{ fontSize: '10px', color: '#6b7280' }}>Lab Access</div>
-                  <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#111827' }}>15 <span style={{ fontSize: '10px', fontWeight: 'normal', color: '#6b7280' }}>Times</span></div>
+              <div>
+                <div style={{ fontSize: '10px', fontWeight: 700, color: '#a1a1aa', textTransform: 'uppercase', marginBottom: '3px' }}>
+                  Contact Phone
+                </div>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: '#09090b' }}>
+                  {phone}
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Building size={20} /></div>
-                <div>
-                  <div style={{ fontSize: '10px', color: '#6b7280' }}>Hostel Access</div>
-                  <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#111827' }}>8 <span style={{ fontSize: '10px', fontWeight: 'normal', color: '#6b7280' }}>Times</span></div>
+              <div>
+                <div style={{ fontSize: '10px', fontWeight: 700, color: '#a1a1aa', textTransform: 'uppercase', marginBottom: '3px' }}>
+                  Blood Group
+                </div>
+                <div style={{ fontSize: '12px', fontWeight: 800, color: '#dc2626' }}>
+                  B+
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#fef2f2', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Ticket size={20} /></div>
-                <div>
-                  <div style={{ fontSize: '10px', color: '#6b7280' }}>Events Access</div>
-                  <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#111827' }}>6 <span style={{ fontSize: '10px', fontWeight: 'normal', color: '#6b7280' }}>Times</span></div>
+              <div style={{ gridColumn: 'span 2' }}>
+                <div style={{ fontSize: '10px', fontWeight: 700, color: '#a1a1aa', textTransform: 'uppercase', marginBottom: '3px' }}>
+                  Official Email
+                </div>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: '#09090b' }}>
+                  {email}
                 </div>
               </div>
 
             </div>
-          </div>
 
-          {/* Recent ID Card Activity */}
-          <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #f3f4f6', padding: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#573cfa', margin: 0 }}>Recent ID Card Activity</h3>
-              <span style={{ fontSize: '12px', color: '#573cfa', fontWeight: 600, cursor: 'pointer' }}>View All</span>
-            </div>
-            
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
-                  <th style={{ padding: '0 0 12px 0', fontSize: '11px', fontWeight: 600, color: '#6b7280', textAlign: 'left' }}>Date & Time</th>
-                  <th style={{ padding: '0 0 12px 0', fontSize: '11px', fontWeight: 600, color: '#6b7280', textAlign: 'left' }}>Location / Service</th>
-                  <th style={{ padding: '0 0 12px 0', fontSize: '11px', fontWeight: 600, color: '#6b7280', textAlign: 'left' }}>Purpose</th>
-                  <th style={{ padding: '0 0 12px 0', fontSize: '11px', fontWeight: 600, color: '#6b7280', textAlign: 'left' }}>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {activities.map((act, i) => (
-                  <tr key={i} style={{ borderBottom: '1px solid #f9fafb' }}>
-                    <td style={{ padding: '16px 0', fontSize: '12px', color: '#4b5563', fontWeight: 500 }}>{act.date}</td>
-                    <td style={{ padding: '16px 0' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: 600, color: '#111827' }}>
-                        <span style={{ color: act.locColor === 'purple' ? '#8b5cf6' : '#10b981' }}>{act.locIcon}</span>
-                        {act.location}
-                      </div>
-                    </td>
-                    <td style={{ padding: '16px 0', fontSize: '12px', color: '#4b5563' }}>{act.purpose}</td>
-                    <td style={{ padding: '16px 0' }}>
-                      <span style={{ background: '#e8f5e9', color: '#10b981', padding: '4px 10px', borderRadius: '4px', fontSize: '10px', fontWeight: 600 }}>{act.status}</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-        </div>
-
-        {/* Right Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          
-          {/* ID Card Actions */}
-          <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #f3f4f6', padding: '24px' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: '0 0 20px 0' }}>ID Card Actions</h3>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+            {/* Bottom Barcode & Security Validity Footer */}
+            <div style={{ paddingTop: '16px', borderTop: '1px solid #f4f4f5', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               
-              <div style={{ border: '1px solid #f3f4f6', borderRadius: '12px', padding: '20px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.2s', background: '#fafafa' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Download size={24} />
+              {/* Barcode Lines */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                <div style={{ display: 'flex', height: '32px', gap: '2px', alignItems: 'center' }}>
+                  {[2, 4, 1, 3, 2, 5, 1, 4, 2, 3, 1, 4, 2, 3, 5, 2, 1, 4, 2, 3, 1, 4, 2, 5].map((w, idx) => (
+                    <div key={idx} style={{ width: `${w}px`, height: '100%', background: '#09090b' }}></div>
+                  ))}
                 </div>
-                <div style={{ fontSize: '11px', fontWeight: 600, color: '#374151', textAlign: 'center', lineHeight: 1.2 }}>Download ID Card</div>
+                <span style={{ fontSize: '9px', fontWeight: 700, color: '#71717a', fontFamily: 'monospace', letterSpacing: '1.5px' }}>
+                  *{enrollmentNumber}*
+                </span>
               </div>
 
-              <div style={{ border: '1px solid #f3f4f6', borderRadius: '12px', padding: '20px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.2s', background: '#fafafa' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#e8f5e9', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Badge size={24} />
+              {/* Validity Tag */}
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '9px', fontWeight: 700, color: '#a1a1aa', textTransform: 'uppercase' }}>
+                  Valid Until
                 </div>
-                <div style={{ fontSize: '11px', fontWeight: 600, color: '#374151', textAlign: 'center', lineHeight: 1.2 }}>Request New Card</div>
-              </div>
-
-              <div style={{ border: '1px solid #f3f4f6', borderRadius: '12px', padding: '20px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.2s', background: '#fafafa' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fef2f2', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <AlertTriangle size={24} />
+                <div style={{ fontSize: '12px', fontWeight: 800, color: '#16a34a' }}>
+                  30 JUNE 2026
                 </div>
-                <div style={{ fontSize: '11px', fontWeight: 600, color: '#374151', textAlign: 'center', lineHeight: 1.2 }}>Report Lost Card</div>
-              </div>
-
-              <div style={{ border: '1px solid #f3f4f6', borderRadius: '12px', padding: '20px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.2s', background: '#fafafa' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Camera size={24} />
-                </div>
-                <div style={{ fontSize: '11px', fontWeight: 600, color: '#374151', textAlign: 'center', lineHeight: 1.2 }}>Update Photo</div>
-              </div>
-
-              <div style={{ border: '1px solid #f3f4f6', borderRadius: '12px', padding: '20px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.2s', background: '#fafafa' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fffbeb', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <BookOpen size={24} />
-                </div>
-                <div style={{ fontSize: '11px', fontWeight: 600, color: '#374151', textAlign: 'center', lineHeight: 1.2 }}>Card Guidelines</div>
-              </div>
-
-              <div style={{ border: '1px solid #f3f4f6', borderRadius: '12px', padding: '20px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.2s', background: '#fafafa' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Headset size={24} />
-                </div>
-                <div style={{ fontSize: '11px', fontWeight: 600, color: '#374151', textAlign: 'center', lineHeight: 1.2 }}>Help & Support</div>
               </div>
 
             </div>
+
           </div>
-
-          {/* ID Card Validity */}
-          <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #f3f4f6', padding: '24px' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: '0 0 24px 0' }}>ID Card Validity</h3>
-            
-            <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-              <div style={{ width: '120px', height: '120px', position: 'relative', flexShrink: 0 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie 
-                      data={validityData} 
-                      innerRadius={45} 
-                      outerRadius={55} 
-                      startAngle={90}
-                      endAngle={-270}
-                      paddingAngle={0} 
-                      dataKey="value" 
-                      stroke="none"
-                    >
-                      {validityData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827', lineHeight: 1.2 }}>75</div>
-                  <div style={{ fontSize: '11px', color: '#6b7280' }}>Days Left</div>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div>
-                  <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '2px' }}>Valid From</div>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#10b981' }}>15 Aug 2024</div>
-                </div>
-                <div>
-                  <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '2px' }}>Valid Till</div>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#573cfa' }}>30 Jun 2025</div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#e8f5e9', color: '#10b981', padding: '6px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: 600, width: 'fit-content' }}>
-                  <CheckCircle2 size={14} /> Your ID card is valid
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Need Help? */}
-          <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #f3f4f6', padding: '24px', flex: 1, position: 'relative', overflow: 'hidden' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: '0 0 16px 0' }}>Need Help?</h3>
-            
-            {/* Illustrative element */}
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
-               <div style={{ width: '160px', height: '140px', background: '#f3f0ff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                  <Headset size={60} color="#573cfa" />
-                  {/* Decorative dots */}
-                  <div style={{ position: 'absolute', top: '20px', right: '10px', width: '8px', height: '8px', borderRadius: '50%', background: '#573cfa' }}></div>
-                  <div style={{ position: 'absolute', bottom: '30px', left: '20px', width: '12px', height: '12px', borderRadius: '50%', background: '#3b82f6' }}></div>
-               </div>
-            </div>
-
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827', marginBottom: '6px' }}>Facing an issue with your ID card?</div>
-              <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '20px' }}>Our support team is here to help you.</div>
-              <button style={{ padding: '12px 24px', background: '#573cfa', color: 'white', borderRadius: '8px', fontSize: '13px', fontWeight: 600, border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                <Headset size={16} /> Contact Support
-              </button>
-            </div>
-          </div>
-
-        </div>
+        </motion.div>
       </div>
+
     </div>
   );
 }

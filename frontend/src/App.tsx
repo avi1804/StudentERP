@@ -37,16 +37,13 @@ const AddFaculty = React.lazy(() => import("./pages/admin/AdminDashboard/AddFacu
 // const Attendance = React.lazy(() => import("./pages/admin/AdminDashboard/Attendance"));
 // const Marks = React.lazy(() => import("./pages/admin/AdminDashboard/Marks"));
 const ManageDepartment = React.lazy(() => import("./pages/admin/AdminDashboard/ManageDepartment").then(m => ({ default: m.ManageDepartment })));
+const ManageComplaints = React.lazy(() => import("./pages/admin/AdminDashboard/ManageComplaints").then(m => ({ default: m.ManageComplaints })));
 
 // Lazy Loaded Fee Admin Pages
 const FeeDashboard = React.lazy(() => import("./pages/admin/fees/FeeDashboard").then(m => ({ default: m.FeeDashboard })));
 const FeeStructure = React.lazy(() => import("./pages/admin/fees/FeeStructure").then(m => ({ default: m.FeeStructure })));
 const StudentFees = React.lazy(() => import("./pages/admin/fees/StudentFees").then(m => ({ default: m.StudentFees })));
 const Payments = React.lazy(() => import("./pages/admin/fees/Payments").then(m => ({ default: m.Payments })));
-const Scholarships = React.lazy(() => import("./pages/admin/fees/Scholarships").then(m => ({ default: m.Scholarships })));
-const Discounts = React.lazy(() => import("./pages/admin/fees/Discounts").then(m => ({ default: m.Discounts })));
-const Fines = React.lazy(() => import("./pages/admin/fees/Fines").then(m => ({ default: m.Fines })));
-const Receipts = React.lazy(() => import("./pages/admin/fees/Receipts").then(m => ({ default: m.Receipts })));
 const FeeReports = React.lazy(() => import("./pages/admin/fees/FeeReports").then(m => ({ default: m.FeeReports })));
 
 // Lazy Loaded Faculty Dashboard Pages
@@ -103,16 +100,13 @@ function App() {
                 <Route path="students/manage" element={<ManageStudent />} />
                 <Route path="students/add" element={<AddStudent />} />
                 <Route path="department/manage" element={<ManageDepartment />} />
+                <Route path="complaints" element={<ManageComplaints />} />
                 
                 {/* Fee Management Routes */}
                 <Route path="fees" element={<FeeDashboard />} />
                 <Route path="fees/structures" element={<FeeStructure />} />
                 <Route path="fees/students" element={<StudentFees />} />
                 <Route path="fees/payments" element={<Payments />} />
-                <Route path="fees/scholarships" element={<Scholarships />} />
-                <Route path="fees/discounts" element={<Discounts />} />
-                <Route path="fees/fines" element={<Fines />} />
-                <Route path="fees/receipts" element={<Receipts />} />
                 <Route path="fees/reports" element={<FeeReports />} />
               </Route> 
             </Route>

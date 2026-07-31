@@ -7,6 +7,7 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 interface Student {
   id: number;
   enrollment_number: string;
+  semester: number;
   batch: string;
   contact_number: string | null;
   user: {
@@ -21,7 +22,7 @@ export default function ManageStudent() {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
-  const [editForm, setEditForm] = useState({ contact_number: "", batch: "", full_name: "", enrollment_number: "" });
+  const [editForm, setEditForm] = useState({ contact_number: "", batch: "", full_name: "", enrollment_number: "", semester: 1 });
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -79,7 +80,8 @@ export default function ManageStudent() {
       contact_number: student.contact_number || "", 
       batch: student.batch,
       full_name: student.user?.full_name || "",
-      enrollment_number: student.enrollment_number || ""
+      enrollment_number: student.enrollment_number || "",
+      semester: student.semester ?? 1
     });
   };
 
@@ -102,6 +104,7 @@ export default function ManageStudent() {
         setStudents(students.map(s => s.id === editingStudent.id ? { 
           ...s, 
           ...editForm,
+          semester: editForm.semester,
           user: { ...s.user, full_name: editForm.full_name }
         } : s));
         setEditingStudent(null);
@@ -172,7 +175,11 @@ export default function ManageStudent() {
                         <span>{s.enrollment_number}</span>
                       </div>
                       <div className="mobile-list-card-row">
-                        <span>Batch/Branch</span>
+                        <span>Semester</span>
+                        <span>Sem {s.semester ?? 1}</span>
+                      </div>
+                      <div className="mobile-list-card-row">
+                        <span>Branch</span>
                         <span>{s.batch}</span>
                       </div>
                       <div className="mobile-list-card-row">
@@ -194,7 +201,8 @@ export default function ManageStudent() {
               <tr>
                 <th>STUDENT</th>
                 <th>ROLL NO</th>
-                <th>BATCH / BRANCH</th>
+                <th>SEMESTER</th>
+                <th>BRANCH</th>
                 <th>PHONE</th>
                 <th>STATUS</th>
                 <th>ACTIONS</th>
@@ -217,6 +225,7 @@ export default function ManageStudent() {
                       </div>
                     </td>
                     <td className="mono">{s.enrollment_number}</td>
+                    <td><span className="badge badge-blue" style={{fontSize: '12px'}}>Sem {s.semester ?? 1}</span></td>
                     <td>{s.batch}</td>
                     <td className="mono">{s.contact_number || "-"}</td>
                     <td><span className="badge badge-green">ACTIVE</span></td>
@@ -237,8 +246,7 @@ export default function ManageStudent() {
 
       {editingStudent && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '16px' }}>
-          <div className="card" style={{ width: '100%', maxWidth: '400px', padding: '24px', maxHeight: '90vh', overflowY: 'auto' }}>
-
+          <div className="card" style={{ width: '100%', maxWidth: '420px', padding: '24px', maxHeight: '90vh', overflowY: 'auto' }}>
             <h3 style={{ marginTop: 0 }}>Edit Student</h3>
             <form onSubmit={handleUpdate}>
               <div className="fg" style={{ marginBottom: '16px' }}>
@@ -260,7 +268,19 @@ export default function ManageStudent() {
                 />
               </div>
               <div className="fg" style={{ marginBottom: '16px' }}>
-                <label>Batch / Branch</label>
+                <label>Semester (1–8)</label>
+                <select
+                  value={editForm.semester}
+                  onChange={e => setEditForm({...editForm, semester: parseInt(e.target.value, 10)})}
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface2)', color: 'var(--text)', fontSize: '14px', fontFamily: 'inherit' }}
+                >
+                  {[1,2,3,4,5,6,7,8].map(sem => (
+                    <option key={sem} value={sem}>Semester {sem}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="fg" style={{ marginBottom: '16px' }}>
+                <label>Branch</label>
                 <input 
                   type="text" 
                   value={editForm.batch} 

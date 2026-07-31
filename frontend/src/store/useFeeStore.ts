@@ -16,9 +16,27 @@ interface FeeState {
   fetchStudentFees: () => Promise<void>;
   fetchPayments: () => Promise<void>;
   verifyPayment: (id: number) => Promise<void>;
+  payFee: (payData: { student_fee_id: number; amount: number; payment_mode: string; transaction_id?: string; fee_category?: string }) => Promise<any>;
+  assignFee: (assignData: {
+    bulk_semester?: number;
+    student_id?: number;
+    enrollment_number?: string;
+    academic_year?: string;
+    semester?: number;
+    category?: string;
+    tuition_fee?: number;
+    exam_fee?: number;
+    library_fee?: number;
+    development_fee?: number;
+    laboratory_fee?: number;
+    hostel_fee?: number;
+    sports_fee?: number;
+    miscellaneous_fee?: number;
+    due_date: string;
+  }) => Promise<any>;
 }
 
-export const useFeeStore = create<FeeState>((set) => ({
+export const useFeeStore = create<FeeState>((set, get) => ({
   adminDashboardData: null,
   studentDashboardData: null,
   feeStructures: [],
@@ -80,10 +98,29 @@ export const useFeeStore = create<FeeState>((set) => ({
   verifyPayment: async (id: number) => {
     try {
       await api.patch(`/fees/payments/${id}/verify`);
-      // Re-fetch necessary data after verification
       const resPayments = await api.get('/fees/payments');
       const resDashboard = await api.get('/fees/admin-dashboard');
       set({ payments: resPayments.data, adminDashboardData: resDashboard.data });
+    } catch (err: any) {
+      throw err;
+    }
+  },
+
+  payFee: async (payData) => {
+    try {
+      const res = await api.post('/fees/pay-fee', payData);
+      await get().fetchStudentDashboard();
+      return res.data;
+    } catch (err: any) {
+      throw err;
+    }
+  },
+
+  assignFee: async (assignData) => {
+    try {
+      const res = await api.post('/fees/assign-fee', assignData);
+      await get().fetchStudentFees();
+      return res.data;
     } catch (err: any) {
       throw err;
     }

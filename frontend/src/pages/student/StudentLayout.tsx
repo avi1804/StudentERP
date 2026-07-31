@@ -23,11 +23,27 @@ export function StudentLayout() {
   const [notifIndex, setNotifIndex] = useState(0);
   const navbarRef = useRef<HTMLDivElement>(null);
 
-  const notificationsList = [
-    { id: 1, type: 'Assignment', badge: 'NEW', title: 'Data Structures Assignment 3 Uploaded', subtitle: 'Prof. Sharma uploaded new task', time: '2h ago' },
-    { id: 2, type: 'Attendance', badge: 'UPDATE', title: 'Computer Networks Attendance Marked', subtitle: 'You were marked Present for lecture', time: 'Yesterday' },
-    { id: 3, type: 'Circular', badge: 'NOTICE', title: 'Mid-Semester Exam Timetable Out', subtitle: 'Check schedule in Timetable tab', time: '2 days ago' },
-  ];
+  const [notificationsList, setNotificationsList] = useState<any[]>([
+    { id: 1, type: 'Notice', badge: 'LIVE', title: 'Welcome to Student ERP', subtitle: 'Check notices section for latest updates', time: 'Just now' }
+  ]);
+
+  useEffect(() => {
+    api.get('/notices/')
+      .then(res => {
+        if (res.data && res.data.length > 0) {
+          const formatted = res.data.map((n: any) => ({
+            id: n.id,
+            type: n.category || 'Notice',
+            badge: n.category || 'NOTICE',
+            title: n.title,
+            subtitle: n.content.length > 60 ? n.content.substring(0, 60) + '...' : n.content,
+            time: new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }));
+          setNotificationsList(formatted);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 

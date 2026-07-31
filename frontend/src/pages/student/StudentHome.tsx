@@ -563,6 +563,9 @@ export function StudentHome() {
     cgpa: 8.4,
   });
 
+  const [complaintStats, setComplaintStats] = useState({ total: 0, open: 0, in_progress: 0, resolved: 0, closed: 0 });
+  const [recentComplaints, setRecentComplaints] = useState<any[]>([]);
+
   useEffect(() => {
     if (user?.full_name) {
       setUserName(user.full_name);
@@ -592,6 +595,19 @@ export function StudentHome() {
             cgpa: res.data.cgpa ?? 8.4,
           });
         }
+      })
+      .catch(() => {});
+
+    // Fetch real-time student complaints
+    api.get('/complaints/kpi')
+      .then(res => {
+        if (res.data) setComplaintStats(res.data);
+      })
+      .catch(() => {});
+
+    api.get('/complaints/my')
+      .then(res => {
+        if (res.data) setRecentComplaints(res.data.slice(0, 4));
       })
       .catch(() => {});
   }, [user, setUser]);
@@ -635,12 +651,12 @@ export function StudentHome() {
         </h1>
       </motion.div>
 
-      {/* ── Real-Time KPI Cards Row (AutoML Studio design) ── */}
+      {/* ── Real-Time KPI Cards Row (AutoML Studio design matching Main Dashboard) ── */}
       <motion.div
         initial="hidden"
         animate="show"
         variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1 } } }}
-        style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginBottom: 36 }}
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20, marginBottom: 36 }}
       >
         {/* Card 1 — Enrollment Number */}
         <motion.div
@@ -672,7 +688,7 @@ export function StudentHome() {
             </div>
           </div>
           <div style={{ marginTop: 'auto', paddingTop: 28 }}>
-            <div style={{ fontSize: 32, fontWeight: 700, color: '#09090b', letterSpacing: '-0.5px', lineHeight: 1.1, marginBottom: 8, wordBreak: 'break-all' }}>
+            <div style={{ fontSize: 28, fontWeight: 700, color: '#09090b', letterSpacing: '-0.5px', lineHeight: 1.1, marginBottom: 8, wordBreak: 'break-all' }}>
               {dashData.enrollment_number || 'ENR20260481'}
             </div>
             <div style={{ fontSize: 12, color: '#71717a', fontWeight: 500 }}>
@@ -711,14 +727,14 @@ export function StudentHome() {
             </div>
           </div>
           <div style={{ marginTop: 'auto', paddingTop: 28 }}>
-            <div style={{ fontSize: 52, fontWeight: 600, color: '#09090b', letterSpacing: '-2px', lineHeight: 1, marginBottom: 8 }}>
+            <div style={{ fontSize: 44, fontWeight: 600, color: '#09090b', letterSpacing: '-2px', lineHeight: 1, marginBottom: 8 }}>
               {dashData.attendance_rate}%
             </div>
             <div style={{ fontSize: 12, color: '#71717a', fontWeight: 500 }}>
               {dashData.total_classes > 0 ? (
                 <span><span style={{ color: '#10b981', fontWeight: 600 }}>{dashData.present_classes}/{dashData.total_classes}</span> classes attended</span>
               ) : (
-                <span><span style={{ color: '#10b981', fontWeight: 600 }}>+3.2%</span> from last month</span>
+                <span><span style={{ color: '#10b981', fontWeight: 600 }}>+3.2%</span> overall rate</span>
               )}
             </div>
           </div>
@@ -754,17 +770,64 @@ export function StudentHome() {
             </div>
           </div>
           <div style={{ marginTop: 'auto', paddingTop: 28 }}>
-            <div style={{ fontSize: 52, fontWeight: 600, color: '#09090b', letterSpacing: '-2px', lineHeight: 1, marginBottom: 8 }}>
+            <div style={{ fontSize: 44, fontWeight: 600, color: '#09090b', letterSpacing: '-2px', lineHeight: 1, marginBottom: 8 }}>
               {dashData.cgpa}
             </div>
             <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.55)', fontWeight: 500 }}>
-              <span style={{ fontWeight: 600 }}>+0.3</span> from last semester
+              <span style={{ fontWeight: 600 }}>Cumulative</span> Grade Point
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Card 4 — Complaints & Support KPI Card */}
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          style={{
+            background: '#ffffff',
+            border: '1.5px solid rgba(87,60,250,0.15)',
+            borderRadius: 28,
+            padding: 24,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            minHeight: 200,
+            boxShadow: '0 4px 20px rgba(87,60,250,0.06)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(87,60,250,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Megaphone size={18} color="#573cfa" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#18181b' }}>Complaints & Support</span>
+            </div>
+            <div
+              onClick={() => navigate('/dashboard/complaints')}
+              style={{ width: 32, height: 32, borderRadius: '50%', background: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(87,60,250,0.3)' }}
+            >
+              <ArrowUpRight size={15} color="#ffffff" />
+            </div>
+          </div>
+          <div style={{ marginTop: 'auto', paddingTop: 20 }}>
+            <div style={{ fontSize: 44, fontWeight: 700, color: '#573cfa', letterSpacing: '-1.5px', lineHeight: 1, marginBottom: 6 }}>
+              {complaintStats.total}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: 12, color: '#71717a', fontWeight: 500 }}>
+                <span style={{ color: '#f59e0b', fontWeight: 700 }}>{complaintStats.open + complaintStats.in_progress} Active</span> · {complaintStats.resolved} Resolved
+              </span>
+              <button
+                onClick={() => navigate('/dashboard/complaints')}
+                style={{ background: '#f3f0ff', color: '#573cfa', border: 'none', borderRadius: '10px', padding: '4px 10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
+              >
+                + Complain
+              </button>
             </div>
           </div>
         </motion.div>
       </motion.div>
 
-      {/* ── Quick Access Row (Full Width spanning 100% below KPI Cards) ── */}
+      {/* ── Quick Access Row (7 direct shortcuts) ── */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -778,7 +841,7 @@ export function StudentHome() {
           <span style={{ fontSize: 12, fontWeight: 600, color: '#71717a' }}>Direct Shortcuts</span>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 16, width: '100%' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 14, width: '100%' }}>
           {[
             { label: 'My Profile', icon: <User size={22} color="#6366f1" />, bg: 'rgba(99, 102, 241, 0.08)', path: '/dashboard/profile' },
             { label: 'ID Card', icon: <IdCard size={22} color="#3b82f6" />, bg: 'rgba(59, 130, 246, 0.08)', path: '/dashboard/idcard' },
@@ -786,6 +849,7 @@ export function StudentHome() {
             { label: 'Timetable', icon: <Calendar size={22} color="#f59e0b" />, bg: 'rgba(245, 158, 11, 0.08)', path: '/dashboard/timetable' },
             { label: 'Results', icon: <BarChart2 size={22} color="#ef4444" />, bg: 'rgba(239, 68, 68, 0.08)', path: '/dashboard/results' },
             { label: 'Subjects', icon: <Book size={22} color="#8b5cf6" />, bg: 'rgba(139, 92, 246, 0.08)', path: '/dashboard/subjects' },
+            { label: 'Complaints', icon: <Megaphone size={22} color="#573cfa" />, bg: 'rgba(87, 60, 250, 0.12)', path: '/dashboard/complaints' },
           ].map((item, index) => (
             <motion.div
               key={index}
@@ -796,12 +860,12 @@ export function StudentHome() {
                 background: '#f4f4f5',
                 border: '1.5px solid rgba(0,0,0,0.06)',
                 borderRadius: 22,
-                padding: '20px 14px',
+                padding: '18px 10px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 12,
+                gap: 10,
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
@@ -809,9 +873,9 @@ export function StudentHome() {
             >
               <div
                 style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 16,
+                  width: 44,
+                  height: 44,
+                  borderRadius: 14,
                   background: item.bg,
                   display: 'flex',
                   alignItems: 'center',
@@ -820,7 +884,7 @@ export function StudentHome() {
               >
                 {item.icon}
               </div>
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#18181b', textAlign: 'center' }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#18181b', textAlign: 'center' }}>
                 {item.label}
               </span>
             </motion.div>
@@ -830,10 +894,76 @@ export function StudentHome() {
 
       <div className="dash-grid-main">
         {/* LEFT COLUMN */}
-        <div className="dash-col-left">
+        <div className="dash-col-left" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
           {/* Today's Ongoing Class Single Box */}
           <CurrentClassCard />
+
+          {/* Real-time Student Complaints & Grievances Widget */}
+          <div style={{ background: '#ffffff', borderRadius: 28, border: '1.5px solid rgba(0,0,0,0.06)', padding: 26, boxShadow: '0 4px 24px rgba(0,0,0,0.03)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#09090b', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Megaphone size={18} color="#573cfa" /> My Complaints Status
+                </h3>
+                <div style={{ fontSize: 12, color: '#71717a', marginTop: 4 }}>Real-time status of your past and current complaints</div>
+              </div>
+              <button
+                onClick={() => navigate('/dashboard/complaints')}
+                style={{ background: '#573cfa', color: '#ffffff', border: 'none', borderRadius: 14, padding: '8px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 2px 10px rgba(87,60,250,0.25)' }}
+              >
+                + Complain Now
+              </button>
+            </div>
+
+            {recentComplaints.length === 0 ? (
+              <div style={{ background: '#f8fafc', borderRadius: 18, padding: '24px', textAlign: 'center', border: '1px dashed #e2e8f0' }}>
+                <CheckCircle2 size={32} color="#10b981" style={{ marginBottom: 8 }} />
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#1e293b' }}>No active complaints</div>
+                <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>You have no unresolved complaints in the system. Click above to file a grievance if needed.</div>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {recentComplaints.map((c) => {
+                  const statusColors: Record<string, { bg: string; text: string }> = {
+                    RESOLVED: { bg: '#e8f5e9', text: '#10b981' },
+                    IN_PROGRESS: { bg: '#fffbeb', text: '#f59e0b' },
+                    OPEN: { bg: '#eff6ff', text: '#3b82f6' },
+                    CLOSED: { bg: '#f3f4f6', text: '#6b7280' },
+                  };
+                  const color = statusColors[c.status] || { bg: '#f3f4f6', text: '#6b7280' };
+
+                  return (
+                    <div
+                      key={c.id}
+                      onClick={() => navigate('/dashboard/complaints')}
+                      style={{ background: '#f9fafb', borderRadius: 16, padding: '14px 18px', border: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.15s' }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <span style={{ background: '#f3f0ff', color: '#573cfa', padding: '3px 8px', borderRadius: 8, fontSize: 11, fontWeight: 700 }}>
+                          {c.ticket_number}
+                        </span>
+                        <div>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: '#09090b' }}>{c.subject}</div>
+                          <div style={{ fontSize: 11, color: '#6b7280' }}>
+                            Category: {c.category || 'General'} · Raised: {new Date(c.created_at).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <span style={{ background: color.bg, color: color.text, padding: '4px 10px', borderRadius: 12, fontSize: 11, fontWeight: 700 }}>
+                          {c.status.replace('_', ' ')}
+                        </span>
+                        <ArrowUpRight size={14} color="#9ca3af" />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
         </div>
 
         {/* RIGHT COLUMN */}

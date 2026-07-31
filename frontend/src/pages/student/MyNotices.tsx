@@ -1,86 +1,103 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { 
   Bell, Filter, Megaphone, Send, Pin, Calendar, 
   BookOpen, ClipboardList, Users, Library, FlaskConical, Bookmark,
-  ChevronDown, MailCheck, Download, Settings, Volume2, ArrowUpRight
+  ChevronDown, MailCheck, Download, Settings, Volume2, ArrowUpRight, Search, Eye, X, AlertTriangle
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import TextType from "../../components/TextType";
+import { apiClient as api } from "../../api/axios";
+
+interface NoticeItem {
+  id: number;
+  title: string;
+  content: string;
+  category: string;
+  is_active: boolean;
+  author_id: number;
+  author_name?: string;
+  created_at: string;
+}
 
 export function MyNotices() {
+  const [notices, setNotices] = useState<NoticeItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("ALL");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedNotice, setSelectedNotice] = useState<NoticeItem | null>(null);
+  const [readIds, setReadIds] = useState<number[]>([]);
 
-  const [activeTab, setActiveTab] = useState("All");
-
-  const categories = [
-    { name: 'Academic', value: 8, color: '#8b5cf6', pct: '33%' },
-    { name: 'Examination', value: 5, color: '#f59e0b', pct: '21%' },
-    { name: 'Event', value: 6, color: '#10b981', pct: '25%' },
-    { name: 'General', value: 3, color: '#3b82f6', pct: '13%' },
-    { name: 'Other', value: 2, color: '#ec4899', pct: '8%' }
-  ];
-
-  const noticesList = [
-    { 
-      unread: true, 
-      icon: <Megaphone size={20} />, iconBg: '#f3f0ff', iconColor: '#8b5cf6',
-      title: 'Mid Semester Examination Schedule Released', isImportant: true,
-      desc: 'The mid semester examination schedule for all departments has been published.',
-      author: 'Admin', date: '26 May 2024',
-      category: 'Examination', catStyle: { bg: '#f3f0ff', text: '#8b5cf6' },
-      time: 'Today, 10:30 AM'
-    },
-    { 
-      unread: true, 
-      icon: <BookOpen size={20} />, iconBg: '#e8f5e9', iconColor: '#10b981',
-      title: 'Guest Lecture on AI & Machine Learning', isImportant: false,
-      desc: 'Expert talk by Dr. Priya Sharma on "Future of AI in Tech Industry".',
-      author: 'Department of CSE', date: '25 May 2024',
-      category: 'Event', catStyle: { bg: '#e8f5e9', text: '#10b981' },
-      time: 'Yesterday, 03:15 PM'
-    },
-    { 
-      unread: false, 
-      icon: <ClipboardList size={20} />, iconBg: '#fffbeb', iconColor: '#f59e0b',
-      title: 'Project Submission Deadline Extended', isImportant: false,
-      desc: 'The final year project submission deadline has been extended to 5th June 2024.',
-      author: 'Admin', date: '24 May 2024',
-      category: 'Academic', catStyle: { bg: '#fffbeb', text: '#f59e0b' },
-      time: '24 May, 11:45 AM'
-    },
-    { 
-      unread: false, 
-      icon: <Users size={20} />, iconBg: '#fdf2f8', iconColor: '#ec4899',
-      title: 'Sports Meet 2024 - Registrations Open', isImportant: false,
-      desc: 'Registrations for Annual Sports Meet are now open. Last date to register: 2nd June.',
-      author: 'Sports Committee', date: '23 May 2024',
-      category: 'Event', catStyle: { bg: '#fdf2f8', text: '#ec4899' },
-      time: '23 May, 09:20 AM'
-    },
-    { 
-      unread: false, 
-      icon: <Library size={20} />, iconBg: '#eff6ff', iconColor: '#3b82f6',
-      title: 'Library Book Issue Policy Updated', isImportant: false,
-      desc: 'New library book issue policy is effective from 1st June 2024.',
-      author: 'Library', date: '22 May 2024',
-      category: 'General', catStyle: { bg: '#eff6ff', text: '#3b82f6' },
-      time: '22 May, 04:10 PM'
-    },
-    { 
-      unread: false, 
-      icon: <FlaskConical size={20} />, iconBg: '#f3f0ff', iconColor: '#8b5cf6',
-      title: 'Lab Maintenance - Computer Lab 2', isImportant: false,
-      desc: 'Computer Lab 2 will remain closed on 28th May due to system maintenance.',
-      author: 'IT Support', date: '21 May 2024',
-      category: 'Other', catStyle: { bg: '#f3f0ff', text: '#8b5cf6' },
-      time: '21 May, 02:30 PM'
+  const fetchNotices = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get<NoticeItem[]>('/notices/');
+      setNotices(res.data);
+    } catch (err) {
+      console.error("Failed to load notices", err);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchNotices();
+  }, []);
+
+  const markAsRead = (id: number) => {
+    if (!readIds.includes(id)) {
+      setReadIds([...readIds, id]);
+    }
+  };
+
+  const handleOpenNotice = (n: NoticeItem) => {
+    setSelectedNotice(n);
+    markAsRead(n.id);
+  };
+
+  const filteredNotices = notices.filter(n => {
+    const matchesTab = activeTab === "ALL" || n.category.toUpperCase() === activeTab;
+    const matchesSearch = 
+      n.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      n.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      n.category.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesTab && matchesSearch;
+  });
+
+  const totalNotices = notices.length;
+  const unreadCount = notices.filter(n => !readIds.includes(n.id)).length;
+  const urgentCount = notices.filter(n => n.category === "URGENT" || n.category === "EXAM").length;
+
+  const categoryCounts: Record<string, number> = {};
+  notices.forEach(n => {
+    const cat = n.category || "GENERAL";
+    categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+  });
+
+  const categoryColors = ['#8b5cf6', '#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#ef4444'];
+  const pieData = Object.keys(categoryCounts).length > 0
+    ? Object.keys(categoryCounts).map((cat, i) => ({
+        name: cat,
+        value: categoryCounts[cat],
+        color: categoryColors[i % categoryColors.length]
+      }))
+    : [{ name: 'GENERAL', value: 1, color: '#8b5cf6' }];
+
+  const getCategoryBadgeStyle = (category: string) => {
+    switch (category.toUpperCase()) {
+      case "URGENT": return { bg: "#fef2f2", text: "#dc2626" };
+      case "EXAM": return { bg: "#fffbeb", text: "#d97706" };
+      case "FEE": return { bg: "#eff6ff", text: "#2563eb" };
+      case "EVENT": return { bg: "#f0fdf4", text: "#16a34a" };
+      case "HOLIDAY": return { bg: "#fdf2f8", text: "#db2777" };
+      default: return { bg: "#f3f0ff", text: "#573cfa" };
+    }
+  };
 
   return (
     <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
       
-      {/* ── Header with Animated Highlighted Text Badge (Matching Main Dashboard & Attendance) ── */}
+      {/* ── Header with Animated Highlighted Text Badge ── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
         <div>
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
@@ -97,7 +114,7 @@ export function MyNotices() {
               border: '1px solid rgba(255, 255, 255, 0.2)',
             }}>
               <TextType
-                text={["Notices", "Circulars", "Announcements"]}
+                text={["Notices", "Announcements", "Circulars"]}
                 typingSpeed={60}
                 deletingSpeed={35}
                 pauseDuration={2200}
@@ -108,15 +125,22 @@ export function MyNotices() {
               />
             </span>
           </h1>
-          <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>Stay updated with important announcements and notifications</div>
+          <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>Real-time announcements posted by college administration</div>
         </div>
 
-        <button style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 22px', background: '#573cfa', color: 'white', borderRadius: '14px', fontSize: '14px', fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(87, 60, 250, 0.3)' }}>
-          <Filter size={18} /> Filter & Sort
-        </button>
+        <div style={{ position: 'relative', width: '280px' }}>
+          <Search size={16} color="#9ca3af" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+          <input
+            type="text"
+            placeholder="Search notices..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            style={{ width: '100%', padding: '10px 12px 10px 36px', borderRadius: '14px', border: '1.5px solid #e5e7eb', fontSize: '13px', outline: 'none', background: 'white' }}
+          />
+        </div>
       </div>
 
-      {/* ── Real-Time Top KPI Cards Row (AutoML Studio design matching Main Dashboard) ── */}
+      {/* ── Real-Time Top KPI Cards Row ── */}
       <motion.div
         initial="hidden"
         animate="show"
@@ -134,7 +158,7 @@ export function MyNotices() {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            minHeight: '185px',
+            minHeight: '165px',
             boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
           }}
         >
@@ -145,16 +169,13 @@ export function MyNotices() {
               </div>
               <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Notices</span>
             </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <ArrowUpRight size={15} color="#18181b" />
-            </div>
           </div>
-          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              24
+          <div style={{ marginTop: 'auto', paddingTop: '16px' }}>
+            <div style={{ fontSize: '42px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              {totalNotices}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#573cfa', fontWeight: 600 }}>100%</span> · Issued This Semester
+              <span style={{ color: '#573cfa', fontWeight: 600 }}>Live Feed</span> · Real-time Database
             </div>
           </div>
         </motion.div>
@@ -170,7 +191,7 @@ export function MyNotices() {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            minHeight: '185px',
+            minHeight: '165px',
             boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
           }}
         >
@@ -181,21 +202,18 @@ export function MyNotices() {
               </div>
               <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Unread Notices</span>
             </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <ArrowUpRight size={15} color="#18181b" />
-            </div>
           </div>
-          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              7
+          <div style={{ marginTop: 'auto', paddingTop: '16px' }}>
+            <div style={{ fontSize: '42px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              {unreadCount}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#22c55e', fontWeight: 600 }}>7 New</span> · Unread Updates
+              <span style={{ color: '#22c55e', fontWeight: 600 }}>{unreadCount} New</span> · Unread Updates
             </div>
           </div>
         </motion.div>
 
-        {/* KPI 3 — Important Notices */}
+        {/* KPI 3 — Urgent & Exam */}
         <motion.div
           variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
           style={{
@@ -206,7 +224,7 @@ export function MyNotices() {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            minHeight: '185px',
+            minHeight: '165px',
             boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
           }}
         >
@@ -215,23 +233,20 @@ export function MyNotices() {
               <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(245,158,11,0.08)' }}>
                 <Pin size={18} color="#f59e0b" strokeWidth={2} />
               </div>
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Important Notices</span>
-            </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <ArrowUpRight size={15} color="#18181b" />
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Urgent & Exam</span>
             </div>
           </div>
-          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              5
+          <div style={{ marginTop: 'auto', paddingTop: '16px' }}>
+            <div style={{ fontSize: '42px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              {urgentCount}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#f59e0b', fontWeight: 600 }}>Pinned</span> · High Priority
+              <span style={{ color: '#f59e0b', fontWeight: 600 }}>High Priority</span> · Requires Attention
             </div>
           </div>
         </motion.div>
 
-        {/* KPI 4 — This Week */}
+        {/* KPI 4 — Categories */}
         <motion.div
           variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
           style={{
@@ -242,7 +257,7 @@ export function MyNotices() {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            minHeight: '185px',
+            minHeight: '165px',
             boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
           }}
         >
@@ -251,244 +266,216 @@ export function MyNotices() {
               <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(59,130,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(59,130,246,0.08)' }}>
                 <Calendar size={18} color="#3b82f6" strokeWidth={2} />
               </div>
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>This Week</span>
-            </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <ArrowUpRight size={15} color="#18181b" />
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Active Categories</span>
             </div>
           </div>
-          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              8
+          <div style={{ marginTop: 'auto', paddingTop: '16px' }}>
+            <div style={{ fontSize: '42px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+              {Object.keys(categoryCounts).length}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#3b82f6', fontWeight: 600 }}>+33%</span> · New Notices
+              <span style={{ color: '#3b82f6', fontWeight: 600 }}>Structured</span> · Categorized Notice Stream
             </div>
           </div>
         </motion.div>
       </motion.div>
 
       {/* Main Layout (2 Columns) */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '2.2fr 1fr', gap: '32px' }}>
         
         {/* Left Column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           {/* All Notices List */}
-          <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #f3f4f6', padding: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-              <h3 style={{ fontSize: '16px', fontWeight: 'bold', color: '#111827', margin: 0 }}>All Notices</h3>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                {['All', 'General', 'Academic', 'Examination', 'Event', 'Other'].map(tab => (
+          <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #f3f4f6', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#111827', margin: 0 }}>All Announcements</h3>
+              
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                {['ALL', 'GENERAL', 'EXAM', 'FEE', 'EVENT', 'HOLIDAY', 'URGENT'].map(tab => (
                   <button 
                     key={tab}
                     onClick={() => setActiveTab(tab)}
                     style={{ 
-                      padding: '8px 16px', 
+                      padding: '6px 12px', 
                       borderRadius: '8px', 
-                      fontSize: '12px', 
-                      fontWeight: 600,
+                      fontSize: '11px', 
+                      fontWeight: 700,
                       border: 'none',
                       cursor: 'pointer',
-                      background: activeTab === tab ? '#f3f0ff' : 'transparent',
-                      color: activeTab === tab ? '#573cfa' : '#6b7280',
-                      display: 'flex', alignItems: 'center', gap: '6px'
+                      background: activeTab === tab ? '#573cfa' : '#f4f4f5',
+                      color: activeTab === tab ? '#ffffff' : '#6b7280',
+                      transition: 'all 0.15s'
                     }}
                   >
-                    {tab === 'All' && <Bell size={14} />} {tab}
+                    {tab}
                   </button>
                 ))}
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {noticesList.map((notice, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', padding: '16px 0', borderBottom: i === noticesList.length - 1 ? 'none' : '1px solid #f9fafb', position: 'relative' }}>
-                  
-                  {/* Read/Unread dot */}
-                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: notice.unread ? '#573cfa' : 'transparent', border: notice.unread ? 'none' : '2px solid #e5e7eb', marginTop: '16px', marginRight: '16px', flexShrink: 0 }}></div>
-                  
-                  <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: notice.iconBg, color: notice.iconColor, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: '16px' }}>
-                    {notice.icon}
-                  </div>
-                  
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
-                      <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#111827' }}>{notice.title}</div>
-                      {notice.isImportant && (
-                        <span style={{ background: '#fffbeb', color: '#f59e0b', fontSize: '10px', fontWeight: 600, padding: '4px 8px', borderRadius: '4px' }}>Important</span>
-                      )}
-                    </div>
-                    <div style={{ fontSize: '13px', color: '#4b5563', marginBottom: '8px', lineHeight: 1.5 }}>
-                      {notice.desc}
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 500 }}>
-                      By {notice.author} &bull; {notice.date}
-                    </div>
-                  </div>
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: '50px', color: '#9ca3af' }}>Loading real-time notices from database...</div>
+            ) : filteredNotices.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '50px 20px' }}>
+                <Megaphone size={40} color="#d1d5db" style={{ marginBottom: '12px' }} />
+                <div style={{ fontSize: '15px', fontWeight: 700, color: '#374151' }}>No notices found</div>
+                <div style={{ fontSize: '13px', color: '#9ca3af', marginTop: '4px' }}>When Admin posts an announcement, it will appear here instantly in real-time.</div>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {filteredNotices.map((notice) => {
+                  const isUnread = !readIds.includes(notice.id);
+                  const badgeStyle = getCategoryBadgeStyle(notice.category);
 
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between', height: '100%', minHeight: '64px', marginLeft: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <span style={{ background: notice.catStyle.bg, color: notice.catStyle.text, fontSize: '10px', fontWeight: 600, padding: '4px 10px', borderRadius: '12px' }}>
-                        {notice.category}
-                      </span>
-                      <div style={{ fontSize: '11px', color: '#6b7280', fontWeight: 500 }}>
-                        {notice.time}
+                  return (
+                    <div
+                      key={notice.id}
+                      onClick={() => handleOpenNotice(notice)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        padding: '18px',
+                        borderRadius: '16px',
+                        background: isUnread ? '#fafafa' : '#ffffff',
+                        border: isUnread ? '1.5px solid rgba(87,60,250,0.15)' : '1px solid #f3f4f6',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s',
+                        boxShadow: isUnread ? '0 2px 10px rgba(87,60,250,0.03)' : 'none'
+                      }}
+                    >
+                      {/* Unread indicator dot */}
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: isUnread ? '#573cfa' : 'transparent', border: isUnread ? 'none' : '2px solid #e5e7eb', marginTop: '6px', marginRight: '14px', flexShrink: 0 }} />
+
+                      <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: badgeStyle.bg, color: badgeStyle.text, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: '16px' }}>
+                        <Megaphone size={20} />
                       </div>
-                      <Bookmark size={16} color="#9ca3af" style={{ cursor: 'pointer' }} />
+
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '15px', fontWeight: 700, color: '#09090b' }}>{notice.title}</span>
+                          <span style={{ background: badgeStyle.bg, color: badgeStyle.text, fontSize: '10px', fontWeight: 800, padding: '3px 8px', borderRadius: '8px' }}>
+                            {notice.category}
+                          </span>
+                        </div>
+
+                        <div style={{ fontSize: '13px', color: '#4b5563', marginBottom: '8px', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                          {notice.content}
+                        </div>
+
+                        <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <span>Posted by <strong style={{ color: '#374151' }}>{notice.author_name || 'Admin'}</strong></span>
+                          <span>•</span>
+                          <span>{new Date(notice.created_at).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                      </div>
+
+                      <button style={{ background: '#f3f4f6', border: 'none', color: '#374151', padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '12px' }}>
+                        <Eye size={13} /> View
+                      </button>
                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <button style={{ width: '100%', background: '#f8fafc', border: 'none', color: '#573cfa', padding: '12px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, marginTop: '16px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-              Load More Notices <ChevronDown size={16} />
-            </button>
-          </div>
-
-          {/* Banner Promo */}
-          <div style={{ background: '#f3f0ff', borderRadius: '16px', padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', zIndex: 1 }}>
-              <div style={{ width: '64px', height: '64px', background: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#573cfa', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
-                <Bell size={28} />
+                  );
+                })}
               </div>
-              <div>
-                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#111827', marginBottom: '4px' }}>Never miss an important update!</div>
-                <div style={{ fontSize: '13px', color: '#4b5563', marginBottom: '16px' }}>Enable notifications to get real-time alerts for new notices.</div>
-                <button style={{ padding: '10px 20px', background: '#573cfa', color: 'white', borderRadius: '8px', fontSize: '13px', fontWeight: 600, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Bell size={16} /> Enable Notifications
-                </button>
-              </div>
-            </div>
-            {/* Illustration mock using icons */}
-            <div style={{ zIndex: 1, paddingRight: '20px', position: 'relative' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100px', height: '100px' }}>
-                 <div style={{ position: 'absolute', top: '-10px', left: '-20px', color: '#8b5cf6', transform: 'rotate(-20deg)' }}><Volume2 size={32} /></div>
-                 <div style={{ position: 'absolute', top: '10px', right: '-10px', color: '#3b82f6', transform: 'rotate(15deg)' }}><Send size={24} /></div>
-                 <div style={{ position: 'absolute', bottom: '0px', right: '30px', color: '#ec4899', transform: 'rotate(-10deg)' }}><MailCheck size={28} /></div>
-              </div>
-            </div>
+            )}
           </div>
 
         </div>
 
-        {/* Right Column */}
+        {/* Right Column: Category Breakdown & Information */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
-          {/* Notice Categories */}
-          <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #f3f4f6', padding: '24px' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: '0 0 24px 0' }}>Notice Categories</h3>
+          {/* Category Breakdown */}
+          <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #f3f4f6', padding: '24px' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 'bold', color: '#111827', margin: '0 0 20px 0' }}>Notice Categories</h3>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-              <div style={{ width: '130px', height: '130px', position: 'relative', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+              <div style={{ width: '110px', height: '110px', position: 'relative', flexShrink: 0 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={categories} innerRadius={45} outerRadius={65} paddingAngle={2} dataKey="value" stroke="none">
-                      {categories.map((entry, index) => (
+                    <Pie data={pieData} innerRadius={36} outerRadius={52} paddingAngle={2} dataKey="value" stroke="none">
+                      {pieData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827' }}>24</div>
-                  <div style={{ fontSize: '11px', color: '#6b7280' }}>Total</div>
+                  <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#111827' }}>{totalNotices}</div>
+                  <div style={{ fontSize: '10px', color: '#6b7280' }}>Total</div>
                 </div>
               </div>
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
-                {categories.map((d, i) => (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+                {pieData.map((d, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#4b5563', fontWeight: 500 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#4b5563', fontWeight: 500 }}>
                       <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: d.color }}></div>
                       {d.name}
                     </div>
-                    <div style={{ color: '#111827', fontWeight: 600 }}>{d.value} <span style={{ color: '#9ca3af', fontWeight: 'normal', marginLeft: '4px' }}>({d.pct})</span></div>
+                    <div style={{ color: '#111827', fontWeight: 600 }}>{d.value}</div>
                   </div>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Pinned Notices */}
-          <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #f3f4f6', padding: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: 0 }}>Pinned Notices</h3>
-              <span style={{ fontSize: '12px', color: '#573cfa', fontWeight: 600, cursor: 'pointer' }}>View all</span>
-            </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              
-              <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #f1f5f9', display: 'flex', gap: '12px' }}>
-                <div style={{ color: '#573cfa', marginTop: '2px' }}><Pin size={16} fill="#573cfa" /></div>
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827', marginBottom: '4px' }}>Academic Calendar 2024-25</div>
-                  <div style={{ fontSize: '11px', color: '#4b5563', marginBottom: '8px' }}>Important academic dates and deadlines.</div>
-                  <div style={{ fontSize: '10px', color: '#9ca3af', fontWeight: 500 }}>Pinned on 10 May 2024</div>
-                </div>
-              </div>
-
-              <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #f1f5f9', display: 'flex', gap: '12px' }}>
-                <div style={{ color: '#573cfa', marginTop: '2px' }}><Pin size={16} fill="#573cfa" /></div>
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827', marginBottom: '4px' }}>Semester Fee Payment Notice</div>
-                  <div style={{ fontSize: '11px', color: '#4b5563', marginBottom: '8px' }}>Last date for semester fee payment.</div>
-                  <div style={{ fontSize: '10px', color: '#9ca3af', fontWeight: 500 }}>Pinned on 08 May 2024</div>
-                </div>
-              </div>
-
-              <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #f1f5f9', display: 'flex', gap: '12px' }}>
-                <div style={{ color: '#573cfa', marginTop: '2px' }}><Pin size={16} fill="#573cfa" /></div>
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827', marginBottom: '4px' }}>College Annual Fest - Technovate 2K24</div>
-                  <div style={{ fontSize: '11px', color: '#4b5563', marginBottom: '8px' }}>Join us for the grand fest on 15th June!</div>
-                  <div style={{ fontSize: '10px', color: '#9ca3af', fontWeight: 500 }}>Pinned on 05 May 2024</div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #f3f4f6', padding: '24px' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: '0 0 20px 0' }}>Quick Actions</h3>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
-              
-              <div style={{ border: '1px solid #f3f4f6', borderRadius: '12px', padding: '20px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.2s', background: '#fafafa' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <MailCheck size={24} />
-                </div>
-                <div style={{ fontSize: '12px', fontWeight: 600, color: '#374151', textAlign: 'center' }}>Mark All as Read</div>
-              </div>
-
-              <div style={{ border: '1px solid #f3f4f6', borderRadius: '12px', padding: '20px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.2s', background: '#fafafa' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#e8f5e9', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Download size={24} />
-                </div>
-                <div style={{ fontSize: '12px', fontWeight: 600, color: '#374151', textAlign: 'center' }}>Download Notices</div>
-              </div>
-
-              <div style={{ border: '1px solid #f3f4f6', borderRadius: '12px', padding: '20px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.2s', background: '#fafafa' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#fffbeb', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Bell size={24} />
-                </div>
-                <div style={{ fontSize: '12px', fontWeight: 600, color: '#374151', textAlign: 'center' }}>Subscribe to Updates</div>
-              </div>
-
-              <div style={{ border: '1px solid #f3f4f6', borderRadius: '12px', padding: '20px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', cursor: 'pointer', transition: 'all 0.2s', background: '#fafafa' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Settings size={24} />
-                </div>
-                <div style={{ fontSize: '12px', fontWeight: 600, color: '#374151', textAlign: 'center' }}>Notice Preferences</div>
-              </div>
-
-            </div>
+          {/* Real-time Status Card */}
+          <div style={{ background: 'linear-gradient(135deg, #573cfa 0%, #432bb3 100%)', borderRadius: '24px', padding: '24px', color: 'white' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Bell size={18} /> Real-Time Notice Broadcast
+            </h3>
+            <p style={{ fontSize: '12px', opacity: 0.85, margin: 0, lineHeight: 1.5 }}>
+              All official notices published by institute administrators are synchronized directly from the database to your dashboard.
+            </p>
           </div>
 
         </div>
       </div>
+
+      {/* ── NOTICE DETAIL MODAL ── */}
+      <AnimatePresence>
+        {selectedNotice && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              style={{ background: 'white', borderRadius: '24px', width: '100%', maxWidth: '580px', padding: '28px', boxShadow: '0 20px 40px rgba(0,0,0,0.2)', position: 'relative' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                <span style={{ background: getCategoryBadgeStyle(selectedNotice.category).bg, color: getCategoryBadgeStyle(selectedNotice.category).text, padding: '4px 12px', borderRadius: '12px', fontSize: '11px', fontWeight: 800 }}>
+                  {selectedNotice.category}
+                </span>
+                <button onClick={() => setSelectedNotice(null)} style={{ background: '#f4f4f5', border: 'none', borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <X size={18} color="#71717a" />
+                </button>
+              </div>
+
+              <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#09090b', margin: '0 0 12px 0', lineHeight: 1.3 }}>
+                {selectedNotice.title}
+              </h2>
+
+              <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span>Issued by <strong style={{ color: '#111827' }}>{selectedNotice.author_name || 'Admin'}</strong></span>
+                <span>•</span>
+                <span>{new Date(selectedNotice.created_at).toLocaleString()}</span>
+              </div>
+
+              <div style={{ background: '#f8fafc', borderRadius: '16px', padding: '18px', fontSize: '14px', color: '#1e293b', lineHeight: 1.6, border: '1px solid #e2e8f0', whiteSpace: 'pre-wrap' }}>
+                {selectedNotice.content}
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '24px' }}>
+                <button onClick={() => setSelectedNotice(null)} style={{ padding: '10px 24px', background: '#573cfa', color: 'white', border: 'none', borderRadius: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
+                  Close
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }

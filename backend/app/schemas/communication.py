@@ -22,6 +22,7 @@ class NoticeResponse(NoticeBase):
     id: int
     author_id: int
     created_at: datetime
+    author_name: Optional[str] = "Admin"
     model_config = {"from_attributes": True}
 
 
@@ -46,22 +47,34 @@ class NotificationResponse(NotificationBase):
 class ComplaintBase(BaseModel):
     subject: str
     description: str
-    priority: ComplaintPriority
+    category: Optional[str] = "General"
+    priority: ComplaintPriority = ComplaintPriority.MEDIUM
 
-class ComplaintCreate(ComplaintBase):
-    pass
+class ComplaintCreate(BaseModel):
+    subject: str
+    description: str
+    category: Optional[str] = "General"
+    priority: ComplaintPriority = ComplaintPriority.MEDIUM
 
-class ComplaintUpdate(BaseModel):
+class ComplaintUpdateStatus(BaseModel):
     status: Optional[ComplaintStatus] = None
     priority: Optional[ComplaintPriority] = None
+    resolution: Optional[str] = None
     assigned_to: Optional[int] = None
+
+ComplaintUpdate = ComplaintUpdateStatus
 
 class ComplaintResponse(ComplaintBase):
     id: int
     ticket_number: str
     student_id: int
+    category: Optional[str] = "General"
+    resolution: Optional[str] = None
     status: ComplaintStatus
+    priority: ComplaintPriority
     assigned_to: Optional[int] = None
     created_at: datetime
     updated_at: datetime
+    student_name: Optional[str] = None
+    student_enrollment: Optional[str] = None
     model_config = {"from_attributes": True}

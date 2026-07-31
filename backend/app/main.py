@@ -13,6 +13,7 @@ import app.models.subject  # noqa
 import app.models.subject_assignment  # noqa
 import app.models.assignment  # noqa  - registers assignments + assignment_submissions
 import app.models.fee  # noqa
+import app.models.communication  # noqa
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -49,9 +50,18 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 
 @app.on_event("startup")
 async def on_startup():
-    """Auto-create any missing tables on server start."""
+    """Auto-create any missing tables and columns on server start."""
+    from sqlalchemy import text
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all, checkfirst=True)
+        try:
+            await conn.execute(text("ALTER TABLE complaints ADD COLUMN category VARCHAR(100) DEFAULT 'General'"))
+        except Exception:
+            pass
+        try:
+            await conn.execute(text("ALTER TABLE complaints ADD COLUMN resolution TEXT NULL"))
+        except Exception:
+            pass
 
 
 @app.get("/")
