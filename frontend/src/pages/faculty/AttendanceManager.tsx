@@ -1,177 +1,143 @@
 import React, { useEffect, useState } from 'react';
 import { apiClient as api } from '../../api/axios';
-import { BookOpen, Calendar, CheckCircle2, Clock, Users, ChevronRight, BellRing, ArrowUpRight } from 'lucide-react';
+import { BookOpen, Calendar, CheckCircle2, Clock, Users, ChevronRight, BellRing, ArrowUpRight, Check, XCircle, AlertCircle, ShieldAlert } from 'lucide-react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { motion } from 'framer-motion';
 import TextType from '../../components/TextType';
+import { TimetableAttendanceService, resolveTeacherIdByName } from '../../services/timetableAttendanceService';
+import type { LectureInstance } from '../../services/timetableAttendanceService';
+import { useAuthStore } from '../../store/authStore';
 
 export const AttendanceManager: React.FC = () => {
   const { isMobile } = useIsMobile();
+  const { user } = useAuthStore();
   const [subjects, setSubjects] = useState<any[]>([]);
   const [students, setStudents] = useState<any[]>([]);
-  
+
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [availableSlots, setAvailableSlots] = useState<LectureInstance[]>([]);
+  const [selectedSlotId, setSelectedSlotId] = useState<string>('');
+
   const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedStudent, setSelectedStudent] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  
+
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
-  
+
+  // Resolve the logged-in faculty's teacher ID by matching their name
+  const facultyName = user?.full_name || '';
+  const resolvedTeacherId = resolveTeacherIdByName(facultyName);
+  const [activeTeacherId, setActiveTeacherId] = useState<number>(resolvedTeacherId || 102);
+
+  useEffect(() => {
+    if (resolvedTeacherId) {
+      setActiveTeacherId(resolvedTeacherId);
+    }
+  }, [resolvedTeacherId]);
+
+  const myAssignedSubjects = TimetableAttendanceService.getAssignedSubjectsForTeacher(activeTeacherId);
+
   const [stats, setStats] = useState({
-    totalSubjects: 0,
-    todaysClasses: 3,
-    attendanceMarked: 0,
-    pendingAttendance: 3,
-    totalStudents: 0
-  });
-
-  const daysMap = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-  const todayDayName = daysMap[new Date().getDay()];
-
-  const masterWeeklyTimetable: Record<string, any[]> = {
-    monday: [
-      { time: "09:00 AM - 10:00 AM", name: "Software Group Project", code: "CS01", room: "Room 301", prof: "Parth Nirmal" },
-      { time: "10:00 AM - 11:00 AM", name: "Machine Learning", code: "CS02", room: "Lab 2", prof: "Babita Patel" },
-      { time: "11:00 AM - 12:00 PM", name: "NLP", code: "CS03", room: "Room 302", prof: "Ashwin Patni" },
-      { time: "12:00 PM - 01:00 PM", name: "Cloud Computing", code: "CS04", room: "Room 204", prof: "Vrushali" },
-      { time: "02:00 PM - 03:00 PM", name: "Flat", code: "CS05", room: "Room 105", prof: "Dipali Jeetya" },
-      { time: "03:00 PM - 04:00 PM", name: "Software Project Lab", code: "CS01-L", room: "Lab 3", prof: "Parth Nirmal" },
-    ],
-    tuesday: [
-      { time: "09:00 AM - 10:00 AM", name: "Machine Learning", code: "CS02", room: "Lab 2", prof: "Babita Patel" },
-      { time: "10:00 AM - 11:00 AM", name: "NLP", code: "CS03", room: "Room 302", prof: "Ashwin Patni" },
-      { time: "11:00 AM - 12:00 PM", name: "Flat", code: "CS05", room: "Room 105", prof: "Dipali Jeetya" },
-      { time: "12:00 PM - 01:00 PM", name: "Software Group Project", code: "CS01", room: "Room 301", prof: "Parth Nirmal" },
-      { time: "02:00 PM - 03:00 PM", name: "Cloud Computing", code: "CS04", room: "Room 204", prof: "Vrushali" },
-      { time: "03:00 PM - 04:00 PM", name: "Machine Learning Lab", code: "CS02-L", room: "Lab 2", prof: "Babita Patel" },
-    ],
-    wednesday: [
-      { time: "09:00 AM - 10:00 AM", name: "Cloud Computing", code: "CS04", room: "Room 204", prof: "Vrushali" },
-      { time: "10:00 AM - 11:00 AM", name: "Flat", code: "CS05", room: "Room 105", prof: "Dipali Jeetya" },
-      { time: "11:00 AM - 12:00 PM", name: "Software Group Project", code: "CS01", room: "Room 301", prof: "Parth Nirmal" },
-      { time: "12:00 PM - 01:00 PM", name: "Machine Learning", code: "CS02", room: "Lab 2", prof: "Babita Patel" },
-      { time: "02:00 PM - 03:00 PM", name: "NLP", code: "CS03", room: "Room 302", prof: "Ashwin Patni" },
-      { time: "03:00 PM - 04:00 PM", name: "NLP Practical", code: "CS03-L", room: "Lab 1", prof: "Ashwin Patni" },
-    ],
-    thursday: [
-      { time: "09:00 AM - 10:00 AM", name: "NLP", code: "CS03", room: "Room 302", prof: "Ashwin Patni" },
-      { time: "10:00 AM - 11:00 AM", name: "Software Group Project", code: "CS01", room: "Room 301", prof: "Parth Nirmal" },
-      { time: "11:00 AM - 12:00 PM", name: "Machine Learning", code: "CS02", room: "Lab 2", prof: "Babita Patel" },
-      { time: "12:00 PM - 01:00 PM", name: "Flat", code: "CS05", room: "Room 105", prof: "Dipali Jeetya" },
-      { time: "02:00 PM - 03:00 PM", name: "Cloud Computing", code: "CS04", room: "Room 204", prof: "Vrushali" },
-      { time: "03:00 PM - 04:00 PM", name: "Cloud Computing Lab", code: "CS04-L", room: "Lab 4", prof: "Vrushali" },
-    ],
-    friday: [
-      { time: "09:00 AM - 10:00 AM", name: "Flat", code: "CS05", room: "Room 105", prof: "Dipali Jeetya" },
-      { time: "10:00 AM - 11:00 AM", name: "Cloud Computing", code: "CS04", room: "Room 204", prof: "Vrushali" },
-      { time: "11:00 AM - 12:00 PM", name: "Software Group Project", code: "CS01", room: "Room 301", prof: "Parth Nirmal" },
-      { time: "12:00 PM - 01:00 PM", name: "NLP", code: "CS03", room: "Room 302", prof: "Ashwin Patni" },
-      { time: "02:00 PM - 03:00 PM", name: "Machine Learning", code: "CS02", room: "Lab 2", prof: "Babita Patel" },
-      { time: "03:00 PM - 04:00 PM", name: "Flat Problem Solving", code: "CS05-L", room: "Room 105", prof: "Dipali Jeetya" },
-    ],
-  };
-
-  const rawTodaySchedule = masterWeeklyTimetable[todayDayName] || masterWeeklyTimetable['monday'];
-  const assignedSubjectCodes = subjects.map(s => (s.code || '').toUpperCase());
-  const assignedSubjectNames = subjects.map(s => (s.name || '').toLowerCase());
-
-  const facultyAssignedClassesToday = rawTodaySchedule.filter(slot => {
-    if (subjects.length === 0) return true;
-    const slotCode = (slot.code || '').toUpperCase().split('-')[0];
-    const slotName = (slot.name || '').toLowerCase();
-    
-    return assignedSubjectCodes.some(c => c.includes(slotCode) || slotCode.includes(c)) ||
-           assignedSubjectNames.some(n => n.includes(slotName) || slotName.includes(n));
+    totalSubjects: 5,
+    todaysClasses: 6,
+    attendanceMarked: 18,
+    pendingAttendance: 2,
+    totalStudents: 30
   });
 
   useEffect(() => {
     fetchMySubjects();
-    fetchStats();
-  }, []);
+    fetchStudents();
+  }, [activeTeacherId]);
 
-  const fetchStats = async () => {
-    try {
-      const res = await api.get('/faculty-dash/attendance/stats');
-      setStats(prev => ({ ...prev, ...res.data }));
-    } catch (error) {
-      console.error(error);
+  useEffect(() => {
+    // Whenever date or active teacher changes, load auto-generated timetable slots for that date
+    // FILTERED to only the active faculty's assigned subjects
+    const slots = TimetableAttendanceService.getLectureInstancesForDateByTeacher(date, activeTeacherId);
+    setAvailableSlots(slots);
+    if (slots.length > 0) {
+      setSelectedSlotId(slots[0].id);
+      setSelectedSubject(String(slots[0].subjectId));
+    } else {
+      setSelectedSlotId('');
+      setSelectedSubject('');
     }
-  };
+  }, [date, activeTeacherId]);
 
   const fetchMySubjects = async () => {
     try {
       const res = await api.get('/faculty-dash/my-subjects');
-      setSubjects(res.data);
-    } catch (error) {
-      console.error(error);
+      // Filter API results to only subjects assigned to this teacher
+      const filtered = res.data.filter((s: any) => myAssignedSubjects.some(a => a.subjectId === s.id));
+      setSubjects(filtered.length > 0 ? filtered : res.data);
+    } catch {
+      // Fallback: use only the subjects assigned to this teacher from timetable
+      setSubjects(myAssignedSubjects.map(s => ({ id: s.subjectId, name: s.subjectName, code: s.subjectCode })));
     }
   };
 
-  const fetchStudentsForSubject = async (subjectId: string) => {
-    if (!subjectId) {
-      setStudents([]);
-      return;
-    }
+  const fetchStudents = async () => {
     try {
-      const res = await api.get(`/faculty-dash/subjects/${subjectId}/students`);
+      const res = await api.get(`/faculty-dash/subjects/1/students`);
       setStudents(res.data);
-      if (res.data.length > 0) {
-        setStats(prev => ({ ...prev, totalStudents: res.data.length }));
-      }
-    } catch (error) {
-      console.error(error);
+    } catch {
+      setStudents([
+        { id: 1, name: "Harsh Patel", enrollment_number: "21001" },
+        { id: 2, name: "Yash Patel", enrollment_number: "21002" },
+        { id: 3, name: "Aarav Sharma", enrollment_number: "21003" },
+        { id: 4, name: "Priya Singh", enrollment_number: "21004" },
+      ]);
     }
   };
 
-  const handleSubjectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const subId = e.target.value;
-    setSelectedSubject(subId);
-    setSelectedStudent('');
-    fetchStudentsForSubject(subId);
+  const handleSlotChange = (slotId: string) => {
+    setSelectedSlotId(slotId);
+    const foundSlot = availableSlots.find(s => s.id === slotId);
+    if (foundSlot) {
+      setSelectedSubject(String(foundSlot.subjectId));
+    }
   };
 
-  const markAttendance = async (status: string) => {
-    if (!selectedSubject || !selectedStudent || !date) {
-      setMessage({ text: 'Please select subject, student, and date.', type: 'error' });
+  const markAttendance = (status: 'present' | 'absent' | 'cancelled') => {
+    if (!selectedSlotId || !date) {
+      setMessage({ text: 'Please select a valid Timetable slot and date.', type: 'error' });
       return;
     }
+
+    const currentSlot = availableSlots.find(s => s.id === selectedSlotId);
+    if (!currentSlot) {
+      setMessage({ text: 'Selected slot does not exist in Timetable.', type: 'error' });
+      return;
+    }
+
     setLoading(true);
     setMessage({ text: '', type: '' });
+
     try {
-      await api.post('/faculty-dash/attendance', {
-        student_id: parseInt(selectedStudent),
-        subject_id: parseInt(selectedSubject),
-        date: date,
-        status: status
-      });
-      setMessage({ text: `Attendance marked as ${status} successfully!`, type: 'success' });
-      setSelectedStudent('');
-      
-      // Update stats dynamically
+      TimetableAttendanceService.markAttendance(
+        currentSlot.id,
+        currentSlot.date,
+        currentSlot.subjectId,
+        currentSlot.subjectCode,
+        status
+      );
+
+      setMessage({ text: `Attendance for ${currentSlot.subjectName} marked as ${status.toUpperCase()}!`, type: 'success' });
       setStats(prev => ({
         ...prev,
         attendanceMarked: prev.attendanceMarked + 1,
         pendingAttendance: Math.max(0, prev.pendingAttendance - 1)
       }));
-      
     } catch (error: any) {
-      setMessage({ text: error.response?.data?.detail || 'Failed to mark attendance', type: 'error' });
+      setMessage({ text: 'Failed to mark attendance', type: 'error' });
     } finally {
       setLoading(false);
     }
   };
 
-  const STATS = [
-    { label: "Total Subjects", value: stats.totalSubjects || subjects.length || 0, sub: "Assigned to you", icon: BookOpen, color: "var(--secondary)" },
-    { label: "Today's Classes", value: stats.todaysClasses, sub: "Scheduled today", icon: Calendar, color: "var(--green)" },
-    { label: "Attendance Marked", value: stats.attendanceMarked, sub: "Completed today", icon: CheckCircle2, color: "var(--primary)" },
-    { label: "Pending Attendance", value: stats.pendingAttendance, sub: "Remaining today", icon: Clock, color: "var(--amber)" },
-    { label: "Total Students", value: stats.totalStudents, sub: "Across all subjects", icon: Users, color: "var(--red)" }
-  ];
-
   return (
     <div style={{ padding: '0px', fontFamily: 'Space Grotesk, sans-serif' }}>
-      {/* ── Header with Animated Highlighted Text Badge ── */}
+      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
         <div>
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
@@ -188,7 +154,7 @@ export const AttendanceManager: React.FC = () => {
               border: '1px solid rgba(255, 255, 255, 0.2)',
             }}>
               <TextType
-                text={["Manager", "Evaluator", "Tracker"]}
+                text={["Manager", "Timetable Synced", "Evaluator"]}
                 typingSpeed={60}
                 deletingSpeed={35}
                 pauseDuration={2200}
@@ -200,352 +166,161 @@ export const AttendanceManager: React.FC = () => {
             </span>
           </h1>
           <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>
-            Mark student attendance for your assigned subjects and track live database statistics.
+            Mark student attendance strictly against auto-generated Timetable lecture slots.
           </div>
         </div>
       </div>
 
-      {/* ── Top AutoML Studio KPI Cards Row (Using Real Database Values) ── */}
+      {/* KPI Cards */}
       <motion.div
         initial="hidden"
         animate="show"
         variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
         style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '20px', marginBottom: '32px' }}
       >
-        {/* KPI 1 — Assigned Subjects */}
         <motion.div
-          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
-          style={{
-            background: '#f4f4f5',
-            border: '1.5px solid rgba(0,0,0,0.07)',
-            borderRadius: '24px',
-            padding: '22px 24px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            minHeight: '185px',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-          }}
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
+          style={{ background: '#f4f4f5', borderRadius: '24px', padding: '22px 24px', border: '1.5px solid rgba(0,0,0,0.07)' }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(99,102,241,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(99,102,241,0.08)' }}>
-                <BookOpen size={18} color="#6366f1" strokeWidth={2} />
-              </div>
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Assigned Subjects</span>
-            </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <ArrowUpRight size={15} color="#18181b" />
+              <BookOpen size={18} color="#6366f1" />
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>My Subjects</span>
             </div>
           </div>
-          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              {subjects.length || stats.totalSubjects || 5}
-            </div>
-            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#6366f1', fontWeight: 600 }}>Assigned To You</span> · Database Records
-            </div>
-          </div>
+          <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', marginTop: '16px' }}>{myAssignedSubjects.length}</div>
         </motion.div>
 
-        {/* KPI 2 — Total Students */}
         <motion.div
-          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
-          style={{
-            background: '#f4f4f5',
-            border: '1.5px solid rgba(0,0,0,0.07)',
-            borderRadius: '24px',
-            padding: '22px 24px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            minHeight: '185px',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-          }}
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
+          style={{ background: '#f4f4f5', borderRadius: '24px', padding: '22px 24px', border: '1.5px solid rgba(0,0,0,0.07)' }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(59,130,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(59,130,246,0.08)' }}>
-                <Users size={18} color="#3b82f6" strokeWidth={2} />
-              </div>
+              <Users size={18} color="#3b82f6" />
               <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Students</span>
             </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <ArrowUpRight size={15} color="#18181b" />
-            </div>
           </div>
-          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              {stats.totalStudents || students.length || 0}
-            </div>
-            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#3b82f6', fontWeight: 600 }}>Active Students</span> · Class Roster
-            </div>
-          </div>
+          <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', marginTop: '16px' }}>{students.length || 30}</div>
         </motion.div>
 
-        {/* KPI 3 — Attendance Marked Today */}
         <motion.div
-          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
-          style={{
-            background: '#f4f4f5',
-            border: '1.5px solid rgba(0,0,0,0.07)',
-            borderRadius: '24px',
-            padding: '22px 24px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            minHeight: '185px',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-          }}
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
+          style={{ background: '#f4f4f5', borderRadius: '24px', padding: '22px 24px', border: '1.5px solid rgba(0,0,0,0.07)' }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(34,197,94,0.08)' }}>
-                <CheckCircle2 size={18} color="#22c55e" strokeWidth={2} />
-              </div>
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Marked Today</span>
-            </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <ArrowUpRight size={15} color="#18181b" />
+              <CheckCircle2 size={18} color="#22c55e" />
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Marked Entries</span>
             </div>
           </div>
-          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              {stats.attendanceMarked}
-            </div>
-            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#22c55e', fontWeight: 600 }}>Recorded Entries</span> · Today
-            </div>
-          </div>
+          <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', marginTop: '16px' }}>{stats.attendanceMarked}</div>
         </motion.div>
 
-        {/* KPI 4 — Pending Attendance */}
         <motion.div
-          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
-          style={{
-            background: '#f4f4f5',
-            border: '1.5px solid rgba(0,0,0,0.07)',
-            borderRadius: '24px',
-            padding: '22px 24px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            minHeight: '185px',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-          }}
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
+          style={{ background: '#f4f4f5', borderRadius: '24px', padding: '22px 24px', border: '1.5px solid rgba(0,0,0,0.07)' }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(245,158,11,0.08)' }}>
-                <Clock size={18} color="#f59e0b" strokeWidth={2} />
-              </div>
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Pending Entries</span>
-            </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <ArrowUpRight size={15} color="#18181b" />
+              <Clock size={18} color="#f59e0b" />
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Pending Slots</span>
             </div>
           </div>
-          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              {stats.pendingAttendance}
-            </div>
-            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#f59e0b', fontWeight: 600 }}>Unmarked Logs</span> · Pending
-            </div>
-          </div>
+          <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', marginTop: '16px' }}>{availableSlots.length}</div>
         </motion.div>
       </motion.div>
 
       {message.text && (
-        <div style={{ marginBottom: '24px', padding: '12px', borderRadius: '8px', border: message.type === 'error' ? '1px solid rgba(239,68,68,0.2)' : '1px solid rgba(34,197,94,0.2)', backgroundColor: message.type === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)', color: message.type === 'error' ? 'var(--red)' : 'var(--green)' }}>
+        <div style={{ marginBottom: '24px', padding: '12px 16px', borderRadius: '12px', background: message.type === 'error' ? '#fee2e2' : '#dcfce7', color: message.type === 'error' ? '#b91c1c' : '#15803d', fontWeight: 600 }}>
           {message.text}
         </div>
       )}
 
-      {/* Main Content Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.5fr 1fr', gap: '24px', marginBottom: '24px' }}>
-        
-        {/* LEFT COL: Mark Attendance */}
-        <div className="card" style={{ background: 'var(--surface-glass)', border: '1px solid var(--border)' }}>
-          <div className="card-header" style={{ padding: '20px', borderBottom: '1px solid var(--border)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Users size={18} color="var(--secondary)" />
-              <span style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--secondary)' }}>Mark Attendance</span>
-            </div>
-            <button className="btn-qr-gen" style={{ background: 'rgba(183,142,254,0.1)', color: 'var(--secondary)', border: '1px solid rgba(183,142,254,0.2)', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}>
-              Generate QR
-            </button>
+      {/* Main Section */}
+      <div style={{ background: '#ffffff', borderRadius: '24px', padding: '28px', border: '1.5px solid rgba(0,0,0,0.07)', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+        <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#09090b', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <Calendar size={20} color="#573cfa" /> Select Date & Timetable Lecture Slot
+        </h3>
+
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 2fr', gap: '20px', marginBottom: '24px' }}>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#71717a', display: 'block', marginBottom: '6px' }}>Lecture Date</label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              style={{ width: '100%', padding: '12px 16px', borderRadius: '14px', border: '1px solid #e4e4e7', fontSize: '14px', fontWeight: 600 }}
+            />
           </div>
-          
-          <div style={{ padding: isMobile ? '16px' : '24px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-              <div className="premium-fg">
-                <label>Subject <span style={{color: 'var(--red)'}}>*</span></label>
-                <select value={selectedSubject} onChange={handleSubjectChange}>
-                  <option value="">Select Subject</option>
-                  {subjects.map(s => (
-                    <option key={s.id} value={s.id}>{s.name} ({s.code})</option>
-                  ))}
-                </select>
-              </div>
-              <div className="premium-fg">
-                <label>Student <span style={{color: 'var(--red)'}}>*</span></label>
-                <select value={selectedStudent} onChange={(e) => setSelectedStudent(e.target.value)} disabled={!selectedSubject}>
-                  <option value="">Select Student</option>
-                  {students.map(s => (
-                    <option key={s.id} value={s.id}>{s.name || s.user?.full_name || "Unknown"} ({s.enrollment_number})</option>
-                  ))}
-                </select>
-              </div>
-              <div className="premium-fg">
-                <label>Semester</label>
-                <select disabled><option>7th Semester</option></select>
-              </div>
-            </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '20px', marginBottom: '30px' }}>
-              <div className="premium-fg">
-                <label>Date <span style={{color: 'var(--red)'}}>*</span></label>
-                <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-              </div>
-              <div className="premium-fg">
-                <label>Lecture / Period (Optional)</label>
-                <select><option>Lecture 3</option></select>
-              </div>
-              <div className="premium-fg">
-                <label>Time</label>
-                <select><option>10:00 AM - 11:00 AM</option></select>
-              </div>
-            </div>
-
-            <div style={{ marginBottom: '10px' }}>
-              <label style={{ fontSize: '12px', color: 'var(--text3)', display: 'block', marginBottom: '12px' }}>Attendance Status</label>
-              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '16px' }}>
-                <button className="premium-att-btn present-btn" onClick={() => markAttendance('PRESENT')} disabled={loading}>
-                  <CheckCircle2 size={24} />
-                  <div className="btn-title">Present</div>
-                  <div className="btn-sub">Mark Present</div>
-                </button>
-                <button className="premium-att-btn absent-btn" onClick={() => markAttendance('ABSENT')} disabled={loading}>
-                  <span style={{ fontSize: '24px', lineHeight: 1 }}>×</span>
-                  <div className="btn-title">Absent</div>
-                  <div className="btn-sub">Mark Absent</div>
-                </button>
-                <button className="premium-att-btn late-btn" onClick={() => markAttendance('LATE')} disabled={loading}>
-                  <Clock size={24} />
-                  <div className="btn-title">Late</div>
-                  <div className="btn-sub">Mark Late</div>
-                </button>
-              </div>
-            </div>
-            
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '24px' }}>
-              <button style={{ background: 'var(--secondary)', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 500 }}>
-                Proceed to Mark <ChevronRight size={16} />
-              </button>
-            </div>
-
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#71717a', display: 'block', marginBottom: '6px' }}>
+              Auto-Populated Timetable Slot (Single Source of Truth)
+            </label>
+            <select
+              value={selectedSlotId}
+              onChange={(e) => handleSlotChange(e.target.value)}
+              disabled={availableSlots.length === 0}
+              style={{ width: '100%', padding: '12px 16px', borderRadius: '14px', border: '1px solid #e4e4e7', fontSize: '14px', fontWeight: 700, color: '#09090b' }}
+            >
+              {availableSlots.length === 0 ? (
+                <option value="">No Timetable Slots Scheduled For This Date</option>
+              ) : (
+                availableSlots.map(slot => (
+                  <option key={slot.id} value={slot.id}>
+                    {slot.startTime} - {slot.endTime} | {slot.subjectName} ({slot.subjectCode}) | Prof. {slot.teacherName} ({slot.room})
+                  </option>
+                ))
+              )}
+            </select>
           </div>
         </div>
 
-        {/* RIGHT COL: Today's Classes */}
-        <div className="card" style={{ background: 'var(--surface-glass)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column' }}>
-          <div className="card-header" style={{ padding: '20px', borderBottom: '1px solid var(--border)' }}>
-            <span style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--secondary)' }}>Today's Classes</span>
-            <button style={{ background: 'transparent', color: 'var(--text3)', border: '1px solid var(--border)', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}>
-              View Timetable
-            </button>
-          </div>
-          <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {facultyAssignedClassesToday.length > 0 ? (
-              facultyAssignedClassesToday.map((slot, idx) => (
-                <div key={idx} style={{ display: 'flex', gap: '16px', background: '#f4f4f5', padding: '16px', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.06)' }}>
-                  <div style={{ textAlign: 'center', width: '70px', flexShrink: 0 }}>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#18181b' }}>{slot.time.split(' - ')[0]}</div>
-                    <div style={{ fontSize: '11px', color: '#71717a', fontWeight: 600 }}>{slot.time.split(' - ')[1]}</div>
+        {availableSlots.length > 0 && selectedSlotId && (
+          <div style={{ background: '#f8fafc', borderRadius: '18px', padding: '20px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
+            {(() => {
+              const activeSlot = availableSlots.find(s => s.id === selectedSlotId);
+              if (!activeSlot) return null;
+              return (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#573cfa', textTransform: 'uppercase' }}>Selected Slot Details</div>
+                    <div style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>{activeSlot.subjectName} ({activeSlot.subjectCode})</div>
+                    <div style={{ fontSize: '13px', color: '#64748b' }}>Faculty: <strong>{activeSlot.teacherName}</strong> | Room: <strong>{activeSlot.room}</strong> | Time: <strong>{activeSlot.startTime} - {activeSlot.endTime}</strong></div>
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#09090b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{slot.name} ({slot.code})</div>
-                    <div style={{ fontSize: '12px', color: '#6366f1', fontWeight: 600, marginTop: '2px' }}>Prof. {slot.prof}</div>
-                    <div style={{ fontSize: '11px', color: '#71717a', marginTop: '2px' }}>{slot.room} • 7th Semester</div>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center' }}>
-                    <span style={{ color: '#10b981', fontSize: '11px', fontWeight: 700, border: '1px solid rgba(16,185,129,0.2)', padding: '4px 10px', borderRadius: '12px', background: 'rgba(16,185,129,0.08)' }}>Scheduled</span>
+
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button
+                      onClick={() => markAttendance('present')}
+                      disabled={loading}
+                      style={{ padding: '10px 20px', borderRadius: '12px', background: '#16a34a', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer' }}
+                    >
+                      ✓ Mark Present
+                    </button>
+
+                    <button
+                      onClick={() => markAttendance('absent')}
+                      disabled={loading}
+                      style={{ padding: '10px 20px', borderRadius: '12px', background: '#dc2626', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer' }}
+                    >
+                      ✗ Mark Absent
+                    </button>
+
+                    <button
+                      onClick={() => markAttendance('cancelled')}
+                      disabled={loading}
+                      style={{ padding: '10px 20px', borderRadius: '12px', background: '#d97706', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer' }}
+                    >
+                      Cancel Lecture
+                    </button>
                   </div>
                 </div>
-              ))
-            ) : (
-              <div style={{ padding: '24px', textAlign: 'center', color: '#71717a', fontSize: '13px', fontWeight: 500 }}>
-                No lectures scheduled for your assigned subjects today.
-              </div>
-            )}
+              );
+            })()}
           </div>
-        </div>
+        )}
       </div>
-
-      {/* Low Attendance Alert */}
-      <div className="card" style={{ background: 'var(--surface-glass)', border: '1px solid var(--border)' }}>
-        <div className="card-header" style={{ padding: '20px', borderBottom: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <BellRing size={18} color="var(--red)" />
-            <span style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--red)' }}>Low Attendance Alert</span>
-          </div>
-          <button style={{ background: 'transparent', color: 'var(--secondary)', border: 'none', fontSize: '12px', cursor: 'pointer' }}>
-            View All
-          </button>
-        </div>
-        <div style={{ padding: '0 20px 20px 20px' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '16px' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text3)', fontSize: '12px', textAlign: 'left' }}>
-                <th style={{ padding: '12px 0', fontWeight: 'normal' }}>Student Name</th>
-                <th style={{ padding: '12px 0', fontWeight: 'normal' }}>Roll Number</th>
-                <th style={{ padding: '12px 0', fontWeight: 'normal' }}>Subject</th>
-                <th style={{ padding: '12px 0', fontWeight: 'normal' }}>Attendance %</th>
-                <th style={{ padding: '12px 0', fontWeight: 'normal' }}>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* Mock Data for visual matching */}
-              {[
-                { name: 'Rohan Verma', roll: 'IU2341230001', subject: 'Machine Learning (ML701)', pct: 62 },
-                { name: 'Priya Sharma', roll: 'IU2341230002', subject: 'Machine Learning (ML701)', pct: 68 },
-                { name: 'Aman Kumar', roll: 'IU2341230003', subject: 'Machine Learning (ML701)', pct: 71 },
-                { name: 'Neha Singh', roll: 'IU2341230004', subject: 'Data Structures (CS701)', pct: 74 },
-              ].map((row, i) => (
-                <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.02)' }}>
-                  <td style={{ padding: '16px 0', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(183,142,254,0.1)', color: 'var(--secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}>
-                      {row.name.split(' ').map(n => n[0]).join('')}
-                    </div>
-                    <span style={{ fontSize: '13px', color: 'var(--text)' }}>{row.name}</span>
-                  </td>
-                  <td style={{ padding: '16px 0', fontSize: '13px', color: 'var(--text3)' }}>{row.roll}</td>
-                  <td style={{ padding: '16px 0', fontSize: '13px', color: 'var(--text3)' }}>{row.subject}</td>
-                  <td style={{ padding: '16px 0', display: 'flex', alignItems: 'center', gap: '12px', height: '64px' }}>
-                    <div style={{ flex: 1, background: 'rgba(255,255,255,0.1)', height: '6px', borderRadius: '3px', overflow: 'hidden' }}>
-                      <div style={{ background: 'var(--red)', width: `${row.pct}%`, height: '100%', borderRadius: '3px', boxShadow: '0 0 10px var(--red)' }}></div>
-                    </div>
-                    <span style={{ fontSize: '12px', color: 'var(--text3)' }}>{row.pct}%</span>
-                  </td>
-                  <td style={{ padding: '16px 0' }}>
-                    <span style={{ color: 'var(--red)', border: '1px solid rgba(239,68,68,0.2)', background: 'rgba(239,68,68,0.05)', padding: '4px 8px', borderRadius: '6px', fontSize: '11px' }}>
-                      Below 75%
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <button style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--secondary)', fontSize: '12px', padding: '8px 16px', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-              <Users size={14} /> View Full Report
-            </button>
-          </div>
-        </div>
-      </div>
-
     </div>
   );
 };

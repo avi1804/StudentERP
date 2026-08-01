@@ -2,11 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { apiClient as api } from '../../api/axios';
 import { UserCircle, GraduationCap, Building2, Library, TrendingUp, Search, CheckCircle2, XCircle } from 'lucide-react';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { useAuthStore } from '../../store/authStore';
+import { TimetableAttendanceService, FACULTY_TEACHER_MAP } from '../../services/timetableAttendanceService';
 
 export const AttendanceReport: React.FC = () => {
   const { isMobile } = useIsMobile();
+  const { user } = useAuthStore();
   const [subjects, setSubjects] = useState<any[]>([]);
   const [allStudents, setAllStudents] = useState<any[]>([]);
+
+  // Resolve the logged-in faculty's teacher ID
+  const facultyUserId = user?.id || 0;
+  const myTeacherId = FACULTY_TEACHER_MAP[facultyUserId] || facultyUserId;
+  const myAssignedSubjects = TimetableAttendanceService.getAssignedSubjectsForTeacher(myTeacherId);
   
   const [reportStudent, setReportStudent] = useState('');
   const [reportSubject, setReportSubject] = useState('');
@@ -32,9 +40,11 @@ export const AttendanceReport: React.FC = () => {
   const fetchMySubjects = async () => {
     try {
       const res = await api.get('/faculty-dash/my-subjects');
-      setSubjects(res.data);
-    } catch (error) {
-      console.error(error);
+      const filtered = res.data.filter((s: any) => myAssignedSubjects.some(a => a.subjectId === s.id));
+      setSubjects(filtered.length > 0 ? filtered : res.data);
+    } catch {
+      // Fallback: only assigned subjects from timetable
+      setSubjects(myAssignedSubjects.map(s => ({ id: s.subjectId, name: s.subjectName, code: s.subjectCode })));
     }
   };
 

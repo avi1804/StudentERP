@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import TextType from "../../components/TextType";
+import { TimetableAttendanceService } from "../../services/timetableAttendanceService";
 
 /* ── Interactive Real-Time Calendar Component with Circular Badges & Surprising UX ── */
 function InteractiveCalendar() {
@@ -557,7 +558,7 @@ export function StudentHome() {
     cgpa: number;
   }>({
     enrollment_number: 'ENR20260481',
-    attendance_rate: 87,
+    attendance_rate: 0,
     total_classes: 0,
     present_classes: 0,
     cgpa: 8.4,
@@ -584,19 +585,27 @@ export function StudentHome() {
     }
 
     // Fetch real-time KPI data
+    const ttStats = TimetableAttendanceService.getAttendanceStats();
     api.get('/student-dash/dashboard')
       .then(res => {
         if (res.data) {
           setDashData({
             enrollment_number: res.data.enrollment_number || 'ENR20260481',
-            attendance_rate: res.data.attendance_rate ?? 87,
-            total_classes: res.data.total_classes ?? 0,
-            present_classes: res.data.present_classes ?? 0,
+            attendance_rate: ttStats.overallPercentage,
+            total_classes: ttStats.totalDelivered,
+            present_classes: ttStats.totalAttended,
             cgpa: res.data.cgpa ?? 8.4,
           });
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        setDashData(prev => ({
+          ...prev,
+          attendance_rate: ttStats.overallPercentage,
+          total_classes: ttStats.totalDelivered,
+          present_classes: ttStats.totalAttended,
+        }));
+      });
 
     // Fetch real-time student complaints
     api.get('/complaints/kpi')

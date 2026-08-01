@@ -131,7 +131,7 @@ export function FacultyLayout() {
   const navbarRef = useRef<HTMLDivElement>(null);
   const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const { user, logout } = useAuthStore();
+  const { user, setUser, logout } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -141,9 +141,12 @@ export function FacultyLayout() {
     api.get('/faculty-dash/dashboard').then(res => {
       if (res.data?.name) {
         setTeacherName(res.data.name);
+        if (user && user.full_name !== res.data.name) {
+          setUser({ ...user, full_name: res.data.name });
+        }
       }
     }).catch(console.error);
-  }, [user]);
+  }, [user, setUser]);
 
   const notificationsList = [
     { id: 1, type: 'Academic', badge: 'MARKS', title: 'Mid-Sem Marks Submission Deadline', subtitle: 'Submit 7th Sem marks before Friday 5 PM', time: '30m ago' },

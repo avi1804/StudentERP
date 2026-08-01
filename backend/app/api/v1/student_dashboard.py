@@ -48,7 +48,7 @@ async def get_dashboard(
         Attendance.status.in_(["PRESENT", "LATE"])
     )) or 0
     
-    attendance_rate = (present_classes / total_classes * 100) if total_classes > 0 else 86.7
+    attendance_rate = round(present_classes / total_classes * 100, 1) if total_classes > 0 else 0.0
     
     # Calculate real-time CGPA from student marks
     marks_records = (await db.scalars(select(Marks).where(Marks.student_id == student.id))).all()
@@ -211,14 +211,14 @@ async def get_attendance(
 
         if total_classes > 0:
             pct = round(((present + late) / total_classes) * 100, 1)
+            remark = "Good" if pct >= 80 else "Average" if pct >= 65 else "Low"
         else:
-            total_classes = 30
-            present = 26
-            absent = 4
+            total_classes = 0
+            present = 0
+            absent = 0
             late = 0
-            pct = 86.7
-
-        remark = "Good" if pct >= 80 else "Average" if pct >= 65 else "Low"
+            pct = 0.0
+            remark = "N/A"
 
         result.append({
             "subjectId": sub.id,

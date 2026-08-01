@@ -11,12 +11,15 @@ import { useIsMobile } from "../../hooks/useIsMobile";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { motion } from "framer-motion";
 import TextType from "../../components/TextType";
+import { TimetableAttendanceService } from "../../services/timetableAttendanceService";
 
 export function MySubjects() {
   const { isMobile } = useIsMobile();
   const [data, setData] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSemester, setSelectedSemester] = useState<number>(7);
+
+  const stats = TimetableAttendanceService.getAttendanceStats();
 
   useEffect(() => {
     setLoading(true);
@@ -35,12 +38,11 @@ export function MySubjects() {
   ];
 
   const defaultSubjects = [
-    { code: "CS701", name: "Operating Systems", credits: 4, professor: "Dr. Mehul Shah", grade: "A+", icon: Monitor, colorType: "purple" },
-    { code: "CS702", name: "Database Management Systems", credits: 4, professor: "Prof. Kinjal Patel", grade: "A+", icon: Database, colorType: "green" },
-    { code: "CS703", name: "Computer Networks", credits: 4, professor: "Prof. Jigar Sheth", grade: "A", icon: Network, colorType: "yellow" },
-    { code: "CS704", name: "Software Engineering", credits: 4, professor: "Dr. Nirav Bhatt", grade: "A+", icon: Code2, colorType: "blue" },
-    { code: "CS705", name: "Machine Learning", credits: 4, professor: "Prof. Rutvik Shah", grade: "A", icon: Brain, colorType: "pink" },
-    { code: "CS706", name: "Elective - Data Science", credits: 4, professor: "Prof. Deeksha Joshi", grade: "A", icon: BarChart2, colorType: "teal" }
+    { code: "CS01", name: "Software Group Project", credits: 4, professor: "Parth Nirmal", grade: "A+", icon: Code2, colorType: "purple", subjectId: 1 },
+    { code: "CS02", name: "Machine Learning", credits: 4, professor: "Babita Patel", grade: "A+", icon: Brain, colorType: "green", subjectId: 2 },
+    { code: "CS03", name: "NLP", credits: 4, professor: "Ashwin Patni", grade: "A", icon: Network, colorType: "yellow", subjectId: 3 },
+    { code: "CS04", name: "Cloud Computing", credits: 4, professor: "Vrushali", grade: "A+", icon: Monitor, colorType: "blue", subjectId: 4 },
+    { code: "CS05", name: "Flat", credits: 4, professor: "Dipali Jeetya", grade: "A", icon: Database, colorType: "pink", subjectId: 5 },
   ];
 
   const subjectsList = data.length > 0 ? data : defaultSubjects;
@@ -68,7 +70,7 @@ export function MySubjects() {
 
   return (
     <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto' }}>
-      {/* ── Header with Animated Highlighted Text Badge (Matching Dashboard & Attendance) ── */}
+      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
         <div>
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
@@ -120,7 +122,7 @@ export function MySubjects() {
         </div>
       </div>
 
-      {/* ── Real-Time KPI Cards Row (AutoML Studio design matching Dashboard & Attendance) ── */}
+      {/* KPI Cards Row */}
       <motion.div
         initial="hidden"
         animate="show"
@@ -129,7 +131,7 @@ export function MySubjects() {
       >
         {/* KPI 1 — Total Subjects */}
         <motion.div
-          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
           style={{
             background: '#f4f4f5',
             border: '1.5px solid rgba(0,0,0,0.07)',
@@ -149,7 +151,7 @@ export function MySubjects() {
               </div>
               <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Subjects</span>
             </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <ArrowUpRight size={15} color="#18181b" />
             </div>
           </div>
@@ -165,7 +167,7 @@ export function MySubjects() {
 
         {/* KPI 2 — Total Credits */}
         <motion.div
-          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
           style={{
             background: '#f4f4f5',
             border: '1.5px solid rgba(0,0,0,0.07)',
@@ -185,7 +187,7 @@ export function MySubjects() {
               </div>
               <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Credits</span>
             </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <ArrowUpRight size={15} color="#18181b" />
             </div>
           </div>
@@ -201,7 +203,7 @@ export function MySubjects() {
 
         {/* KPI 3 — Completed Subjects */}
         <motion.div
-          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
+          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
           style={{
             background: '#f4f4f5',
             border: '1.5px solid rgba(0,0,0,0.07)',
@@ -221,7 +223,7 @@ export function MySubjects() {
               </div>
               <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Completed Subjects</span>
             </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <ArrowUpRight size={15} color="#18181b" />
             </div>
           </div>
@@ -236,30 +238,38 @@ export function MySubjects() {
         </motion.div>
       </motion.div>
 
-      {/* Subjects Grid */}
+      {/* Subjects Grid with Timetable-Synced Attendance % */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
         {loading ? (
            <div style={{ padding: '20px', color: '#6b7280' }}>Loading subjects...</div>
         ) : (
-          subjectsList.map((sub, i) => {
+          subjectsList.map((sub: any, i: number) => {
             const colors = getColorStyles(sub.colorType || "purple");
             const IconComp = sub.icon || BookOpen;
-            
+
+            // Match attendance stats for this subject
+            const matchingStat = stats.subjects.find(s => s.subjectId === sub.id || s.subjectCode === sub.code);
+            const attPct = matchingStat ? matchingStat.percentage : 0;
+
             return (
               <div key={i} style={{ padding: '20px', background: 'white', borderRadius: '16px', border: '1px solid #f3f4f6', display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
                 <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: colors.bg, color: colors.text, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <IconComp size={24} />
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#9ca3af', marginBottom: '4px' }}>{sub.code}</div>
-                  <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#111827', marginBottom: '12px' }}>{sub.name}</div>
-                  <div style={{ fontSize: '12px', color: '#6b7280' }}>{sub.credits} Credits &bull; {sub.professor}</div>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between', height: '100%' }}>
-                  <span style={{ padding: '4px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', background: colors.bg, color: colors.text }}>{sub.grade}</span>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', cursor: 'pointer', marginTop: 'auto' }}>
-                    <ChevronRight size={16} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 600, color: '#9ca3af' }}>{sub.code}</span>
+                    <span style={{
+                      fontSize: '11px', fontWeight: 700,
+                      color: attPct >= 75 ? '#16a34a' : '#d97706',
+                      background: attPct >= 75 ? '#dcfce7' : '#fef3c7',
+                      padding: '2px 8px', borderRadius: '8px'
+                    }}>
+                      {attPct}% Attended
+                    </span>
                   </div>
+                  <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#111827', marginBottom: '12px' }}>{sub.name}</div>
+                  <div style={{ fontSize: '12px', color: '#6b7280' }}>{sub.credits || 4} Credits &bull; {sub.professor || sub.faculty}</div>
                 </div>
               </div>
             );
@@ -267,9 +277,7 @@ export function MySubjects() {
         )}
       </div>
 
-
-
-      {/* ── 50-50 Split: Subject Overview | Credits Summary (Modern UI/UX Design) ── */}
+      {/* 50-50 Split: Subject Overview | Credits Summary */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '28px', alignItems: 'stretch' }}>
         
         {/* Subject Overview Card */}
@@ -283,13 +291,12 @@ export function MySubjects() {
           flexDirection: 'column',
           justifyContent: 'space-between',
         }}>
-          {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: 'rgba(87,60,250,0.08)', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <BookOpen size={20} color="#573cfa" strokeWidth={2} />
               </div>
-              <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#09090b', margin: 0, letterSpacing: '-0.3px' }}>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#09090b', margin: 0 }}>
                 Subject Overview
               </h3>
             </div>
@@ -298,8 +305,7 @@ export function MySubjects() {
             </span>
           </div>
 
-          {/* Donut Chart & Legend Row */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: 1, marginY: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: 1, margin: '12px 0' }}>
             <div style={{ width: '150px', height: '150px', position: 'relative', flexShrink: 0 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -329,7 +335,6 @@ export function MySubjects() {
             </div>
           </div>
 
-          {/* Footer Note */}
           <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '16px', borderTop: '1px solid #f4f4f5' }}>
             <CalendarDays size={14} color="#573cfa" /> All {totalSubjects} subjects actively tracked for Semester 7
           </div>
@@ -346,13 +351,12 @@ export function MySubjects() {
           flexDirection: 'column',
           justifyContent: 'space-between',
         }}>
-          {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Award size={20} color="#22c55e" strokeWidth={2} />
               </div>
-              <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#09090b', margin: 0, letterSpacing: '-0.3px' }}>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#09090b', margin: 0 }}>
                 Credits Summary
               </h3>
             </div>
@@ -361,8 +365,7 @@ export function MySubjects() {
             </span>
           </div>
 
-          {/* Semi-Circle Progress Gauge */}
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginY: '8px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '8px 0' }}>
             <div style={{ position: 'relative', width: '220px', height: '110px' }}>
               <svg viewBox="0 0 200 100" style={{ width: '100%', height: '100%' }}>
                 <defs>
@@ -371,9 +374,7 @@ export function MySubjects() {
                     <stop offset="100%" stopColor="#10b981" />
                   </linearGradient>
                 </defs>
-                {/* Background Track Arc */}
                 <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#f4f4f5" strokeWidth="18" strokeLinecap="round" />
-                {/* Active Progress Arc */}
                 <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#creditGradient)" strokeWidth="18" strokeLinecap="round" strokeDasharray="251.2" strokeDashoffset="0" />
               </svg>
               <div style={{ position: 'absolute', bottom: '0', left: 0, width: '100%', textAlign: 'center' }}>
@@ -385,7 +386,6 @@ export function MySubjects() {
             </div>
           </div>
 
-          {/* Registered vs Completed Stats Row */}
           <div style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
             <div style={{ flex: 1, background: '#f4f4f5', padding: '14px 18px', borderRadius: '18px', border: '1px solid rgba(0,0,0,0.03)', textAlign: 'center' }}>
               <div style={{ fontSize: '20px', fontWeight: 800, color: '#573cfa' }}>{totalCredits}</div>

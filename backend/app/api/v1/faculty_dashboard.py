@@ -152,6 +152,14 @@ async def mark_attendance(
     
     parsed_date = datetime.strptime(req.date, "%Y-%m-%d").date()
     
+    # Ensure date maps to a valid timetable weekday (Monday-Friday)
+    weekday_name = parsed_date.strftime("%A").lower()
+    if weekday_name in ["saturday", "sunday"]:
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot mark attendance on weekends. Timetable has no scheduled lectures for this date."
+        )
+    
     # Check if attendance already exists for today
     existing = await db.scalar(
         select(Attendance).where(
