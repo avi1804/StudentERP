@@ -29,6 +29,8 @@ export function FacultySidebar() {
     { to: "/faculty/assignments", label: "Assignments", icon: ClipboardList },
     { to: "/faculty/marks", label: "Enter Marks", icon: BookOpen },
     { to: "/faculty/results", label: "View Results", icon: BarChart2 },
+    { to: "/faculty/assign-substitute", label: "Assign Substitute", icon: User },
+    { to: "/faculty/events", label: "Events", icon: BookOpen },
   ];
 
   return (

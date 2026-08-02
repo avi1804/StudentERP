@@ -90,6 +90,8 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Add Faculty", icon: UserPlus, path: "/admin/dashboard/faculty/add" },
   { label: "Add Subject", icon: BookOpen, path: "/admin/dashboard/subject/add" },
   { label: "Post Notice", icon: Megaphone, path: "/admin/dashboard/notify/student" },
+  { isCategory: true, label: "CAMPUS LIFE" },
+  { label: "College Events", icon: BookMarked, path: "/admin/dashboard/events" },
   { isCategory: true, label: "FINANCE" },
   { label: "Fee Dashboard", icon: Wallet, path: "/admin/dashboard/fees" },
   { label: "Fee Structure", icon: FileText, path: "/admin/dashboard/fees/structures" },

@@ -6,7 +6,10 @@ import { motion } from 'framer-motion';
 import TextType from '../../components/TextType';
 import { TimetableAttendanceService, resolveTeacherIdByName } from '../../services/timetableAttendanceService';
 import type { LectureInstance } from '../../services/timetableAttendanceService';
+import { qrAttendanceService } from '../../services/qrAttendanceService';
+import { substituteService, type MySubstituteAssignment } from '../../services/substituteService';
 import { useAuthStore } from '../../store/authStore';
+import QRCode from 'react-qr-code';
 
 export const AttendanceManager: React.FC = () => {
   const { isMobile } = useIsMobile();
@@ -15,7 +18,7 @@ export const AttendanceManager: React.FC = () => {
   const [students, setStudents] = useState<any[]>([]);
 
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [availableSlots, setAvailableSlots] = useState<LectureInstance[]>([]);
+  const [availableSlots, setAvailableSlots] = useState<(LectureInstance & { isSubstitute?: boolean })[]>([]);
   const [selectedSlotId, setSelectedSlotId] = useState<string>('');
 
   const [selectedSubject, setSelectedSubject] = useState('');
@@ -23,6 +26,12 @@ export const AttendanceManager: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
+  
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [qrToken, setQrToken] = useState('');
+  const [qrExpiresAt, setQrExpiresAt] = useState<Date | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [qrStudentCount, setQrStudentCount] = useState(0);
 
   // Resolve the logged-in faculty's teacher ID by matching their name
   const facultyName = user?.full_name || '';
@@ -50,18 +59,107 @@ export const AttendanceManager: React.FC = () => {
     fetchStudents();
   }, [activeTeacherId]);
 
-  useEffect(() => {
-    // Whenever date or active teacher changes, load auto-generated timetable slots for that date
-    // FILTERED to only the active faculty's assigned subjects
-    const slots = TimetableAttendanceService.getLectureInstancesForDateByTeacher(date, activeTeacherId);
-    setAvailableSlots(slots);
-    if (slots.length > 0) {
-      setSelectedSlotId(slots[0].id);
-      setSelectedSubject(String(slots[0].subjectId));
-    } else {
-      setSelectedSlotId('');
-      setSelectedSubject('');
+  const markAttendance = async (status: 'present' | 'absent' | 'cancelled') => {
+    if (!selectedSlotId || !date) {
+      setMessage({ text: 'Please select a valid Timetable slot and date.', type: 'error' });
+      return;
     }
+
+    const currentSlot = availableSlots.find(s => s.id === selectedSlotId);
+    if (!currentSlot) {
+      setMessage({ text: 'Selected slot does not exist in Timetable.', type: 'error' });
+      return;
+    }
+
+    if (!selectedStudent && status !== 'cancelled') {
+      setMessage({ text: 'Please select a student.', type: 'error' });
+      return;
+    }
+
+    if (currentSlot.isSubstitute) {
+      try {
+        await substituteService.markAttendance(currentSlot.id, status);
+      } catch (error) {
+        console.error("Failed to log substitute audit", error);
+        // Continue to mark it locally so the UI updates
+      }
+    }
+
+    if (status === 'cancelled') {
+      TimetableAttendanceService.markAttendance(
+        currentSlot.id,
+        currentSlot.date,
+        currentSlot.subjectId,
+        currentSlot.subjectCode,
+        'cancelled'
+      );
+      setMessage({ text: 'Lecture cancelled successfully for all students.', type: 'success' });
+    } else {
+      TimetableAttendanceService.markAttendance(
+        currentSlot.id,
+        currentSlot.date,
+        currentSlot.subjectId,
+        currentSlot.subjectCode,
+        status
+      );
+      setMessage({ 
+        text: `Attendance marked as ${status.toUpperCase()} in ${currentSlot.subjectName}`, 
+        type: 'success' 
+      });
+    }
+
+    // Refresh slots to reflect cancellations
+    const baseSlots = TimetableAttendanceService.getLectureInstancesForDateByTeacher(date, activeTeacherId);
+    // Note: To keep the substitute slot in the list after marking, we just do a quick re-fetch or preserve it.
+    // For now, we will let the next re-render handle it correctly if they change dates.
+    setAvailableSlots(prev => prev.map(p => {
+      if (p.id === currentSlot.id && status === 'cancelled') return { ...p, status: 'cancelled' };
+      return p;
+    }));
+  };
+
+  useEffect(() => {
+    const fetchSlots = async () => {
+      // FILTERED to only the active faculty's assigned subjects
+      const baseSlots = TimetableAttendanceService.getLectureInstancesForDateByTeacher(date, activeTeacherId);
+      let combinedSlots: (LectureInstance & { isSubstitute?: boolean })[] = [...baseSlots];
+      
+      try {
+        const subs = await substituteService.getMyAssignments();
+        // Filter subs for current date
+        const todaysSubs = subs.filter(s => s.start_date === date);
+        
+        for (const sub of todaysSubs) {
+          // Construct a mock LectureInstance for the substitute class
+          // (Assuming the lecture_instance_id matches one in the MASTER_TIMETABLE)
+          const allInstancesForDate = TimetableAttendanceService.getLectureInstancesForDate(date);
+          const matchedInstance = allInstancesForDate.find(i => i.id === sub.lecture_instance_id);
+          
+          if (matchedInstance) {
+             // Only add if not already in list to prevent duplicates
+             if (!combinedSlots.some(s => s.id === matchedInstance.id)) {
+               combinedSlots.push({
+                 ...matchedInstance,
+                 isSubstitute: true
+               });
+             }
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch substitute assignments", err);
+      }
+
+      setAvailableSlots(combinedSlots);
+      if (combinedSlots.length > 0) {
+        setSelectedSlotId(combinedSlots[0].id);
+        setSelectedSubject(String(combinedSlots[0].subjectId));
+      } else {
+        setSelectedSlotId('');
+        setSelectedSubject('');
+      }
+    };
+    
+    fetchSlots();
   }, [date, activeTeacherId]);
 
   const fetchMySubjects = async () => {
@@ -98,41 +196,63 @@ export const AttendanceManager: React.FC = () => {
     }
   };
 
-  const markAttendance = (status: 'present' | 'absent' | 'cancelled') => {
-    if (!selectedSlotId || !date) {
-      setMessage({ text: 'Please select a valid Timetable slot and date.', type: 'error' });
-      return;
+  // QR Modal and Countdown Logic
+  useEffect(() => {
+    let timer: number;
+    if (showQRModal && qrExpiresAt) {
+      timer = setInterval(() => {
+        const now = new Date();
+        const diff = Math.floor((qrExpiresAt.getTime() - now.getTime()) / 1000);
+        if (diff <= 0) {
+          setTimeRemaining(0);
+          clearInterval(timer);
+        } else {
+          setTimeRemaining(diff);
+        }
+      }, 1000);
     }
+    return () => clearInterval(timer);
+  }, [showQRModal, qrExpiresAt]);
 
-    const currentSlot = availableSlots.find(s => s.id === selectedSlotId);
-    if (!currentSlot) {
-      setMessage({ text: 'Selected slot does not exist in Timetable.', type: 'error' });
-      return;
-    }
-
+  const handleGenerateQR = async () => {
+    if (!selectedSlotId) return;
     setLoading(true);
-    setMessage({ text: '', type: '' });
-
     try {
-      TimetableAttendanceService.markAttendance(
-        currentSlot.id,
-        currentSlot.date,
-        currentSlot.subjectId,
-        currentSlot.subjectCode,
-        status
-      );
-
-      setMessage({ text: `Attendance for ${currentSlot.subjectName} marked as ${status.toUpperCase()}!`, type: 'success' });
-      setStats(prev => ({
-        ...prev,
-        attendanceMarked: prev.attendanceMarked + 1,
-        pendingAttendance: Math.max(0, prev.pendingAttendance - 1)
-      }));
-    } catch (error: any) {
-      setMessage({ text: 'Failed to mark attendance', type: 'error' });
+      const res = await qrAttendanceService.generateQR(selectedSlotId);
+      setQrToken(res.token);
+      setQrExpiresAt(new Date(res.expires_at));
+      setTimeRemaining(60);
+      setQrStudentCount(0); // Reset count on new QR
+      setShowQRModal(true);
+    } catch (err: any) {
+      setMessage({ text: err.response?.data?.detail || 'Failed to generate QR', type: 'error' });
     } finally {
       setLoading(false);
     }
+  };
+
+  // Poll stats when QR modal is open
+  useEffect(() => {
+    let interval: number;
+    if (showQRModal && selectedSlotId) {
+      interval = setInterval(async () => {
+        try {
+          const stats = await qrAttendanceService.getStats(selectedSlotId);
+          setQrStudentCount(stats.scanned_count);
+        } catch (e) {
+          console.error('Failed to fetch QR stats', e);
+        }
+      }, 2000);
+    }
+    return () => clearInterval(interval);
+  }, [showQRModal, selectedSlotId]);
+
+  // Check if slot is currently live
+  const isSlotLive = (slot: LectureInstance) => {
+    if (slot.date !== new Date().toISOString().split('T')[0]) return false;
+    // VERY BASIC check for demo purposes, assume true if date matches. 
+    // In a real app we'd parse time properly. 
+    return true; 
   };
 
   return (
@@ -265,11 +385,11 @@ export const AttendanceManager: React.FC = () => {
               style={{ width: '100%', padding: '12px 16px', borderRadius: '14px', border: '1px solid #e4e4e7', fontSize: '14px', fontWeight: 700, color: '#09090b' }}
             >
               {availableSlots.length === 0 ? (
-                <option value="">No Timetable Slots Scheduled For This Date</option>
+                <option value="" disabled>No scheduled classes found</option>
               ) : (
                 availableSlots.map(slot => (
                   <option key={slot.id} value={slot.id}>
-                    {slot.startTime} - {slot.endTime} | {slot.subjectName} ({slot.subjectCode}) | Prof. {slot.teacherName} ({slot.room})
+                    {slot.startTime} - {slot.endTime} | {slot.subjectName} ({slot.room}) {slot.isSubstitute ? '[SUBSTITUTE]' : ''} {slot.status === 'cancelled' ? '[CANCELLED]' : ''}
                   </option>
                 ))
               )}
@@ -291,6 +411,14 @@ export const AttendanceManager: React.FC = () => {
                   </div>
 
                   <div style={{ display: 'flex', gap: '10px' }}>
+                    <button
+                      onClick={handleGenerateQR}
+                      disabled={loading || !isSlotLive(activeSlot)}
+                      style={{ padding: '10px 20px', borderRadius: '12px', background: '#3b82f6', color: '#fff', border: 'none', fontWeight: 700, cursor: loading || !isSlotLive(activeSlot) ? 'not-allowed' : 'pointer', opacity: isSlotLive(activeSlot) ? 1 : 0.5 }}
+                    >
+                      Generate QR
+                    </button>
+
                     <button
                       onClick={() => markAttendance('present')}
                       disabled={loading}
@@ -321,6 +449,66 @@ export const AttendanceManager: React.FC = () => {
           </div>
         )}
       </div>
+      
+      {/* QR Code Modal */}
+      {showQRModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            style={{ background: '#ffffff', borderRadius: '24px', padding: '32px', width: '100%', maxWidth: '420px', boxShadow: '0 20px 40px rgba(0,0,0,0.2)', textAlign: 'center' }}
+          >
+            <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#09090b', margin: '0 0 8px 0' }}>Scan to Mark Attendance</h2>
+            <p style={{ fontSize: '14px', color: '#71717a', margin: '0 0 24px 0' }}>Students can scan this QR code using their app to instantly mark themselves present.</p>
+
+            <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '20px', display: 'inline-block', marginBottom: '24px', position: 'relative' }}>
+              {timeRemaining > 0 ? (
+                <QRCode value={JSON.stringify({ lectureInstanceId: selectedSlotId, token: qrToken })} size={240} style={{ display: 'block' }} />
+              ) : (
+                <div style={{ width: 240, height: 240, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', color: '#ef4444' }}>
+                  <XCircle size={48} style={{ marginBottom: '12px' }} />
+                  <div style={{ fontSize: '18px', fontWeight: 700 }}>QR Expired</div>
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', padding: '16px', background: '#f4f4f5', borderRadius: '16px' }}>
+              <div style={{ textAlign: 'left' }}>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase' }}>Students Scanned</div>
+                <div style={{ fontSize: '24px', fontWeight: 800, color: '#16a34a' }}>{qrStudentCount} <span style={{ fontSize: '14px', color: '#a1a1aa' }}>/ 30</span></div>
+              </div>
+              
+              <div style={{ position: 'relative', width: '56px', height: '56px' }}>
+                <svg viewBox="0 0 36 36" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e4e4e7" strokeWidth="4" />
+                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke={timeRemaining > 15 ? "#3b82f6" : "#ef4444"} strokeWidth="4" strokeDasharray={`${(timeRemaining / 60) * 100}, 100`} style={{ transition: 'stroke-dasharray 1s linear' }} />
+                </svg>
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 700, color: timeRemaining > 15 ? '#09090b' : '#ef4444' }}>
+                  {timeRemaining}s
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={() => setShowQRModal(false)}
+                style={{ flex: 1, padding: '14px', borderRadius: '14px', background: '#f4f4f5', color: '#09090b', border: 'none', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Close
+              </button>
+              {timeRemaining <= 0 && (
+                <button
+                  onClick={handleGenerateQR}
+                  disabled={loading}
+                  style={{ flex: 1, padding: '14px', borderRadius: '14px', background: '#3b82f6', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  Regenerate QR
+                </button>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };

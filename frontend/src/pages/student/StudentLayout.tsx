@@ -134,6 +134,7 @@ export function StudentLayout() {
     { name: "Attendance", path: "/dashboard/attendance", icon: CheckCircle },
     { name: "Subjects", path: "/dashboard/subjects", icon: BookOpen },
     { name: "Timetable", path: "/dashboard/timetable", icon: Calendar },
+    { name: "Events", path: "/dashboard/events", icon: Calendar },
     { name: "Exams & Marks", path: "/dashboard/results", icon: FileText },
     { name: "Assignments", path: "/dashboard/assignments", icon: ClipboardList },
     { name: "Placement Cell", path: "/dashboard/placement", icon: Briefcase },

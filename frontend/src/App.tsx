@@ -54,6 +54,7 @@ const AttendanceReport = React.lazy(() => import("./pages/faculty/AttendanceRepo
 const AssignmentManager = React.lazy(() => import("./pages/faculty/AssignmentManager").then(m => ({ default: m.AssignmentManager })));
 const MarksManager = React.lazy(() => import("./pages/faculty/MarksManager").then(m => ({ default: m.MarksManager })));
 const ResultCard = React.lazy(() => import("./pages/faculty/ResultCard").then(m => ({ default: m.ResultCard })));
+const AssignSubstitute = React.lazy(() => import("./pages/faculty/AssignSubstitute").then(m => ({ default: m.AssignSubstitute })));
 
 // Lazy Loaded Placement Admin Pages
 const PlacementLayout = React.lazy(() => import("./pages/placement-admin/PlacementLayout").then(m => ({ default: m.PlacementLayout })));
@@ -66,6 +67,12 @@ const Analytics = React.lazy(() => import("./pages/placement-admin/Analytics").t
 const Reports = React.lazy(() => import("./pages/placement-admin/Reports").then(m => ({ default: m.Reports })));
 const Notifications = React.lazy(() => import("./pages/placement-admin/Notifications").then(m => ({ default: m.Notifications })));
 const PlacementSettings = React.lazy(() => import("./pages/placement-admin/Settings").then(m => ({ default: m.PlacementSettings })));
+
+// Lazy Loaded Event Pages
+const AdminEvents = React.lazy(() => import("./pages/admin/AdminDashboard/AdminEvents").then(m => ({ default: m.AdminEvents })));
+const EventForm = React.lazy(() => import("./pages/admin/AdminDashboard/EventForm").then(m => ({ default: m.EventForm })));
+const EventsList = React.lazy(() => import("./pages/events/EventsList").then(m => ({ default: m.EventsList })));
+const EventDetail = React.lazy(() => import("./pages/events/EventDetail").then(m => ({ default: m.EventDetail })));
 
 // Loader Component
 const LoadingSpinner = () => (
@@ -101,6 +108,9 @@ function App() {
                 <Route path="students/add" element={<AddStudent />} />
                 <Route path="department/manage" element={<ManageDepartment />} />
                 <Route path="complaints" element={<ManageComplaints />} />
+                <Route path="events" element={<AdminEvents />} />
+                <Route path="events/add" element={<EventForm />} />
+                <Route path="events/edit/:id" element={<EventForm />} />
                 
                 {/* Fee Management Routes */}
                 <Route path="fees" element={<FeeDashboard />} />
@@ -125,6 +135,8 @@ function App() {
               <Route path="notices" element={<MyNotices />} />
               <Route path="fees" element={<MyFees />} />
               <Route path="profile" element={<MyProfile />} />
+              <Route path="events" element={<EventsList />} />
+              <Route path="events/detail/:id" element={<EventDetail />} />
             </Route>
             
             {/* Faculty Routes */}
@@ -136,6 +148,9 @@ function App() {
                 <Route path="assignments" element={<AssignmentManager />} />
                 <Route path="marks" element={<MarksManager />} />
                 <Route path="results" element={<ResultCard />} />
+                <Route path="events" element={<EventsList />} />
+                <Route path="events/detail/:id" element={<EventDetail />} />
+                <Route path="assign-substitute" element={<AssignSubstitute />} />
               </Route>
             </Route>
 

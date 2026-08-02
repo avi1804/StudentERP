@@ -13,8 +13,11 @@ import {
 } from "../../services/timetableAttendanceService";
 import type {
   SubjectAttendanceStat,
-  OverallAttendanceStats
+  OverallAttendanceStats,
+  LectureInstance
 } from "../../services/timetableAttendanceService";
+import { qrAttendanceService } from "../../services/qrAttendanceService";
+import { Html5QrcodeScanner } from 'html5-qrcode';
 
 // ── Mobile Progress Ring ──
 function ProgressRing({ percentage, size = 80, strokeWidth = 6 }: { percentage: number; size?: number; strokeWidth?: number }) {
@@ -564,6 +567,11 @@ export function MyAttendance() {
   const [stats, setStats] = useState<OverallAttendanceStats>(TimetableAttendanceService.getAttendanceStats());
   const [expandedSubjectId, setExpandedSubjectId] = useState<number | null>(null);
 
+  // QR Scan States
+  const [showScanner, setShowScanner] = useState(false);
+  const [scanMessage, setScanMessage] = useState({ text: '', type: '' });
+  const [isScanning, setIsScanning] = useState(false);
+
   const refreshStats = () => {
     setStats(TimetableAttendanceService.getAttendanceStats());
   };
@@ -577,6 +585,70 @@ export function MyAttendance() {
       window.removeEventListener('storage', handleUpdate);
     };
   }, []);
+
+  // Initialize QR Scanner when modal opens
+  React.useEffect(() => {
+    if (!showScanner) return;
+
+    const scanner = new Html5QrcodeScanner(
+      "qr-reader",
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      /* verbose= */ false
+    );
+
+    scanner.render(async (decodedText) => {
+      if (isScanning) return;
+      setIsScanning(true);
+      
+      try {
+        const data = JSON.parse(decodedText);
+        if (!data.lectureInstanceId || !data.token) throw new Error("Invalid QR code format.");
+        
+        scanner.pause(true);
+        const res = await qrAttendanceService.scanQR(data.lectureInstanceId, data.token);
+        
+        setScanMessage({ text: res.message, type: res.status === 'success' ? 'success' : 'info' });
+        
+        if (res.status === 'success') {
+          // Parse lecture instance id to get details for local store update
+          // format: inst_YYYY-MM-DD_tt_day_N
+          const parts = data.lectureInstanceId.split('_');
+          const dateStr = parts[1];
+          // We need to find the subjectId to properly mark attendance locally
+          const instances = TimetableAttendanceService.getLectureInstancesForDate(dateStr);
+          const currentInstance = instances.find(i => i.id === data.lectureInstanceId);
+          
+          if (currentInstance) {
+            TimetableAttendanceService.markAttendance(
+              currentInstance.id,
+              currentInstance.date,
+              currentInstance.subjectId,
+              currentInstance.subjectCode,
+              'present'
+            );
+          }
+          refreshStats();
+        }
+        
+        setTimeout(() => {
+          setShowScanner(false);
+          setIsScanning(false);
+          scanner.clear();
+        }, 2500);
+
+      } catch (err: any) {
+        setScanMessage({ text: err.response?.data?.detail || err.message || 'Failed to scan QR.', type: 'error' });
+        setTimeout(() => setIsScanning(false), 2000);
+        scanner.resume();
+      }
+    }, (error) => {
+      // ignore empty scan frames
+    });
+
+    return () => {
+      scanner.clear().catch(e => console.error("Failed to clear scanner", e));
+    };
+  }, [showScanner, isScanning]);
 
   // Mobile View
   if (isMobile) {
@@ -623,7 +695,42 @@ export function MyAttendance() {
             Timetable-synced attendance records • Semester 7 (August – December 2026)
           </div>
         </div>
+        <button
+          onClick={() => { setShowScanner(true); setScanMessage({text:'', type:''}); }}
+          style={{ padding: '12px 24px', borderRadius: '14px', background: '#3b82f6', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+        >
+          <Book size={18} /> Scan QR
+        </button>
       </div>
+
+      {/* Scanner Modal */}
+      {showScanner && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            style={{ background: '#ffffff', borderRadius: '24px', padding: '32px', width: '100%', maxWidth: '420px', boxShadow: '0 20px 40px rgba(0,0,0,0.2)', textAlign: 'center' }}
+          >
+            <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#09090b', margin: '0 0 8px 0' }}>Scan Attendance QR</h2>
+            <p style={{ fontSize: '14px', color: '#71717a', margin: '0 0 24px 0' }}>Point your camera at the QR code displayed by your faculty.</p>
+
+            <div id="qr-reader" style={{ width: '100%', borderRadius: '16px', overflow: 'hidden', marginBottom: '16px' }}></div>
+
+            {scanMessage.text && (
+              <div style={{ padding: '12px', borderRadius: '12px', marginBottom: '16px', fontWeight: 600, background: scanMessage.type === 'success' ? '#dcfce7' : scanMessage.type === 'error' ? '#fee2e2' : '#fef3c7', color: scanMessage.type === 'success' ? '#15803d' : scanMessage.type === 'error' ? '#b91c1c' : '#b45309' }}>
+                {scanMessage.text}
+              </div>
+            )}
+
+            <button
+              onClick={() => setShowScanner(false)}
+              style={{ width: '100%', padding: '14px', borderRadius: '14px', background: '#f4f4f5', color: '#09090b', border: 'none', fontWeight: 700, cursor: 'pointer' }}
+            >
+              Cancel
+            </button>
+          </motion.div>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <motion.div
