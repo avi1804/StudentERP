@@ -5,14 +5,13 @@ import {
   TrendingUp, Search, ChevronRight, Filter, BookOpen, XCircle
 } from 'lucide-react';
 import { useIsMobile } from '../../hooks/useIsMobile';
-import { useAuthStore } from '../../store/authStore';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { TimetableAttendanceService } from '../../services/timetableAttendanceService';
 import type { OverallAttendanceStats } from '../../services/timetableAttendanceService';
 
 export const AttendanceReport: React.FC = () => {
   const { isMobile } = useIsMobile();
-  const { user } = useAuthStore();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [allStudents, setAllStudents] = useState<any[]>([]);
 
   // Search & Filter State
@@ -25,6 +24,15 @@ export const AttendanceReport: React.FC = () => {
   const [reportLoading, setReportLoading] = useState(false);
   const [reportData, setReportData] = useState<OverallAttendanceStats | null>(null);
   const [message, setMessage] = useState({ text: '', type: '' });
+
+  async function fetchAllStudents() {
+    try {
+      const res = await api.get('/students/'); 
+      setAllStudents(res.data.items || res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     fetchAllStudents();
@@ -43,15 +51,6 @@ export const AttendanceReport: React.FC = () => {
     };
   }, [selectedStudentId]);
 
-  const fetchAllStudents = async () => {
-    try {
-      const res = await api.get('/students/'); 
-      setAllStudents(res.data.items || res.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const filteredStudents = useMemo(() => {
     return allStudents.filter(s => {
       const name = (s.name || s.user?.full_name || '').toLowerCase();
@@ -61,7 +60,7 @@ export const AttendanceReport: React.FC = () => {
       const matchesSearch = !query || name.includes(query) || enrollment.includes(query);
       
       // Default to CSE and Sem 7 if not set in DB for simple mapping
-      let sDept = 'Unknown';
+      let sDept;
       if (s.course_rel?.name) sDept = s.course_rel.name;
       else if (s.department && s.department.name) sDept = s.department.name;
       else if (typeof s.department === 'string') sDept = s.department;
@@ -87,7 +86,7 @@ export const AttendanceReport: React.FC = () => {
       try {
         const stats = TimetableAttendanceService.getAttendanceStats();
         setReportData(stats);
-      } catch (err) {
+      } catch {
         setMessage({ text: 'Failed to generate real-time report', type: 'error' });
       } finally {
         setReportLoading(false);
@@ -333,7 +332,7 @@ export const AttendanceReport: React.FC = () => {
                           </div>
                         </div>
                         
-                        <div style={{ width: '200px', padding: '0 24px', display: 'none', '@media(min-width: 768px)': { display: 'block' } } as any}>
+                        <div style={{ width: '200px', padding: '0 24px', display: isMobile ? 'none' : 'block' }}>
                            <div style={{ background: '#e4e4e7', height: '6px', borderRadius: '3px', overflow: 'hidden', width: '100%' }}>
                             <div style={{ background: r.percentage >= 75 ? '#22c55e' : r.percentage >= 60 ? '#f59e0b' : '#ef4444', width: `${r.percentage}%`, height: '100%', borderRadius: '3px' }}></div>
                           </div>

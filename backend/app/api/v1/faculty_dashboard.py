@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from datetime import datetime
 
 from app.dependencies.database import get_db
@@ -23,6 +23,20 @@ class MarkAttendanceRequest(BaseModel):
     subject_id: int
     date: str
     status: AttendanceStatus
+    lecture_id: Optional[str] = None
+    time: Optional[str] = None
+    attendance_method: str = "Manual"
+
+class BulkStudentAttendance(BaseModel):
+    student_id: int
+    status: AttendanceStatus
+
+class BulkAttendanceRequest(BaseModel):
+    subject_id: int
+    date: str
+    lecture_id: str
+    attendance_method: str = "Manual"
+    records: List[BulkStudentAttendance]
 
 class AddMarksRequest(BaseModel):
     student_id: int
@@ -172,12 +186,16 @@ async def mark_attendance(
     if existing:
         raise HTTPException(status_code=400, detail="Attendance has already been marked for this student for this day.")
 
+    now_time = datetime.utcnow().strftime("%H:%M")
     new_att = Attendance(
         student_id=req.student_id,
         subject_id=req.subject_id,
         date=parsed_date,
         status=req.status,
-        marked_by_id=faculty_id if faculty_id else None
+        marked_by_id=faculty_id if faculty_id else None,
+        lecture_id=req.lecture_id,
+        time=req.time or now_time,
+        attendance_method=req.attendance_method
     )
     db.add(new_att)
         
@@ -221,7 +239,95 @@ async def add_marks(
     await db.commit()
     return {"message": "Marks added successfully"}
 
-from typing import Optional
+
+
+
+@router.get("/attendance/is-submitted/{lecture_id}")
+async def is_attendance_submitted(
+    lecture_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(RequireRole(["faculty", "admin"]))
+) -> Any:
+    """Check if attendance for this lecture has already been submitted/locked."""
+    existing = await db.scalar(
+        select(Attendance).where(Attendance.lecture_id == lecture_id)
+    )
+    return {"submitted": existing is not None}
+
+
+@router.get("/attendance/lecture/{lecture_id}")
+async def get_lecture_attendance(
+    lecture_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(RequireRole(["faculty", "admin"]))
+) -> Any:
+    """Fetch attendance records for a specific locked lecture."""
+    records = await db.scalars(
+        select(Attendance).where(Attendance.lecture_id == lecture_id)
+    )
+    return [
+        {
+            "student_id": r.student_id,
+            "status": getattr(r.status, 'name', str(r.status))
+        } for r in records
+    ]
+
+
+@router.post("/attendance/bulk")
+async def bulk_save_attendance(
+    req: BulkAttendanceRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(RequireRole(["faculty", "admin"]))
+) -> Any:
+    """Bulk save attendance for all students in a lecture. Prevents duplicates."""
+    faculty = await _get_faculty_profile(db, current_user)
+    faculty_id = faculty.id if faculty else None
+
+    # Check if attendance already submitted for this lecture
+    existing_count = await db.scalar(
+        select(func.count(Attendance.id)).where(Attendance.lecture_id == req.lecture_id)
+    ) or 0
+    if existing_count > 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Attendance for this lecture has already been submitted and locked."
+        )
+
+    parsed_date = datetime.strptime(req.date, "%Y-%m-%d").date()
+    weekday_name = parsed_date.strftime("%A").lower()
+    if weekday_name in ["saturday", "sunday"]:
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot mark attendance on weekends."
+        )
+
+    now_time = datetime.utcnow().strftime("%H:%M")
+    records_to_add = []
+    for rec in req.records:
+        att = Attendance(
+            student_id=rec.student_id,
+            subject_id=req.subject_id,
+            date=parsed_date,
+            status=rec.status,
+            marked_by_id=faculty_id,
+            lecture_id=req.lecture_id,
+            time=now_time,
+            attendance_method=req.attendance_method
+        )
+        records_to_add.append(att)
+
+    db.add_all(records_to_add)
+    await db.commit()
+
+    present_count = sum(1 for r in req.records if r.status == AttendanceStatus.PRESENT)
+    absent_count = len(req.records) - present_count
+    return {
+        "message": "Attendance saved successfully.",
+        "total": len(req.records),
+        "present": present_count,
+        "absent": absent_count,
+        "lecture_id": req.lecture_id
+    }
 
 @router.get("/attendance/report")
 async def get_attendance_report(
@@ -251,11 +357,12 @@ async def get_attendance_report(
             }
         
         report[sub_id]["totalClasses"] += 1
-        if att.status.name == "PRESENT":
+        status_val = getattr(att.status, 'name', str(att.status))
+        if status_val == "PRESENT":
             report[sub_id]["present"] += 1
-        elif att.status.name == "ABSENT":
+        elif status_val == "ABSENT":
             report[sub_id]["absent"] += 1
-        elif att.status.name == "LATE":
+        elif status_val == "LATE":
             report[sub_id]["late"] += 1
 
     result = []

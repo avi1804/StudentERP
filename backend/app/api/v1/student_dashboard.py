@@ -185,8 +185,15 @@ async def get_attendance(
     if not subjects:
         subjects = (await db.scalars(select(Subject))).all()
 
-    result = []
+    result_subject_wise = []
     color_types = ["purple", "green", "yellow", "blue", "pink", "teal"]
+    
+    overall_total = 0
+    overall_present = 0
+    overall_absent = 0
+    overall_late = 0
+    
+    calendar_data = {}
 
     for idx, sub in enumerate(subjects):
         prof_name = await get_faculty_name(db, sub.faculty_id)
@@ -205,22 +212,23 @@ async def get_attendance(
         )).all()
 
         total_classes = len(attendances)
-        present = sum(1 for a in attendances if a.status.name == "PRESENT")
-        absent = sum(1 for a in attendances if a.status.name == "ABSENT")
-        late = sum(1 for a in attendances if a.status.name == "LATE")
+        present = sum(1 for a in attendances if getattr(a.status, 'name', str(a.status)) == "PRESENT")
+        absent = sum(1 for a in attendances if getattr(a.status, 'name', str(a.status)) == "ABSENT")
+        late = sum(1 for a in attendances if getattr(a.status, 'name', str(a.status)) == "LATE")
+        
+        overall_total += total_classes
+        overall_present += present
+        overall_absent += absent
+        overall_late += late
 
         if total_classes > 0:
             pct = round(((present + late) / total_classes) * 100, 1)
             remark = "Good" if pct >= 80 else "Average" if pct >= 65 else "Low"
         else:
-            total_classes = 0
-            present = 0
-            absent = 0
-            late = 0
             pct = 0.0
             remark = "N/A"
 
-        result.append({
+        result_subject_wise.append({
             "subjectId": sub.id,
             "subjectCode": sub.code,
             "subjectName": sub.name,
@@ -233,8 +241,33 @@ async def get_attendance(
             "remark": remark,
             "colorType": color_types[idx % len(color_types)]
         })
+        
+        # Populate calendar data
+        for a in attendances:
+            date_str = a.date.isoformat()
+            if date_str not in calendar_data:
+                calendar_data[date_str] = {"date": date_str, "records": []}
+            calendar_data[date_str]["records"].append({
+                "id": str(a.id),
+                "lectureInstanceId": a.lecture_id or str(a.id),
+                "date": date_str,
+                "subjectId": sub.id,
+                "subjectCode": sub.code,
+                "status": getattr(a.status, 'name', str(a.status)).lower()
+            })
 
-    return result
+    overall_pct = round(((overall_present + overall_late) / overall_total * 100), 1) if overall_total > 0 else 0.0
+
+    return {
+        "totalDelivered": overall_total,
+        "totalAttended": overall_present + overall_late,
+        "totalMissed": overall_absent,
+        "totalCancelled": 0,
+        "overallPercentage": overall_pct,
+        "subjectWise": result_subject_wise,
+        "subjects": result_subject_wise,
+        "calendarData": calendar_data
+    }
 
 @router.get("/results")
 async def get_results(

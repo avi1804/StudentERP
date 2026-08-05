@@ -64,9 +64,7 @@ export function MySubjects() {
     }
   };
 
-  if (isMobile) {
-    return <div style={{ padding: '20px' }}>Mobile view is under construction for My Subjects.</div>;
-  }
+
 
   return (
     <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto' }}>
@@ -247,8 +245,9 @@ export function MySubjects() {
             const colors = getColorStyles(sub.colorType || "purple");
             const IconComp = sub.icon || BookOpen;
 
-            // Match attendance stats for this subject
-            const matchingStat = stats.subjects.find(s => s.subjectId === sub.id || s.subjectCode === sub.code);
+            // Match attendance stats for this subject safely
+            const subjectStats = stats?.subjectWise || stats?.subjects || [];
+            const matchingStat = subjectStats.find(s => s.subjectId === sub.id || s.subjectId === sub.subjectId || s.subjectCode === sub.code);
             const attPct = matchingStat ? matchingStat.percentage : 0;
 
             return (

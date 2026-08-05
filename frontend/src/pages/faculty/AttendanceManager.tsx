@@ -1,514 +1,930 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { apiClient as api } from '../../api/axios';
-import { BookOpen, Calendar, CheckCircle2, Clock, Users, ChevronRight, BellRing, ArrowUpRight, Check, XCircle, AlertCircle, ShieldAlert } from 'lucide-react';
+import {
+  BookOpen, Calendar, CheckCircle2, Clock, Users, Check, XCircle,
+  Search, Filter, QrCode, Save, RefreshCw, AlertTriangle, Lock,
+  User as UserIcon, ChevronDown,
+} from 'lucide-react';
 import { useIsMobile } from '../../hooks/useIsMobile';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import TextType from '../../components/TextType';
 import { TimetableAttendanceService, resolveTeacherIdByName } from '../../services/timetableAttendanceService';
 import type { LectureInstance } from '../../services/timetableAttendanceService';
-import { qrAttendanceService } from '../../services/qrAttendanceService';
-import { substituteService, type MySubstituteAssignment } from '../../services/substituteService';
+import { qrAttendanceService, attendanceService } from '../../services/qrAttendanceService';
+import { substituteService } from '../../services/substituteService';
 import { useAuthStore } from '../../store/authStore';
 import QRCode from 'react-qr-code';
 
-export const AttendanceManager: React.FC = () => {
-  const { isMobile } = useIsMobile();
-  const { user } = useAuthStore();
-  const [subjects, setSubjects] = useState<any[]>([]);
-  const [students, setStudents] = useState<any[]>([]);
+/* ─── Types ─────────────────────────────────────────────────── */
+interface StudentRecord {
+  id: number;
+  name: string;
+  enrollment_number: string;
+  roll_number?: string;
+  photo?: string;
+  status: 'PRESENT' | 'ABSENT';
+}
 
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [availableSlots, setAvailableSlots] = useState<(LectureInstance & { isSubstitute?: boolean })[]>([]);
-  const [selectedSlotId, setSelectedSlotId] = useState<string>('');
+/* ─── Avatar helper ──────────────────────────────────────────── */
+function Avatar({ name, photo, size = 44 }: { name: string; photo?: string; size?: number }) {
+  const initials = name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
+  const hue = (name.charCodeAt(0) + (name.charCodeAt(1) || 0)) % 360;
+  if (photo) {
+    return (
+      <img
+        src={photo}
+        alt={name}
+        style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+      />
+    );
+  }
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: '50%', flexShrink: 0,
+      background: `hsl(${hue}, 60%, 88%)`, color: `hsl(${hue}, 55%, 30%)`,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontWeight: 800, fontSize: size * 0.35, letterSpacing: '-0.5px',
+      border: `2px solid hsl(${hue}, 40%, 80%)`,
+    }}>
+      {initials}
+    </div>
+  );
+}
 
-  const [selectedSubject, setSelectedSubject] = useState('');
-  const [selectedStudent, setSelectedStudent] = useState('');
+/* ─── Student Card ───────────────────────────────────────────── */
+function StudentCard({
+  student, locked, onToggle,
+}: {
+  student: StudentRecord;
+  locked: boolean;
+  onToggle: (id: number) => void;
+}) {
+  const isPresent = student.status === 'PRESENT';
+  return (
+    <motion.div
+      layout
+      onClick={() => !locked && onToggle(student.id)}
+      style={{
+        background: isPresent
+          ? 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)'
+          : 'linear-gradient(135deg, #fff5f5 0%, #fee2e2 100%)',
+        border: `2px solid ${isPresent ? '#bbf7d0' : '#fecaca'}`,
+        borderRadius: '18px',
+        padding: '16px 18px',
+        cursor: locked ? 'not-allowed' : 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '14px',
+        transition: 'all 0.22s cubic-bezier(0.4,0,0.2,1)',
+        boxShadow: isPresent
+          ? '0 2px 12px rgba(34,197,94,0.12)'
+          : '0 2px 12px rgba(239,68,68,0.08)',
+        userSelect: 'none',
+        opacity: locked ? 0.85 : 1,
+      }}
+      whileHover={!locked ? { scale: 1.018, y: -2 } : {}}
+      whileTap={!locked ? { scale: 0.97 } : {}}
+    >
+      {/* Avatar */}
+      <div style={{ position: 'relative', flexShrink: 0 }}>
+        <Avatar name={student.name} photo={student.photo} />
+        <motion.div
+          animate={{
+            background: isPresent ? '#22c55e' : '#ef4444',
+            border: `2px solid ${isPresent ? '#fff' : '#fff'}`,
+          }}
+          transition={{ duration: 0.2 }}
+          style={{
+            position: 'absolute', bottom: -2, right: -2,
+            width: 14, height: 14, borderRadius: '50%',
+          }}
+        />
+      </div>
 
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ text: '', type: '' });
-  
-  const [showQRModal, setShowQRModal] = useState(false);
-  const [qrToken, setQrToken] = useState('');
-  const [qrExpiresAt, setQrExpiresAt] = useState<Date | null>(null);
-  const [timeRemaining, setTimeRemaining] = useState(0);
-  const [qrStudentCount, setQrStudentCount] = useState(0);
+      {/* Info */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{
+          fontSize: '14px', fontWeight: 700, color: '#111827',
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        }}>
+          {student.name}
+        </div>
+        <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500, marginTop: '2px' }}>
+          {student.enrollment_number}
+          {student.roll_number ? ` · Roll ${student.roll_number}` : ''}
+        </div>
+      </div>
 
-  // Resolve the logged-in faculty's teacher ID by matching their name
-  const facultyName = user?.full_name || '';
-  const resolvedTeacherId = resolveTeacherIdByName(facultyName);
-  const [activeTeacherId, setActiveTeacherId] = useState<number>(resolvedTeacherId || 102);
+      {/* Status Badge */}
+      <motion.div
+        animate={{
+          background: isPresent ? '#dcfce7' : '#fee2e2',
+          color: isPresent ? '#15803d' : '#b91c1c',
+          borderColor: isPresent ? '#bbf7d0' : '#fecaca',
+        }}
+        transition={{ duration: 0.2 }}
+        style={{
+          padding: '5px 12px', borderRadius: '20px', border: '1.5px solid',
+          fontSize: '11px', fontWeight: 800, letterSpacing: '0.5px',
+          textTransform: 'uppercase', flexShrink: 0, display: 'flex',
+          alignItems: 'center', gap: '5px',
+        }}
+      >
+        {isPresent
+          ? <><Check size={11} strokeWidth={3} /> Present</>
+          : <><XCircle size={11} /> Absent</>}
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* ─── Confirmation Dialog ────────────────────────────────────── */
+function ConfirmDialog({
+  open, presentCount, absentCount, onConfirm, onCancel,
+}: {
+  open: boolean;
+  presentCount: number;
+  absentCount: number;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)',
+            backdropFilter: 'blur(5px)', zIndex: 2000,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+          }}
+        >
+          <motion.div
+            initial={{ scale: 0.92, opacity: 0, y: 10 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.95, opacity: 0, y: 6 }}
+            style={{
+              background: '#fff', borderRadius: '24px', padding: '32px',
+              maxWidth: 420, width: '100%', boxShadow: '0 24px 48px rgba(0,0,0,0.18)',
+              textAlign: 'center',
+            }}
+          >
+            <div style={{
+              width: 60, height: 60, borderRadius: '50%', background: '#fef3c7',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 20px',
+            }}>
+              <AlertTriangle size={28} color="#f59e0b" />
+            </div>
+            <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#111827', margin: '0 0 8px' }}>
+              Save Attendance?
+            </h2>
+            <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 24px', lineHeight: 1.6 }}>
+              Are you sure you want to save attendance for this lecture?<br />
+              <strong style={{ color: '#111827' }}>This action cannot be undone.</strong>
+            </p>
+            <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
+              <div style={{
+                flex: 1, background: '#dcfce7', borderRadius: 12, padding: '12px 0',
+                fontSize: '20px', fontWeight: 800, color: '#15803d',
+              }}>
+                {presentCount}
+                <div style={{ fontSize: '11px', fontWeight: 600, color: '#16a34a', marginTop: 2 }}>PRESENT</div>
+              </div>
+              <div style={{
+                flex: 1, background: '#fee2e2', borderRadius: 12, padding: '12px 0',
+                fontSize: '20px', fontWeight: 800, color: '#b91c1c',
+              }}>
+                {absentCount}
+                <div style={{ fontSize: '11px', fontWeight: 600, color: '#dc2626', marginTop: 2 }}>ABSENT</div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <button
+                onClick={onCancel}
+                style={{
+                  flex: 1, padding: '13px', borderRadius: 14, background: '#f4f4f5',
+                  border: 'none', fontWeight: 700, color: '#374151', cursor: 'pointer', fontSize: '14px',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={onConfirm}
+                style={{
+                  flex: 1, padding: '13px', borderRadius: 14,
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  border: 'none', fontWeight: 700, color: '#fff', cursor: 'pointer', fontSize: '14px',
+                  boxShadow: '0 4px 14px rgba(16,185,129,0.3)',
+                }}
+              >
+                ✓ Save Attendance
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/* ─── QR Modal ───────────────────────────────────────────────── */
+function QRModal({
+  open, qrPayload, expiresAt, expirySeconds, slotLabel, scannedCount, totalStudents,
+  onClose, onRegenerate, loading,
+}: {
+  open: boolean;
+  qrPayload: string;
+  expiresAt: Date | null;
+  expirySeconds: number;
+  slotLabel: string;
+  scannedCount: number;
+  totalStudents: number;
+  onClose: () => void;
+  onRegenerate: () => void;
+  loading: boolean;
+}) {
+  // Compute initial remaining seconds immediately from the Date object
+  const calcRemaining = () =>
+    expiresAt ? Math.max(0, Math.floor((expiresAt.getTime() - Date.now()) / 1000)) : expirySeconds;
+
+  const [timeRemaining, setTimeRemaining] = useState<number>(calcRemaining);
+  const totalSeconds = useRef<number>(expirySeconds);
 
   useEffect(() => {
-    if (resolvedTeacherId) {
-      setActiveTeacherId(resolvedTeacherId);
-    }
-  }, [resolvedTeacherId]);
-
-  const myAssignedSubjects = TimetableAttendanceService.getAssignedSubjectsForTeacher(activeTeacherId);
-
-  const [stats, setStats] = useState({
-    totalSubjects: 5,
-    todaysClasses: 6,
-    attendanceMarked: 18,
-    pendingAttendance: 2,
-    totalStudents: 30
-  });
-
-  useEffect(() => {
-    fetchMySubjects();
-    fetchStudents();
-  }, [activeTeacherId]);
-
-  const markAttendance = async (status: 'present' | 'absent' | 'cancelled') => {
-    if (!selectedSlotId || !date) {
-      setMessage({ text: 'Please select a valid Timetable slot and date.', type: 'error' });
-      return;
-    }
-
-    const currentSlot = availableSlots.find(s => s.id === selectedSlotId);
-    if (!currentSlot) {
-      setMessage({ text: 'Selected slot does not exist in Timetable.', type: 'error' });
-      return;
-    }
-
-    if (!selectedStudent && status !== 'cancelled') {
-      setMessage({ text: 'Please select a student.', type: 'error' });
-      return;
-    }
-
-    if (currentSlot.isSubstitute) {
-      try {
-        await substituteService.markAttendance(currentSlot.id, status);
-      } catch (error) {
-        console.error("Failed to log substitute audit", error);
-        // Continue to mark it locally so the UI updates
-      }
-    }
-
-    if (status === 'cancelled') {
-      TimetableAttendanceService.markAttendance(
-        currentSlot.id,
-        currentSlot.date,
-        currentSlot.subjectId,
-        currentSlot.subjectCode,
-        'cancelled'
-      );
-      setMessage({ text: 'Lecture cancelled successfully for all students.', type: 'success' });
-    } else {
-      TimetableAttendanceService.markAttendance(
-        currentSlot.id,
-        currentSlot.date,
-        currentSlot.subjectId,
-        currentSlot.subjectCode,
-        status
-      );
-      setMessage({ 
-        text: `Attendance marked as ${status.toUpperCase()} in ${currentSlot.subjectName}`, 
-        type: 'success' 
-      });
-    }
-
-    // Refresh slots to reflect cancellations
-    const baseSlots = TimetableAttendanceService.getLectureInstancesForDateByTeacher(date, activeTeacherId);
-    // Note: To keep the substitute slot in the list after marking, we just do a quick re-fetch or preserve it.
-    // For now, we will let the next re-render handle it correctly if they change dates.
-    setAvailableSlots(prev => prev.map(p => {
-      if (p.id === currentSlot.id && status === 'cancelled') return { ...p, status: 'cancelled' };
-      return p;
-    }));
-  };
-
-  useEffect(() => {
-    const fetchSlots = async () => {
-      // FILTERED to only the active faculty's assigned subjects
-      const baseSlots = TimetableAttendanceService.getLectureInstancesForDateByTeacher(date, activeTeacherId);
-      let combinedSlots: (LectureInstance & { isSubstitute?: boolean })[] = [...baseSlots];
-      
-      try {
-        const subs = await substituteService.getMyAssignments();
-        // Filter subs for current date
-        const todaysSubs = subs.filter(s => s.start_date === date);
-        
-        for (const sub of todaysSubs) {
-          // Construct a mock LectureInstance for the substitute class
-          // (Assuming the lecture_instance_id matches one in the MASTER_TIMETABLE)
-          const allInstancesForDate = TimetableAttendanceService.getLectureInstancesForDate(date);
-          const matchedInstance = allInstancesForDate.find(i => i.id === sub.lecture_instance_id);
-          
-          if (matchedInstance) {
-             // Only add if not already in list to prevent duplicates
-             if (!combinedSlots.some(s => s.id === matchedInstance.id)) {
-               combinedSlots.push({
-                 ...matchedInstance,
-                 isSubstitute: true
-               });
-             }
-          }
-        }
-      } catch (err) {
-        console.error("Failed to fetch substitute assignments", err);
-      }
-
-      setAvailableSlots(combinedSlots);
-      if (combinedSlots.length > 0) {
-        setSelectedSlotId(combinedSlots[0].id);
-        setSelectedSubject(String(combinedSlots[0].subjectId));
-      } else {
-        setSelectedSlotId('');
-        setSelectedSubject('');
-      }
-    };
-    
-    fetchSlots();
-  }, [date, activeTeacherId]);
-
-  const fetchMySubjects = async () => {
-    try {
-      const res = await api.get('/faculty-dash/my-subjects');
-      // Filter API results to only subjects assigned to this teacher
-      const filtered = res.data.filter((s: any) => myAssignedSubjects.some(a => a.subjectId === s.id));
-      setSubjects(filtered.length > 0 ? filtered : res.data);
-    } catch {
-      // Fallback: use only the subjects assigned to this teacher from timetable
-      setSubjects(myAssignedSubjects.map(s => ({ id: s.subjectId, name: s.subjectName, code: s.subjectCode })));
-    }
-  };
-
-  const fetchStudents = async () => {
-    try {
-      const res = await api.get(`/faculty-dash/subjects/1/students`);
-      setStudents(res.data);
-    } catch {
-      setStudents([
-        { id: 1, name: "Harsh Patel", enrollment_number: "21001" },
-        { id: 2, name: "Yash Patel", enrollment_number: "21002" },
-        { id: 3, name: "Aarav Sharma", enrollment_number: "21003" },
-        { id: 4, name: "Priya Singh", enrollment_number: "21004" },
-      ]);
-    }
-  };
-
-  const handleSlotChange = (slotId: string) => {
-    setSelectedSlotId(slotId);
-    const foundSlot = availableSlots.find(s => s.id === slotId);
-    if (foundSlot) {
-      setSelectedSubject(String(foundSlot.subjectId));
-    }
-  };
-
-  // QR Modal and Countdown Logic
-  useEffect(() => {
-    let timer: number;
-    if (showQRModal && qrExpiresAt) {
-      timer = setInterval(() => {
-        const now = new Date();
-        const diff = Math.floor((qrExpiresAt.getTime() - now.getTime()) / 1000);
-        if (diff <= 0) {
-          setTimeRemaining(0);
-          clearInterval(timer);
-        } else {
-          setTimeRemaining(diff);
-        }
-      }, 1000);
-    }
+    if (!open || !expiresAt) return;
+    const diff = Math.max(0, Math.floor((expiresAt.getTime() - Date.now()) / 1000));
+    totalSeconds.current = diff > 0 ? diff : expirySeconds;
+    setTimeRemaining(diff);
+    if (diff <= 0) return; // already expired
+    const timer = setInterval(() => {
+      const remaining = Math.max(0, Math.floor((expiresAt.getTime() - Date.now()) / 1000));
+      setTimeRemaining(remaining);
+      if (remaining === 0) clearInterval(timer);
+    }, 1000);
     return () => clearInterval(timer);
-  }, [showQRModal, qrExpiresAt]);
+  }, [open, expiresAt]);
 
-  const handleGenerateQR = async () => {
-    if (!selectedSlotId) return;
-    setLoading(true);
-    try {
-      const res = await qrAttendanceService.generateQR(selectedSlotId);
-      setQrToken(res.token);
-      setQrExpiresAt(new Date(res.expires_at));
-      setTimeRemaining(60);
-      setQrStudentCount(0); // Reset count on new QR
-      setShowQRModal(true);
-    } catch (err: any) {
-      setMessage({ text: err.response?.data?.detail || 'Failed to generate QR', type: 'error' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Poll stats when QR modal is open
-  useEffect(() => {
-    let interval: number;
-    if (showQRModal && selectedSlotId) {
-      interval = setInterval(async () => {
-        try {
-          const stats = await qrAttendanceService.getStats(selectedSlotId);
-          setQrStudentCount(stats.scanned_count);
-        } catch (e) {
-          console.error('Failed to fetch QR stats', e);
-        }
-      }, 2000);
-    }
-    return () => clearInterval(interval);
-  }, [showQRModal, selectedSlotId]);
-
-  // Check if slot is currently live
-  const isSlotLive = (slot: LectureInstance) => {
-    if (slot.date !== new Date().toISOString().split('T')[0]) return false;
-    // VERY BASIC check for demo purposes, assume true if date matches. 
-    // In a real app we'd parse time properly. 
-    return true; 
-  };
+  const pct = totalSeconds.current > 0 ? (timeRemaining / totalSeconds.current) * 100 : 100;
+  const isExpired = timeRemaining <= 0 && expiresAt !== null;
+  const timerColor = timeRemaining > 60 ? '#3b82f6' : timeRemaining > 20 ? '#f59e0b' : '#ef4444';
+  const expiryMinutes = Math.ceil(expirySeconds / 60);
 
   return (
-    <div style={{ padding: '0px', fontFamily: 'Space Grotesk, sans-serif' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
-        <div>
-          <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-            <span>Attendance</span>
-            <span style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
-              padding: '4px 18px',
-              borderRadius: '14px',
-              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
-              display: 'inline-flex',
-              alignItems: 'center',
-              lineHeight: 1.2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-            }}>
-              <TextType
-                text={["Manager", "Timetable Synced", "Evaluator"]}
-                typingSpeed={60}
-                deletingSpeed={35}
-                pauseDuration={2200}
-                loop={true}
-                showCursor={true}
-                cursorCharacter="|"
-                style={{ color: '#ffffff' }}
-              />
-            </span>
-          </h1>
-          <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>
-            Mark student attendance strictly against auto-generated Timetable lecture slots.
-          </div>
-        </div>
-      </div>
-
-      {/* KPI Cards */}
-      <motion.div
-        initial="hidden"
-        animate="show"
-        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
-        style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '20px', marginBottom: '32px' }}
-      >
+    <AnimatePresence>
+      {open && (
         <motion.div
-          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
-          style={{ background: '#f4f4f5', borderRadius: '24px', padding: '22px 24px', border: '1.5px solid rgba(0,0,0,0.07)' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)',
+            backdropFilter: 'blur(6px)', zIndex: 1500,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+          }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <BookOpen size={18} color="#6366f1" />
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>My Subjects</span>
-            </div>
-          </div>
-          <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', marginTop: '16px' }}>{myAssignedSubjects.length}</div>
-        </motion.div>
-
-        <motion.div
-          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
-          style={{ background: '#f4f4f5', borderRadius: '24px', padding: '22px 24px', border: '1.5px solid rgba(0,0,0,0.07)' }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Users size={18} color="#3b82f6" />
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Students</span>
-            </div>
-          </div>
-          <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', marginTop: '16px' }}>{students.length || 30}</div>
-        </motion.div>
-
-        <motion.div
-          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
-          style={{ background: '#f4f4f5', borderRadius: '24px', padding: '22px 24px', border: '1.5px solid rgba(0,0,0,0.07)' }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <CheckCircle2 size={18} color="#22c55e" />
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Marked Entries</span>
-            </div>
-          </div>
-          <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', marginTop: '16px' }}>{stats.attendanceMarked}</div>
-        </motion.div>
-
-        <motion.div
-          variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
-          style={{ background: '#f4f4f5', borderRadius: '24px', padding: '22px 24px', border: '1.5px solid rgba(0,0,0,0.07)' }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Clock size={18} color="#f59e0b" />
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Pending Slots</span>
-            </div>
-          </div>
-          <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', marginTop: '16px' }}>{availableSlots.length}</div>
-        </motion.div>
-      </motion.div>
-
-      {message.text && (
-        <div style={{ marginBottom: '24px', padding: '12px 16px', borderRadius: '12px', background: message.type === 'error' ? '#fee2e2' : '#dcfce7', color: message.type === 'error' ? '#b91c1c' : '#15803d', fontWeight: 600 }}>
-          {message.text}
-        </div>
-      )}
-
-      {/* Main Section */}
-      <div style={{ background: '#ffffff', borderRadius: '24px', padding: '28px', border: '1.5px solid rgba(0,0,0,0.07)', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#09090b', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Calendar size={20} color="#573cfa" /> Select Date & Timetable Lecture Slot
-        </h3>
-
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 2fr', gap: '20px', marginBottom: '24px' }}>
-          <div>
-            <label style={{ fontSize: '12px', fontWeight: 700, color: '#71717a', display: 'block', marginBottom: '6px' }}>Lecture Date</label>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              style={{ width: '100%', padding: '12px 16px', borderRadius: '14px', border: '1px solid #e4e4e7', fontSize: '14px', fontWeight: 600 }}
-            />
-          </div>
-
-          <div>
-            <label style={{ fontSize: '12px', fontWeight: 700, color: '#71717a', display: 'block', marginBottom: '6px' }}>
-              Auto-Populated Timetable Slot (Single Source of Truth)
-            </label>
-            <select
-              value={selectedSlotId}
-              onChange={(e) => handleSlotChange(e.target.value)}
-              disabled={availableSlots.length === 0}
-              style={{ width: '100%', padding: '12px 16px', borderRadius: '14px', border: '1px solid #e4e4e7', fontSize: '14px', fontWeight: 700, color: '#09090b' }}
-            >
-              {availableSlots.length === 0 ? (
-                <option value="" disabled>No scheduled classes found</option>
-              ) : (
-                availableSlots.map(slot => (
-                  <option key={slot.id} value={slot.id}>
-                    {slot.startTime} - {slot.endTime} | {slot.subjectName} ({slot.room}) {slot.isSubstitute ? '[SUBSTITUTE]' : ''} {slot.status === 'cancelled' ? '[CANCELLED]' : ''}
-                  </option>
-                ))
-              )}
-            </select>
-          </div>
-        </div>
-
-        {availableSlots.length > 0 && selectedSlotId && (
-          <div style={{ background: '#f8fafc', borderRadius: '18px', padding: '20px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
-            {(() => {
-              const activeSlot = availableSlots.find(s => s.id === selectedSlotId);
-              if (!activeSlot) return null;
-              return (
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-                  <div>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#573cfa', textTransform: 'uppercase' }}>Selected Slot Details</div>
-                    <div style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>{activeSlot.subjectName} ({activeSlot.subjectCode})</div>
-                    <div style={{ fontSize: '13px', color: '#64748b' }}>Faculty: <strong>{activeSlot.teacherName}</strong> | Room: <strong>{activeSlot.room}</strong> | Time: <strong>{activeSlot.startTime} - {activeSlot.endTime}</strong></div>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <button
-                      onClick={handleGenerateQR}
-                      disabled={loading || !isSlotLive(activeSlot)}
-                      style={{ padding: '10px 20px', borderRadius: '12px', background: '#3b82f6', color: '#fff', border: 'none', fontWeight: 700, cursor: loading || !isSlotLive(activeSlot) ? 'not-allowed' : 'pointer', opacity: isSlotLive(activeSlot) ? 1 : 0.5 }}
-                    >
-                      Generate QR
-                    </button>
-
-                    <button
-                      onClick={() => markAttendance('present')}
-                      disabled={loading}
-                      style={{ padding: '10px 20px', borderRadius: '12px', background: '#16a34a', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer' }}
-                    >
-                      ✓ Mark Present
-                    </button>
-
-                    <button
-                      onClick={() => markAttendance('absent')}
-                      disabled={loading}
-                      style={{ padding: '10px 20px', borderRadius: '12px', background: '#dc2626', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer' }}
-                    >
-                      ✗ Mark Absent
-                    </button>
-
-                    <button
-                      onClick={() => markAttendance('cancelled')}
-                      disabled={loading}
-                      style={{ padding: '10px 20px', borderRadius: '12px', background: '#d97706', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer' }}
-                    >
-                      Cancel Lecture
-                    </button>
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-        )}
-      </div>
-      
-      {/* QR Code Modal */}
-      {showQRModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            style={{ background: '#ffffff', borderRadius: '24px', padding: '32px', width: '100%', maxWidth: '420px', boxShadow: '0 20px 40px rgba(0,0,0,0.2)', textAlign: 'center' }}
+            initial={{ scale: 0.93, opacity: 0, y: 12 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.96, opacity: 0 }}
+            style={{
+              background: '#fff', borderRadius: '28px', padding: '32px',
+              maxWidth: 440, width: '100%', boxShadow: '0 32px 64px rgba(0,0,0,0.22)',
+              textAlign: 'center',
+            }}
           >
-            <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#09090b', margin: '0 0 8px 0' }}>Scan to Mark Attendance</h2>
-            <p style={{ fontSize: '14px', color: '#71717a', margin: '0 0 24px 0' }}>Students can scan this QR code using their app to instantly mark themselves present.</p>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              background: '#f0f9ff', borderRadius: 10, padding: '6px 14px',
+              fontSize: '12px', fontWeight: 700, color: '#0369a1', marginBottom: 16,
+            }}>
+              <QrCode size={14} />  {slotLabel}
+            </div>
 
-            <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '20px', display: 'inline-block', marginBottom: '24px', position: 'relative' }}>
-              {timeRemaining > 0 ? (
-                <QRCode value={JSON.stringify({ lectureInstanceId: selectedSlotId, token: qrToken })} size={240} style={{ display: 'block' }} />
+            <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#111827', margin: '0 0 6px' }}>
+              Scan to Mark Attendance
+            </h2>
+            <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 24px' }}>
+              Students scan this code from their app. Auto-expires in{' '}
+              <strong style={{ color: '#111827' }}>{expiryMinutes} min</strong>.
+            </p>
+
+            {/* QR Code */}
+            <div style={{
+              background: isExpired ? '#fef2f2' : '#f8fafc',
+              padding: 24, borderRadius: 20, display: 'inline-block',
+              marginBottom: 20, border: `2px solid ${isExpired ? '#fecaca' : '#e2e8f0'}`,
+              position: 'relative',
+            }}>
+              {!isExpired ? (
+                <QRCode value={qrPayload} size={220} style={{ display: 'block' }} />
               ) : (
-                <div style={{ width: 240, height: 240, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', color: '#ef4444' }}>
-                  <XCircle size={48} style={{ marginBottom: '12px' }} />
-                  <div style={{ fontSize: '18px', fontWeight: 700 }}>QR Expired</div>
+                <div style={{
+                  width: 220, height: 220, display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', flexDirection: 'column', color: '#ef4444',
+                }}>
+                  <XCircle size={52} strokeWidth={1.5} style={{ marginBottom: 12 }} />
+                  <div style={{ fontSize: '18px', fontWeight: 800 }}>QR Expired</div>
                 </div>
               )}
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', padding: '16px', background: '#f4f4f5', borderRadius: '16px' }}>
+            {/* Timer + Stats row */}
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              background: '#f8fafc', borderRadius: 16, padding: '14px 20px', marginBottom: 20,
+            }}>
               <div style={{ textAlign: 'left' }}>
-                <div style={{ fontSize: '12px', fontWeight: 600, color: '#71717a', textTransform: 'uppercase' }}>Students Scanned</div>
-                <div style={{ fontSize: '24px', fontWeight: 800, color: '#16a34a' }}>{qrStudentCount} <span style={{ fontSize: '14px', color: '#a1a1aa' }}>/ 30</span></div>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', marginBottom: 4 }}>
+                  Students Scanned
+                </div>
+                <div style={{ fontSize: '26px', fontWeight: 800, color: '#15803d' }}>
+                  {scannedCount}
+                  <span style={{ fontSize: '14px', color: '#9ca3af', fontWeight: 600 }}> / {totalStudents}</span>
+                </div>
               </div>
-              
-              <div style={{ position: 'relative', width: '56px', height: '56px' }}>
+
+              {/* Circular timer */}
+              <div style={{ position: 'relative', width: 64, height: 64 }}>
                 <svg viewBox="0 0 36 36" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
-                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e4e4e7" strokeWidth="4" />
-                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke={timeRemaining > 15 ? "#3b82f6" : "#ef4444"} strokeWidth="4" strokeDasharray={`${(timeRemaining / 60) * 100}, 100`} style={{ transition: 'stroke-dasharray 1s linear' }} />
+                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e4e4e7" strokeWidth="3.5" />
+                  <circle
+                    cx="18" cy="18" r="15.9" fill="none"
+                    stroke={timerColor} strokeWidth="3.5"
+                    strokeDasharray={`${pct}, 100`}
+                    strokeLinecap="round"
+                    style={{ transition: 'stroke-dasharray 1s linear' }}
+                  />
                 </svg>
-                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 700, color: timeRemaining > 15 ? '#09090b' : '#ef4444' }}>
-                  {timeRemaining}s
+                <div style={{
+                  position: 'absolute', inset: 0, display: 'flex',
+                  alignItems: 'center', justifyContent: 'center',
+                  fontSize: '14px', fontWeight: 800, color: isExpired ? '#ef4444' : '#111827',
+                }}>
+                  {isExpired ? '✕' : `${timeRemaining}s`}
                 </div>
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: 10 }}>
               <button
-                onClick={() => setShowQRModal(false)}
-                style={{ flex: 1, padding: '14px', borderRadius: '14px', background: '#f4f4f5', color: '#09090b', border: 'none', fontWeight: 700, cursor: 'pointer' }}
+                onClick={onClose}
+                style={{
+                  flex: 1, padding: '13px', borderRadius: 14, background: '#f4f4f5',
+                  border: 'none', fontWeight: 700, cursor: 'pointer', color: '#374151',
+                }}
               >
                 Close
               </button>
-              {timeRemaining <= 0 && (
-                <button
-                  onClick={handleGenerateQR}
-                  disabled={loading}
-                  style={{ flex: 1, padding: '14px', borderRadius: '14px', background: '#3b82f6', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer' }}
-                >
-                  Regenerate QR
-                </button>
-              )}
+              <button
+                onClick={onRegenerate}
+                disabled={loading || !isExpired}
+                style={{
+                  flex: 1, padding: '13px', borderRadius: 14, background: '#3b82f6',
+                  border: 'none', fontWeight: 700, cursor: loading || !isExpired ? 'not-allowed' : 'pointer',
+                  color: '#fff', opacity: !isExpired ? 0.5 : 1,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                }}
+              >
+                <RefreshCw size={14} /> Regenerate
+              </button>
             </div>
           </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/* ─── Main Component ─────────────────────────────────────────── */
+export const AttendanceManager: React.FC = () => {
+  const { isMobile } = useIsMobile();
+  const { user } = useAuthStore();
+
+  /* ── Slot / slot selection ── */
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [availableSlots, setAvailableSlots] = useState<(LectureInstance & { isSubstitute?: boolean })[]>([]);
+  const [selectedSlotId, setSelectedSlotId] = useState('');
+
+  /* ── Student list ── */
+  const [students, setStudents] = useState<StudentRecord[]>([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  /* ── Attendance state ── */
+  const [locked, setLocked] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState({ text: '', type: '' });
+
+  /* ── Confirm dialog ── */
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  /* ── QR ── */
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [qrPayload, setQrPayload] = useState('');
+  const [qrExpiresAt, setQrExpiresAt] = useState<Date | null>(null);
+  const [qrLoading, setQrLoading] = useState(false);
+  const [qrStudentCount, setQrStudentCount] = useState(0);
+
+  /* ── Faculty resolution ── */
+  const facultyName = user?.full_name || '';
+  const resolvedTeacherId = resolveTeacherIdByName(facultyName);
+  const [activeTeacherId] = useState<number>(resolvedTeacherId || 102);
+  const myAssignedSubjects = TimetableAttendanceService.getAssignedSubjectsForTeacher(activeTeacherId);
+
+  /* ─── Load slots whenever date changes ─── */
+  useEffect(() => {
+    const fetchSlots = async () => {
+      const baseSlots = TimetableAttendanceService.getLectureInstancesForDateByTeacher(date, activeTeacherId);
+      let combined: (LectureInstance & { isSubstitute?: boolean })[] = [...baseSlots];
+
+      try {
+        const subs = await substituteService.getMyAssignments();
+        const todaysSubs = subs.filter(s => s.start_date === date);
+        for (const sub of todaysSubs) {
+          const all = TimetableAttendanceService.getLectureInstancesForDate(date);
+          const match = all.find(i => i.id === sub.lecture_instance_id);
+          if (match && !combined.some(s => s.id === match.id)) {
+            combined.push({ ...match, isSubstitute: true });
+          }
+        }
+      } catch {/* ignore */}
+
+      setAvailableSlots(combined);
+      if (combined.length > 0) {
+        setSelectedSlotId(combined[0].id);
+      } else {
+        setSelectedSlotId('');
+        setStudents([]);
+      }
+    };
+    fetchSlots();
+  }, [date, activeTeacherId]);
+
+  /* ─── Load + check-lock students when slot changes ─── */
+  useEffect(() => {
+    if (!selectedSlotId) {
+      setStudents([]);
+      setLocked(false);
+      return;
+    }
+    const slot = availableSlots.find(s => s.id === selectedSlotId);
+    if (!slot) return;
+
+    const loadStudents = async () => {
+      setLoadingStudents(true);
+      setMessage({ text: '', type: '' });
+
+      // Check if attendance already submitted for this lecture
+      let isSubmitted = false;
+      try {
+        isSubmitted = await attendanceService.isSubmitted(selectedSlotId);
+      } catch {/* ignore, default false */}
+      setLocked(isSubmitted);
+
+      // Fetch students and possibly their saved attendance
+      try {
+        const [data, lectureAttendance] = await Promise.all([
+          attendanceService.getStudentsForSubject(slot.subjectId),
+          isSubmitted ? attendanceService.getLectureAttendance(selectedSlotId) : Promise.resolve([])
+        ]);
+
+        const attendanceMap = new Map<number, 'PRESENT' | 'ABSENT'>();
+        if (isSubmitted) {
+          lectureAttendance.forEach(record => {
+            attendanceMap.set(record.student_id, record.status);
+          });
+        }
+
+        const mapped: StudentRecord[] = data.map((s: any) => ({
+          id: s.id,
+          name: s.name,
+          enrollment_number: s.enrollment_number,
+          roll_number: s.roll_number,
+          photo: s.photo,
+          status: attendanceMap.get(s.id) || 'ABSENT',
+        }));
+        setStudents(mapped);
+      } catch {
+        // Demo fallback
+        setStudents([
+          { id: 1, name: 'Harsh Patel', enrollment_number: 'EN21001', roll_number: '01', status: 'ABSENT' },
+          { id: 2, name: 'Yash Patel', enrollment_number: 'EN21002', roll_number: '02', status: 'ABSENT' },
+          { id: 3, name: 'Aarav Sharma', enrollment_number: 'EN21003', roll_number: '03', status: 'ABSENT' },
+          { id: 4, name: 'Priya Singh', enrollment_number: 'EN21004', roll_number: '04', status: 'ABSENT' },
+          { id: 5, name: 'Riya Verma', enrollment_number: 'EN21005', roll_number: '05', status: 'ABSENT' },
+          { id: 6, name: 'Karan Mehta', enrollment_number: 'EN21006', roll_number: '06', status: 'ABSENT' },
+          { id: 7, name: 'Sneha Joshi', enrollment_number: 'EN21007', roll_number: '07', status: 'ABSENT' },
+          { id: 8, name: 'Ankit Rao', enrollment_number: 'EN21008', roll_number: '08', status: 'ABSENT' },
+          { id: 9, name: 'Divya Nair', enrollment_number: 'EN21009', roll_number: '09', status: 'ABSENT' },
+          { id: 10, name: 'Raj Kumar', enrollment_number: 'EN21010', roll_number: '10', status: 'ABSENT' },
+          { id: 11, name: 'Pooja Shah', enrollment_number: 'EN21011', roll_number: '11', status: 'ABSENT' },
+          { id: 12, name: 'Amit Gupta', enrollment_number: 'EN21012', roll_number: '12', status: 'ABSENT' },
+        ]);
+      }
+      setLoadingStudents(false);
+    };
+
+    loadStudents();
+  }, [selectedSlotId, availableSlots]);
+
+  /* ─── Poll QR stats ─── */
+  useEffect(() => {
+    if (!showQRModal || !selectedSlotId) return;
+    const interval = setInterval(async () => {
+      try {
+        const stats = await qrAttendanceService.getStats(selectedSlotId);
+        setQrStudentCount(stats.scanned_count);
+      } catch {/* ignore */}
+    }, 2500);
+    return () => clearInterval(interval);
+  }, [showQRModal, selectedSlotId]);
+
+  /* ─── Handlers ─── */
+  const toggleStudent = useCallback((id: number) => {
+    setStudents(prev => prev.map(s =>
+      s.id === id ? { ...s, status: s.status === 'PRESENT' ? 'ABSENT' : 'PRESENT' } : s
+    ));
+  }, []);
+
+  const markAll = (status: 'PRESENT' | 'ABSENT') => {
+    setStudents(prev => prev.map(s => ({ ...s, status })));
+  };
+
+  const handleSaveClick = () => {
+    if (students.length === 0) return;
+    setShowConfirm(true);
+  };
+
+  const handleConfirmSave = async () => {
+    setShowConfirm(false);
+    setSaving(true);
+    const slot = availableSlots.find(s => s.id === selectedSlotId);
+    if (!slot) { setSaving(false); return; }
+
+    try {
+      const result = await attendanceService.bulkSave({
+        subject_id: slot.subjectId,
+        date,
+        lecture_id: selectedSlotId,
+        attendance_method: 'Manual',
+        records: students.map(s => ({ student_id: s.id, status: s.status })),
+      });
+      setLocked(true);
+      setMessage({
+        text: `✓ Attendance saved! ${result.present} present · ${result.absent} absent`,
+        type: 'success',
+      });
+    } catch (err: any) {
+      setMessage({
+        text: err.response?.data?.detail || 'Failed to save attendance.',
+        type: 'error',
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleGenerateQR = async () => {
+    if (!selectedSlotId) return;
+    const slot = availableSlots.find(s => s.id === selectedSlotId);
+    setQrLoading(true);
+    try {
+      const res = await qrAttendanceService.generateQR({
+        lecture_instance_id: selectedSlotId,
+        subject_id: slot?.subjectId,
+        expiry_seconds: 180,
+      });
+      setQrPayload(res.qr_payload);
+      setQrExpiresAt(new Date(res.expires_at));
+      setQrStudentCount(0);
+      setShowQRModal(true);
+    } catch (err: any) {
+      setMessage({ text: err.response?.data?.detail || 'Failed to generate QR.', type: 'error' });
+    } finally {
+      setQrLoading(false);
+    }
+  };
+
+  /* ─── Derived ─── */
+  const filteredStudents = students.filter(s => {
+    const q = searchQuery.toLowerCase();
+    return (
+      s.name.toLowerCase().includes(q) ||
+      s.enrollment_number.toLowerCase().includes(q) ||
+      (s.roll_number || '').toLowerCase().includes(q)
+    );
+  });
+
+  const presentCount = students.filter(s => s.status === 'PRESENT').length;
+  const absentCount = students.length - presentCount;
+  const activeSlot = availableSlots.find(s => s.id === selectedSlotId);
+
+  /* ─── Render ─── */
+  return (
+    <div style={{ padding: 0, fontFamily: "'Space Grotesk', sans-serif" }}>
+
+      {/* ── Header ── */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 12 }}>
+        <div>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#111827', letterSpacing: '-0.6px', margin: 0, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <span>Attendance</span>
+            <span style={{
+              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+              color: '#fff', padding: '4px 18px', borderRadius: 14,
+              boxShadow: '0 4px 20px rgba(99,102,241,0.3)',
+              display: 'inline-flex', alignItems: 'center', lineHeight: 1.2,
+            }}>
+              <TextType
+                text={['Manager', 'Lecture-Wise', 'Evaluator']}
+                typingSpeed={60} deletingSpeed={35} pauseDuration={2200}
+                loop showCursor cursorCharacter="|"
+                style={{ color: '#fff' }}
+              />
+            </span>
+          </h1>
+          <div style={{ fontSize: 13, color: '#6b7280', marginTop: 6 }}>
+            Mark class attendance per lecture slot • All students default to Absent
+          </div>
+        </div>
+      </div>
+
+      {/* ── KPI Row ── */}
+      <motion.div
+        initial="hidden" animate="show"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07 } } }}
+        style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: 18, marginBottom: 28 }}
+      >
+        {[
+          { icon: <BookOpen size={16} color="#6366f1" />, label: 'My Subjects', value: myAssignedSubjects.length, color: '#6366f1' },
+          { icon: <Users size={16} color="#3b82f6" />, label: 'Students Loaded', value: students.length, color: '#3b82f6' },
+          { icon: <CheckCircle2 size={16} color="#22c55e" />, label: 'Present', value: presentCount, color: '#22c55e' },
+          { icon: <Clock size={16} color="#ef4444" />, label: 'Absent', value: absentCount, color: '#ef4444' },
+        ].map((card, i) => (
+          <motion.div
+            key={i}
+            variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0 } }}
+            style={{ background: '#f9fafb', borderRadius: 22, padding: '20px 22px', border: '1.5px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+              <div style={{ width: 34, height: 34, borderRadius: '50%', background: `${card.color}18`, border: `1px solid ${card.color}22`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {card.icon}
+              </div>
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#6b7280' }}>{card.label}</span>
+            </div>
+            <div style={{ fontSize: 36, fontWeight: 800, color: '#111827', letterSpacing: '-1px' }}>{card.value}</div>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* ── Alert Banner ── */}
+      <AnimatePresence>
+        {message.text && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            style={{
+              marginBottom: 20, padding: '12px 18px', borderRadius: 14,
+              background: message.type === 'success' ? '#dcfce7' : '#fee2e2',
+              color: message.type === 'success' ? '#15803d' : '#b91c1c',
+              fontWeight: 600, fontSize: 14,
+              display: 'flex', alignItems: 'center', gap: 10,
+            }}
+          >
+            {message.type === 'success' ? <CheckCircle2 size={16} /> : <AlertTriangle size={16} />}
+            {message.text}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Slot Selector ── */}
+      <div style={{ background: '#fff', borderRadius: 24, padding: 26, border: '1.5px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)', marginBottom: 24 }}>
+        <h3 style={{ fontSize: 16, fontWeight: 800, color: '#111827', marginBottom: 18, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Calendar size={18} color="#6366f1" /> Select Lecture Slot
+        </h3>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '200px 1fr', gap: 16 }}>
+          <div>
+            <label style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Date</label>
+            <input
+              type="date"
+              value={date}
+              onChange={e => setDate(e.target.value)}
+              style={{ width: '100%', padding: '11px 14px', borderRadius: 12, border: '1.5px solid #e5e7eb', fontSize: 14, fontWeight: 600, boxSizing: 'border-box' }}
+            />
+          </div>
+          <div>
+            <label style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Lecture Slot (Timetable-Synced)
+            </label>
+            <div style={{ position: 'relative' }}>
+              <select
+                value={selectedSlotId}
+                onChange={e => setSelectedSlotId(e.target.value)}
+                disabled={availableSlots.length === 0}
+                style={{
+                  width: '100%', padding: '11px 40px 11px 14px', borderRadius: 12,
+                  border: '1.5px solid #e5e7eb', fontSize: 14, fontWeight: 700,
+                  color: '#111827', background: '#fff', appearance: 'none', boxSizing: 'border-box',
+                }}
+              >
+                {availableSlots.length === 0
+                  ? <option value="">No scheduled classes found</option>
+                  : availableSlots.map(slot => (
+                    <option key={slot.id} value={slot.id}>
+                      {slot.startTime}–{slot.endTime} | {slot.subjectName} ({slot.room})
+                      {slot.isSubstitute ? ' [SUBSTITUTE]' : ''}
+                      {slot.status === 'cancelled' ? ' [CANCELLED]' : ''}
+                    </option>
+                  ))
+                }
+              </select>
+              <ChevronDown size={16} color="#9ca3af" style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+            </div>
+          </div>
+        </div>
+
+        {/* Slot details + Actions row */}
+        {activeSlot && (
+          <div style={{
+            marginTop: 18, background: '#f8fafc', borderRadius: 16, padding: '16px 20px',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 14,
+            border: '1px solid #e2e8f0',
+          }}>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>
+                {locked ? '🔒 Attendance Locked' : 'Active Slot'}
+              </div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: '#111827' }}>{activeSlot.subjectName}</div>
+              <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>
+                {activeSlot.teacherName} · {activeSlot.room} · {activeSlot.startTime}–{activeSlot.endTime}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <button
+                onClick={handleGenerateQR}
+                disabled={qrLoading || locked}
+                style={{
+                  padding: '9px 18px', borderRadius: 11,
+                  background: locked ? '#f3f4f6' : '#3b82f6', color: locked ? '#9ca3af' : '#fff',
+                  border: 'none', fontWeight: 700, cursor: locked ? 'not-allowed' : 'pointer',
+                  display: 'flex', alignItems: 'center', gap: 6, fontSize: 13,
+                }}
+              >
+                <QrCode size={14} />
+                {qrLoading ? 'Generating…' : 'Generate QR'}
+              </button>
+
+              {!locked && (
+                <>
+                  <button
+                    onClick={() => markAll('PRESENT')}
+                    style={{ padding: '9px 18px', borderRadius: 11, background: '#dcfce7', color: '#15803d', border: '1.5px solid #bbf7d0', fontWeight: 700, cursor: 'pointer', fontSize: 13 }}
+                  >
+                    ✓ All Present
+                  </button>
+                  <button
+                    onClick={() => markAll('ABSENT')}
+                    style={{ padding: '9px 18px', borderRadius: 11, background: '#fee2e2', color: '#b91c1c', border: '1.5px solid #fecaca', fontWeight: 700, cursor: 'pointer', fontSize: 13 }}
+                  >
+                    ✗ All Absent
+                  </button>
+                  <button
+                    onClick={handleSaveClick}
+                    disabled={saving || students.length === 0}
+                    style={{
+                      padding: '9px 18px', borderRadius: 11,
+                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                      color: '#fff', border: 'none', fontWeight: 700, cursor: saving || students.length === 0 ? 'not-allowed' : 'pointer',
+                      boxShadow: '0 4px 14px rgba(16,185,129,0.28)',
+                      display: 'flex', alignItems: 'center', gap: 6, fontSize: 13,
+                    }}
+                  >
+                    <Save size={14} /> {saving ? 'Saving…' : 'Save Attendance'}
+                  </button>
+                </>
+              )}
+
+              {locked && (
+                <div style={{
+                  padding: '9px 18px', borderRadius: 11, background: '#f0fdf4',
+                  border: '1.5px solid #bbf7d0', fontWeight: 700, color: '#15803d',
+                  display: 'flex', alignItems: 'center', gap: 6, fontSize: 13,
+                }}>
+                  <Lock size={14} /> Attendance Saved
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── Student List ── */}
+      {selectedSlotId && (
+        <div style={{ background: '#fff', borderRadius: 24, padding: 26, border: '1.5px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+
+          {/* Header row */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 800, color: '#111827', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Users size={18} color="#3b82f6" />
+              Student List
+              {loadingStudents && <span style={{ fontSize: 12, fontWeight: 500, color: '#6b7280' }}> · Loading…</span>}
+              {!loadingStudents && (
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#6b7280' }}>
+                  · {filteredStudents.length} students
+                  {locked ? ' (Locked)' : ''}
+                </span>
+              )}
+            </h3>
+
+            {/* Search */}
+            <div style={{ position: 'relative' }}>
+              <Search size={14} color="#9ca3af" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
+              <input
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search by name, enrollment, roll…"
+                style={{
+                  paddingLeft: 34, paddingRight: 14, paddingTop: 9, paddingBottom: 9,
+                  borderRadius: 12, border: '1.5px solid #e5e7eb', fontSize: 13,
+                  width: isMobile ? '100%' : 280, outline: 'none', fontWeight: 500,
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Summary pills */}
+          {!loadingStudents && students.length > 0 && (
+            <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
+              {[
+                { label: `${presentCount} Present`, bg: '#dcfce7', color: '#15803d', border: '#bbf7d0' },
+                { label: `${absentCount} Absent`, bg: '#fee2e2', color: '#b91c1c', border: '#fecaca' },
+              ].map(p => (
+                <div key={p.label} style={{ padding: '5px 14px', borderRadius: 20, background: p.bg, color: p.color, border: `1.5px solid ${p.border}`, fontSize: 12, fontWeight: 700 }}>
+                  {p.label}
+                </div>
+              ))}
+              <div style={{ padding: '5px 14px', borderRadius: 20, background: '#f3f4f6', color: '#374151', border: '1.5px solid #e5e7eb', fontSize: 12, fontWeight: 700 }}>
+                {Math.round((presentCount / Math.max(students.length, 1)) * 100)}% Attendance
+              </div>
+            </div>
+          )}
+
+          {/* Card grid */}
+          {loadingStudents ? (
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(260px, 1fr))', gap: 14 }}>
+              {[...Array(6)].map((_, i) => (
+                <div key={i} style={{ background: '#f9fafb', borderRadius: 18, height: 80, border: '2px solid #e5e7eb', animation: 'pulse 1.5s ease infinite' }} />
+              ))}
+            </div>
+          ) : filteredStudents.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '48px 24px', color: '#6b7280' }}>
+              <UserIcon size={40} style={{ opacity: 0.3, marginBottom: 12 }} />
+              <div style={{ fontWeight: 600 }}>No students found</div>
+              {searchQuery && <div style={{ fontSize: 13, marginTop: 4 }}>Try clearing the search</div>}
+            </div>
+          ) : (
+            <motion.div
+              layout
+              style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(268px, 1fr))', gap: 14 }}
+            >
+              <AnimatePresence>
+                {filteredStudents.map(student => (
+                  <StudentCard
+                    key={student.id}
+                    student={student}
+                    locked={locked}
+                    onToggle={toggleStudent}
+                  />
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          )}
         </div>
       )}
+
+      {/* ── Modals ── */}
+      <ConfirmDialog
+        open={showConfirm}
+        presentCount={presentCount}
+        absentCount={absentCount}
+        onConfirm={handleConfirmSave}
+        onCancel={() => setShowConfirm(false)}
+      />
+
+      <QRModal
+        open={showQRModal}
+        qrPayload={qrPayload}
+        expiresAt={qrExpiresAt}
+        expirySeconds={180}
+        slotLabel={activeSlot ? `${activeSlot.subjectName} · ${activeSlot.startTime}–${activeSlot.endTime}` : ''}
+        scannedCount={qrStudentCount}
+        totalStudents={students.length || 30}
+        onClose={() => setShowQRModal(false)}
+        onRegenerate={handleGenerateQR}
+        loading={qrLoading}
+      />
     </div>
   );
 };

@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { useAuthStore } from "../../store/authStore";
 import {
   CheckCircle2, XCircle, ChevronDown, ChevronLeft, ChevronRight,
-  Calendar, Book, ArrowUpRight
+  Calendar, Book, ArrowUpRight, QrCode, AlertCircle, RefreshCw
 } from 'lucide-react';
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,10 +12,10 @@ import {
 } from "../../services/timetableAttendanceService";
 import type {
   SubjectAttendanceStat,
-  OverallAttendanceStats,
-  LectureInstance
+  OverallAttendanceStats
 } from "../../services/timetableAttendanceService";
 import { qrAttendanceService } from "../../services/qrAttendanceService";
+import { studentAttendanceService } from "../../services/studentAttendanceService";
 import { Html5QrcodeScanner } from 'html5-qrcode';
 
 // ── Mobile Progress Ring ──
@@ -90,11 +89,12 @@ function MobileAttendance({ stats, onRefresh }: {
       </motion.div>
 
       {/* Subject Cards — expandable on mobile too */}
-      <motion.div variants={itemVariants}>
+      <motion.div variants={containerVariants} initial="hidden" animate="visible" style={{ marginTop: '24px' }}>
         <div className="m-section-label">Subject Breakdown</div>
-        {stats.subjects.map((r, i) => {
+        {stats.subjectWise.map((r, i) => {
           const pctColor = r.percentage >= 75 ? '#22c55e' : r.percentage >= 60 ? '#f59e0b' : '#ef4444';
           const isExpanded = expandedSubject === r.subjectId;
+
           return (
             <motion.div key={i} variants={itemVariants}>
               <div
@@ -124,6 +124,7 @@ function MobileAttendance({ stats, onRefresh }: {
                 <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', borderTop: 'none', borderRadius: '0 0 16px 16px', padding: '16px', marginBottom: '12px' }}>
                   <SubjectCalendarAccordionContent
                     subjectStat={r}
+                    calendarData={stats.calendarData}
                     onAttendanceUpdated={onRefresh}
                     isMobile={true}
                   />
@@ -140,11 +141,11 @@ function MobileAttendance({ stats, onRefresh }: {
 // ── Subject Calendar Accordion Content (shared between mobile & desktop) ──
 function SubjectCalendarAccordionContent({
   subjectStat,
-  onAttendanceUpdated,
+  calendarData = {},
   isMobile = false
 }: {
   subjectStat: SubjectAttendanceStat;
-  onAttendanceUpdated: () => void;
+  calendarData: Record<string, { date: string; records: Record<string, unknown>[] }>;
   isMobile?: boolean;
 }) {
   const [currentMonthDate, setCurrentMonthDate] = useState(new Date(2026, 7, 1)); // August 2026
@@ -166,14 +167,6 @@ function SubjectCalendarAccordionContent({
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const prevMonthDays = new Date(year, month, 0).getDate();
 
-  // Get subject-specific dots for this month
-  const subjectDots = TimetableAttendanceService.getSubjectCalendarDots(year, month, subjectStat.subjectId);
-
-  // Lecture slots for selected date (filtered to this subject)
-  const currentSlots = TimetableAttendanceService.getLectureInstancesForDateAndSubject(selectedDateStr, subjectStat.subjectId);
-
-
-
   // Calendar cells
   const gridCells: { day: number; isCurrentMonth: boolean; fullDateStr: string; dots?: string[] }[] = [];
   for (let i = firstDayOfWeek - 1; i >= 0; i--) {
@@ -181,11 +174,21 @@ function SubjectCalendarAccordionContent({
   }
   for (let d = 1; d <= daysInMonth; d++) {
     const fullDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    
+    // Extract dots for this day from backend calendarData
+    const dayData = calendarData[fullDateStr];
+    let dots: string[] = [];
+    if (dayData && dayData.records) {
+      dots = dayData.records
+        .filter(r => r.subjectId === subjectStat.subjectId)
+        .map(r => r.status);
+    }
+    
     gridCells.push({
       day: d,
       isCurrentMonth: true,
       fullDateStr,
-      dots: subjectDots[d] || []
+      dots
     });
   }
   const remaining = 42 - gridCells.length;
@@ -197,6 +200,8 @@ function SubjectCalendarAccordionContent({
   const formattedSelectedDate = isNaN(dateObj.getTime())
     ? selectedDateStr
     : dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+  const currentSlots = TimetableAttendanceService.getLectureInstancesForDateAndSubject(selectedDateStr, subjectStat.subjectId);
 
   const textColor = isMobile ? '#ffffff' : '#09090b';
   const subtextColor = isMobile ? '#7a80a1' : '#71717a';
@@ -348,7 +353,8 @@ function SubjectCalendarAccordionContent({
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {currentSlots.map(slot => {
-              const rec = TimetableAttendanceService.getAttendanceForInstance(slot.id);
+              const dayData = calendarData[selectedDateStr];
+              const rec = dayData?.records?.find(r => r.lectureInstanceId === slot.id || r.subjectId === subjectStat.subjectId);
               const currentStatus = rec ? rec.status : 'not_marked';
 
               return (
@@ -410,11 +416,13 @@ function SubjectCalendarAccordionContent({
 // ── Subject Accordion Card (Desktop) ──
 function SubjectAccordionCard({
   subjectStat,
+  calendarData = {},
   isExpanded,
   onToggle,
   onAttendanceUpdated,
 }: {
   subjectStat: SubjectAttendanceStat;
+  calendarData: Record<string, { date: string; records: Record<string, unknown>[] }>;
   isExpanded: boolean;
   onToggle: () => void;
   onAttendanceUpdated: () => void;
@@ -548,6 +556,7 @@ function SubjectAccordionCard({
               {/* Per-Subject Calendar */}
               <SubjectCalendarAccordionContent
                 subjectStat={subjectStat}
+                calendarData={calendarData}
                 onAttendanceUpdated={onAttendanceUpdated}
               />
             </div>
@@ -561,32 +570,47 @@ function SubjectAccordionCard({
 
 // ── Main Component Export ──
 export function MyAttendance() {
-  const { user } = useAuthStore();
   const { isMobile } = useIsMobile();
 
-  const [stats, setStats] = useState<OverallAttendanceStats>(TimetableAttendanceService.getAttendanceStats());
+  const [stats, setStats] = useState<OverallAttendanceStats | null>(null);
+  const [loading, setLoading] = useState(true);
   const [expandedSubjectId, setExpandedSubjectId] = useState<number | null>(null);
 
   // QR Scan States
   const [showScanner, setShowScanner] = useState(false);
   const [scanMessage, setScanMessage] = useState({ text: '', type: '' });
-  const [isScanning, setIsScanning] = useState(false);
 
-  const refreshStats = () => {
-    setStats(TimetableAttendanceService.getAttendanceStats());
+  const fetchStats = async () => {
+    setLoading(true);
+    try {
+      const data = await studentAttendanceService.getRealAttendanceStats();
+      if (data && data.subjectWise) {
+        setStats(data);
+      } else {
+        setStats(TimetableAttendanceService.getAttendanceStats());
+      }
+    } catch (error) {
+      console.error("Failed to load attendance stats from backend, using local fallback", error);
+      setStats(TimetableAttendanceService.getAttendanceStats());
+    } finally {
+      setLoading(false);
+    }
   };
 
   React.useEffect(() => {
-    const handleUpdate = () => refreshStats();
+    setTimeout(fetchStats, 0);
+    
+    // Listen for cross-tab or scan updates
+    const handleUpdate = () => fetchStats();
     window.addEventListener('attendance_updated', handleUpdate);
-    window.addEventListener('storage', handleUpdate); // For cross-tab updates
     return () => {
       window.removeEventListener('attendance_updated', handleUpdate);
-      window.removeEventListener('storage', handleUpdate);
     };
   }, []);
 
   // Initialize QR Scanner when modal opens
+  const isScanningRef = React.useRef(false);
+
   React.useEffect(() => {
     if (!showScanner) return;
 
@@ -597,65 +621,87 @@ export function MyAttendance() {
     );
 
     scanner.render(async (decodedText) => {
-      if (isScanning) return;
-      setIsScanning(true);
-      
-      try {
-        const data = JSON.parse(decodedText);
-        if (!data.lectureInstanceId || !data.token) throw new Error("Invalid QR code format.");
-        
-        scanner.pause(true);
-        const res = await qrAttendanceService.scanQR(data.lectureInstanceId, data.token);
-        
-        setScanMessage({ text: res.message, type: res.status === 'success' ? 'success' : 'info' });
-        
-        if (res.status === 'success') {
-          // Parse lecture instance id to get details for local store update
-          // format: inst_YYYY-MM-DD_tt_day_N
-          const parts = data.lectureInstanceId.split('_');
-          const dateStr = parts[1];
-          // We need to find the subjectId to properly mark attendance locally
-          const instances = TimetableAttendanceService.getLectureInstancesForDate(dateStr);
-          const currentInstance = instances.find(i => i.id === data.lectureInstanceId);
-          
-          if (currentInstance) {
-            TimetableAttendanceService.markAttendance(
-              currentInstance.id,
-              currentInstance.date,
-              currentInstance.subjectId,
-              currentInstance.subjectCode,
-              'present'
-            );
-          }
-          refreshStats();
-        }
-        
-        setTimeout(() => {
-          setShowScanner(false);
-          setIsScanning(false);
-          scanner.clear();
-        }, 2500);
+      if (isScanningRef.current) return;
+      isScanningRef.current = true;
 
-      } catch (err: any) {
-        setScanMessage({ text: err.response?.data?.detail || err.message || 'Failed to scan QR.', type: 'error' });
-        setTimeout(() => setIsScanning(false), 2000);
-        scanner.resume();
+      try {
+        // Parse the enriched QR payload from the new API
+        const data = JSON.parse(decodedText);
+        const lectureInstanceId = data.lectureInstanceId;
+        const token = data.token;
+        const subjectId = data.subjectId;
+
+        if (!lectureInstanceId || !token) {
+          throw new Error("Invalid QR code. Please scan the correct attendance QR.");
+        }
+
+        scanner.pause(true);
+
+        // Call the backend scan endpoint
+        const res = await qrAttendanceService.scanQR(lectureInstanceId, token, subjectId);
+
+        if (res.status === 'success') {
+          setScanMessage({ text: '✓ ' + res.message, type: 'success' });
+
+          // Re-fetch stats from backend
+          fetchStats();
+          setTimeout(() => {
+            setShowScanner(false);
+            isScanningRef.current = false;
+            scanner.clear();
+          }, 2500);
+
+        } else if (res.status === 'expired') {
+          setScanMessage({ text: '⏰ ' + res.message, type: 'warning' });
+          setTimeout(() => { isScanningRef.current = false; scanner.resume(); }, 2500);
+
+        } else if (res.status === 'duplicate') {
+          setScanMessage({ text: '✓ ' + res.message, type: 'info' });
+          setTimeout(() => {
+            setShowScanner(false);
+            isScanningRef.current = false;
+            scanner.clear();
+          }, 2500);
+
+        } else {
+          setScanMessage({ text: res.message, type: 'error' });
+          setTimeout(() => { isScanningRef.current = false; scanner.resume(); }, 2000);
+        }
+
+      } catch (err) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const error = err as any;
+        const msg = error.response?.data?.detail || error.message || 'Failed to scan QR. Please try again.';
+        setScanMessage({ text: msg, type: 'error' });
+        setTimeout(() => { isScanningRef.current = false; scanner.resume(); }, 2000);
       }
-    }, (error) => {
-      // ignore empty scan frames
+    }, () => {
+      // Ignore empty scan frames
     });
 
     return () => {
       scanner.clear().catch(e => console.error("Failed to clear scanner", e));
     };
-  }, [showScanner, isScanning]);
+  }, [showScanner]);
+
+  if (loading) {
+    return (
+      <div style={{ padding: '40px', textAlign: 'center', color: '#6b7280', fontSize: '15px' }}>
+        <RefreshCw size={24} className="spin" style={{ marginBottom: '12px', color: '#3b82f6' }} />
+        <div>Loading your live attendance stats...</div>
+      </div>
+    );
+  }
+
+  // Ensure stats is non-null using fallback if state was somehow clear
+  const activeStats = stats || TimetableAttendanceService.getAttendanceStats();
 
   // Mobile View
   if (isMobile) {
     return (
       <MobileAttendance
-        stats={stats}
-        onRefresh={refreshStats}
+        stats={activeStats}
+        onRefresh={fetchStats}
       />
     );
   }
@@ -696,10 +742,10 @@ export function MyAttendance() {
           </div>
         </div>
         <button
-          onClick={() => { setShowScanner(true); setScanMessage({text:'', type:''}); }}
+          onClick={() => { setShowScanner(true); setScanMessage({ text: '', type: '' }); }}
           style={{ padding: '12px 24px', borderRadius: '14px', background: '#3b82f6', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
         >
-          <Book size={18} /> Scan QR
+          <QrCode size={18} /> Scan QR
         </button>
       </div>
 
@@ -717,7 +763,22 @@ export function MyAttendance() {
             <div id="qr-reader" style={{ width: '100%', borderRadius: '16px', overflow: 'hidden', marginBottom: '16px' }}></div>
 
             {scanMessage.text && (
-              <div style={{ padding: '12px', borderRadius: '12px', marginBottom: '16px', fontWeight: 600, background: scanMessage.type === 'success' ? '#dcfce7' : scanMessage.type === 'error' ? '#fee2e2' : '#fef3c7', color: scanMessage.type === 'success' ? '#15803d' : scanMessage.type === 'error' ? '#b91c1c' : '#b45309' }}>
+              <div style={{
+                padding: '12px 16px', borderRadius: '12px', marginBottom: '16px',
+                fontWeight: 600, fontSize: '14px',
+                background:
+                  scanMessage.type === 'success' ? '#dcfce7' :
+                  scanMessage.type === 'error' ? '#fee2e2' :
+                  scanMessage.type === 'warning' ? '#fef3c7' : '#eff6ff',
+                color:
+                  scanMessage.type === 'success' ? '#15803d' :
+                  scanMessage.type === 'error' ? '#b91c1c' :
+                  scanMessage.type === 'warning' ? '#b45309' : '#1d4ed8',
+                display: 'flex', alignItems: 'center', gap: '8px',
+              }}>
+                {scanMessage.type === 'success' && <CheckCircle2 size={16} />}
+                {scanMessage.type === 'error' && <XCircle size={16} />}
+                {scanMessage.type === 'warning' && <AlertCircle size={16} />}
                 {scanMessage.text}
               </div>
             )}
@@ -767,7 +828,7 @@ export function MyAttendance() {
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
             <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              {stats.totalDelivered}
+              {activeStats.totalDelivered}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
               <span style={{ color: '#573cfa', fontWeight: 600 }}>100%</span> · Timetable Synced
@@ -803,10 +864,10 @@ export function MyAttendance() {
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
             <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              {stats.totalAttended}
+              {activeStats.totalAttended}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#22c55e', fontWeight: 600 }}>{stats.overallPercentage}%</span> · Attended Rate
+              <span style={{ color: '#22c55e', fontWeight: 600 }}>{activeStats.overallPercentage}%</span> · Attended Rate
             </div>
           </div>
         </motion.div>
@@ -839,10 +900,10 @@ export function MyAttendance() {
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
             <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
-              {stats.totalMissed}
+              {activeStats.totalMissed}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#ef4444', fontWeight: 600 }}>{stats.totalDelivered > 0 ? Math.round((stats.totalMissed / stats.totalDelivered) * 100) : 0}%</span> · Missed Rate
+              <span style={{ color: '#ef4444', fontWeight: 600 }}>{activeStats.totalDelivered > 0 ? Math.round((activeStats.totalMissed / activeStats.totalDelivered) * 100) : 0}%</span> · Missed Rate
             </div>
           </div>
         </motion.div>
@@ -883,15 +944,16 @@ export function MyAttendance() {
 
         {/* Accordion Cards */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {stats.subjects.map((subjectStat) => (
+          {(activeStats.subjectWise || []).map((subjectStat) => (
             <SubjectAccordionCard
               key={subjectStat.subjectId}
               subjectStat={subjectStat}
+              calendarData={activeStats.calendarData || {}}
               isExpanded={expandedSubjectId === subjectStat.subjectId}
               onToggle={() => setExpandedSubjectId(
                 expandedSubjectId === subjectStat.subjectId ? null : subjectStat.subjectId
               )}
-              onAttendanceUpdated={refreshStats}
+              onAttendanceUpdated={fetchStats}
             />
           ))}
         </div>

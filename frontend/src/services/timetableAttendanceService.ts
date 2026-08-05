@@ -60,7 +60,9 @@ export interface OverallAttendanceStats {
   totalMissed: number;
   totalCancelled: number;
   overallPercentage: number;
-  subjects: SubjectAttendanceStat[];
+  subjectWise: SubjectAttendanceStat[];
+  subjects?: SubjectAttendanceStat[];
+  calendarData: Record<string, { date: string; records: AttendanceRecord[] }>;
 }
 
 // ── Master Timetable Data (Single Source of Truth) ──
@@ -369,7 +371,9 @@ export class TimetableAttendanceService {
       totalMissed,
       totalCancelled,
       overallPercentage,
-      subjects
+      subjectWise: subjects,
+      subjects: subjects,
+      calendarData: {}
     };
   }
 

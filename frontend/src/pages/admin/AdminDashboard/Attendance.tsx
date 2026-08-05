@@ -98,7 +98,7 @@ export default function Attendance() {
     setReportLoading(true);
     try {
       const stats = TimetableAttendanceService.getAttendanceStats();
-      setReportData(stats.subjects);
+      setReportData(stats.subjects || stats.subjectWise || []);
     } catch {
       setMessage({ text: 'Failed to fetch report', type: 'error' });
     } finally {
