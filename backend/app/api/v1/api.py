@@ -3,7 +3,8 @@ from app.api.v1 import (
     users, auth, students, faculty, departments,
     subjects, timetable, fees,
     assignments, events, notices, complaints, placements, dashboard,
-    student_dashboard, faculty_dashboard, qr_attendance, substitutes
+    student_dashboard, faculty_dashboard, qr_attendance, substitutes,
+    chatbot
 )
 
 api_router = APIRouter()
@@ -25,3 +26,4 @@ api_router.include_router(dashboard.router, prefix="/dashboard", tags=["dashboar
 api_router.include_router(fees.router, prefix="/fees", tags=["fees"])
 api_router.include_router(qr_attendance.router, prefix="/qr", tags=["qr_attendance"])
 api_router.include_router(substitutes.router, prefix="/substitutes", tags=["substitutes"])
+api_router.include_router(chatbot.router, prefix="/chatbot", tags=["chatbot"])

@@ -3,6 +3,7 @@ import React, { Suspense } from 'react';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import ChatWidget from "./components/ChatWidget";
 
 // Lazy Loaded Pages
 const Login = React.lazy(() => import("./pages/Login"));
@@ -173,6 +174,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
+        <ChatWidget />
       </BrowserRouter>
     </GoogleOAuthProvider>
   );
