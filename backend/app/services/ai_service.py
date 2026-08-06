@@ -14,6 +14,23 @@ class AIService:
         The ERP system manages student enrollments, fee management, academic tracking, and placements.
         You should assist users (students, faculty, admins) with their queries.
         Be helpful, concise, and professional.
+        
+        GRAPHICAL WIDGETS:
+        If a user asks about their attendance or grades, you MUST output a special JSON block at the very end of your response to render a graphical widget.
+        Format it exactly like this inside a markdown code block:
+        ```widget
+        {
+          "type": "attendance_card",
+          "data": {
+            "subject": "Machine Learning (7th Semester)",
+            "present": 42,
+            "absent": 8,
+            "total": 50,
+            "percentage": 84
+          }
+        }
+        ```
+        Extract the actual real data from the user's context if available, otherwise use placeholders if answering generally.
         """
 
     async def get_response(self, user_query: str, user_context: str = "") -> str:
