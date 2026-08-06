@@ -40,7 +40,7 @@ export const AttendanceReport: React.FC = () => {
     // Listen for real-time updates from TimetableAttendanceService
     const handleStorageUpdate = () => {
       if (selectedStudentId) {
-        setReportData(TimetableAttendanceService.getAttendanceStats());
+        handleGenerateReport(selectedStudentId);
       }
     };
     window.addEventListener('attendance_updated', handleStorageUpdate);
@@ -76,22 +76,22 @@ export const AttendanceReport: React.FC = () => {
     });
   }, [allStudents, searchQuery, filterDept, filterSem]);
 
-  const handleGenerateReport = (studentId: string) => {
+  const handleGenerateReport = async (studentId: string) => {
     setSelectedStudentId(studentId);
     setReportLoading(true);
     setMessage({ text: '', type: '' });
     
-    // Simulate network delay for UI responsiveness then fetch real-time local data
-    setTimeout(() => {
-      try {
-        const stats = TimetableAttendanceService.getAttendanceStats();
-        setReportData(stats);
-      } catch {
-        setMessage({ text: 'Failed to generate real-time report', type: 'error' });
-      } finally {
-        setReportLoading(false);
-      }
-    }, 400);
+    try {
+      const res = await api.get(`/faculty-dash/attendance/report?student_id=${studentId}`);
+      setReportData(res.data);
+    } catch (error) {
+      console.error(error);
+      setMessage({ text: 'Failed to generate real-time report', type: 'error' });
+      // Fallback for demo if API fails
+      setReportData(TimetableAttendanceService.getAttendanceStats());
+    } finally {
+      setReportLoading(false);
+    }
   };
 
   const selectedStudentObj = allStudents.find(s => s.id.toString() === selectedStudentId);
@@ -314,14 +314,14 @@ export const AttendanceReport: React.FC = () => {
                   <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#09090b', margin: 0 }}>Subject-wise Breakdown</h3>
                 </div>
 
-                {reportData.subjects.length === 0 ? (
+                {(reportData?.subjects || reportData?.subjectWise || []).length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '40px', color: '#71717a', background: '#f8fafc', borderRadius: '16px' }}>
                     <BookOpen size={32} color="#d4d4d8" style={{ margin: '0 auto 12px' }} />
                     <div style={{ fontSize: '14px', fontWeight: 600 }}>No attendance records found</div>
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {reportData.subjects.map((r, i) => (
+                    {(reportData?.subjects || reportData?.subjectWise || []).map((r, i) => (
                       <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '16px', background: '#f8fafc', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.04)' }}>
                         <div style={{ flex: 1 }}>
                           <div style={{ fontSize: '15px', fontWeight: 700, color: '#09090b', marginBottom: '4px' }}>

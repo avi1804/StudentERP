@@ -232,7 +232,7 @@ async def get_attendance(
             "subjectId": sub.id,
             "subjectCode": sub.code,
             "subjectName": sub.name,
-            "faculty": prof_name,
+            "teacherName": prof_name,
             "present": present,
             "absent": absent,
             "late": late,

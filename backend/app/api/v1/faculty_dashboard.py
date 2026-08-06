@@ -332,55 +332,115 @@ async def bulk_save_attendance(
 @router.get("/attendance/report")
 async def get_attendance_report(
     student_id: int,
+    semester: Optional[int] = None,
     subject_id: Optional[int] = None,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(RequireRole(["faculty", "admin", "student"]))
 ) -> Any:
-    query = select(Attendance).where(Attendance.student_id == student_id)
-    if subject_id:
-        query = query.where(Attendance.subject_id == subject_id)
-        
-    attendances = (await db.scalars(query)).all()
-    
-    report = {}
-    for att in attendances:
-        sub_id = att.subject_id
-        if sub_id not in report:
-            subject = await db.scalar(select(Subject).where(Subject.id == sub_id))
-            report[sub_id] = {
-                "subjectId": sub_id,
-                "subjectName": subject.name if subject else "Unknown",
-                "present": 0,
-                "absent": 0,
-                "late": 0,
-                "totalClasses": 0
-            }
-        
-        report[sub_id]["totalClasses"] += 1
-        status_val = getattr(att.status, 'name', str(att.status))
-        if status_val == "PRESENT":
-            report[sub_id]["present"] += 1
-        elif status_val == "ABSENT":
-            report[sub_id]["absent"] += 1
-        elif status_val == "LATE":
-            report[sub_id]["late"] += 1
+    student = await db.scalar(select(Student).where(Student.id == student_id))
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
 
-    result = []
-    for sub_id, data in report.items():
-        present_count = data["present"] + data["late"]
-        pct = (present_count / data["totalClasses"]) * 100 if data["totalClasses"] > 0 else 0
-        data["percentage"] = round(pct, 1)
+    target_sem = semester if semester is not None else (student.semester or 7)
+
+    query = select(Subject).where(Subject.semester == target_sem)
+    if subject_id:
+        query = query.where(Subject.id == subject_id)
         
-        if pct >= 80:
-            data["remark"] = "Good"
-        elif pct >= 65:
-            data["remark"] = "Average"
+    subjects = (await db.scalars(query)).all()
+    if not subjects and not subject_id:
+        subjects = (await db.scalars(select(Subject))).all()
+
+    result_subject_wise = []
+    color_types = ["purple", "green", "yellow", "blue", "pink", "teal"]
+    
+    overall_total = 0
+    overall_present = 0
+    overall_absent = 0
+    overall_late = 0
+    
+    calendar_data = {}
+
+    for idx, sub in enumerate(subjects):
+        prof_name = "Not Assigned"
+        if sub.faculty_id:
+            fac = await db.scalar(select(Faculty).where(Faculty.id == sub.faculty_id))
+            if fac:
+                u = await db.scalar(select(User).where(User.id == fac.user_id))
+                if u and u.full_name:
+                    prof_name = u.full_name
+        if prof_name == "Not Assigned":
+            assignment = await db.scalar(select(SubjectAssignment).where(SubjectAssignment.subject_id == sub.id))
+            if assignment:
+                fac = await db.scalar(select(Faculty).where(Faculty.id == assignment.faculty_id))
+                if fac:
+                    u = await db.scalar(select(User).where(User.id == fac.user_id))
+                    if u and u.full_name:
+                        prof_name = u.full_name
+
+        attendances = (await db.scalars(
+            select(Attendance).where(
+                Attendance.student_id == student.id,
+                Attendance.subject_id == sub.id
+            )
+        )).all()
+
+        total_classes = len(attendances)
+        present = sum(1 for a in attendances if getattr(a.status, 'name', str(a.status)) == "PRESENT")
+        absent = sum(1 for a in attendances if getattr(a.status, 'name', str(a.status)) == "ABSENT")
+        late = sum(1 for a in attendances if getattr(a.status, 'name', str(a.status)) == "LATE")
+        
+        overall_total += total_classes
+        overall_present += present
+        overall_absent += absent
+        overall_late += late
+
+        if total_classes > 0:
+            pct = round(((present + late) / total_classes) * 100, 1)
+            remark = "Good" if pct >= 80 else "Average" if pct >= 65 else "Low"
         else:
-            data["remark"] = "Low"
-            
-        result.append(data)
+            pct = 0.0
+            remark = "N/A"
+
+        result_subject_wise.append({
+            "subjectId": sub.id,
+            "subjectCode": sub.code,
+            "subjectName": sub.name,
+            "teacherName": prof_name,
+            "present": present,
+            "absent": absent,
+            "late": late,
+            "totalClasses": total_classes,
+            "percentage": pct,
+            "remark": remark,
+            "colorType": color_types[idx % len(color_types)]
+        })
         
-    return result
+        for a in attendances:
+            date_str = a.date.isoformat()
+            if date_str not in calendar_data:
+                calendar_data[date_str] = {"date": date_str, "records": []}
+            calendar_data[date_str]["records"].append({
+                "id": str(a.id),
+                "lectureInstanceId": a.lecture_id or str(a.id),
+                "date": date_str,
+                "subjectId": sub.id,
+                "subjectCode": sub.code,
+                "status": getattr(a.status, 'name', str(a.status)).lower()
+            })
+
+    overall_pct = round(((overall_present + overall_late) / overall_total * 100), 1) if overall_total > 0 else 0.0
+
+    return {
+        "totalDelivered": overall_total,
+        "totalAttended": overall_present + overall_late,
+        "totalMissed": overall_absent,
+        "totalCancelled": 0,
+        "overallPercentage": overall_pct,
+        "subjectWise": result_subject_wise,
+        "subjects": result_subject_wise,
+        "calendarData": calendar_data
+    }
 
 
 @router.get('/attendance/stats')

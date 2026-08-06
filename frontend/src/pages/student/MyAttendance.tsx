@@ -125,7 +125,6 @@ function MobileAttendance({ stats, onRefresh }: {
                   <SubjectCalendarAccordionContent
                     subjectStat={r}
                     calendarData={stats.calendarData}
-                    onAttendanceUpdated={onRefresh}
                     isMobile={true}
                   />
                 </div>
@@ -557,7 +556,6 @@ function SubjectAccordionCard({
               <SubjectCalendarAccordionContent
                 subjectStat={subjectStat}
                 calendarData={calendarData}
-                onAttendanceUpdated={onAttendanceUpdated}
               />
             </div>
           </motion.div>

@@ -1,5 +1,5 @@
 import { apiClient } from '../api/axios';
-import { OverallAttendanceStats } from './timetableAttendanceService'; // Import the type
+import type { OverallAttendanceStats } from './timetableAttendanceService';
 
 export const studentAttendanceService = {
   getRealAttendanceStats: async (): Promise<OverallAttendanceStats> => {
