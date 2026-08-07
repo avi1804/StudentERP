@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import React, { Suspense } from 'react';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
@@ -81,6 +81,13 @@ const LoadingSpinner = () => (
     <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-indigo-500 border-t-transparent"></div>
   </div>
 );
+
+const ChatWidgetWrapper = () => {
+  const location = useLocation();
+  const isAllowed = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/faculty');
+  if (!isAllowed) return null;
+  return <ChatWidget />;
+};
 
 function App() {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID_HERE";
@@ -174,7 +181,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
-        <ChatWidget />
+        <ChatWidgetWrapper />
       </BrowserRouter>
     </GoogleOAuthProvider>
   );
