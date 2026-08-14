@@ -30,13 +30,32 @@ function PlacementSidebar({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className="premium-student-sidebar">
-      <div className="logo-area">
-        <div className="logo-icon" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)' }}>
-          <Briefcase size={28} color="#ffffff" />
+      <div className="logo-area" style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '28px 24px 20px' }}>
+        <div 
+          className="logo-icon" 
+          style={{ 
+            width: '46px', 
+            height: '46px', 
+            borderRadius: '14px', 
+            background: '#ffffff', 
+            boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
+            border: '1px solid rgba(0,0,0,0.08)',
+            padding: '6px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0
+          }}
+        >
+          <img 
+            src="/indus-logo.png" 
+            alt="Indus Logo" 
+            className="w-full h-full object-contain"
+          />
         </div>
         <div className="logo-text">
-          <h2>Placement ERP</h2>
-          <p>Recruit. Manage. Hire.</p>
+          <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#111827', margin: 0, letterSpacing: '-0.02em' }}>IndusERP</h2>
+          <p style={{ fontSize: '12px', color: '#6b7280', margin: '2px 0 0 0', fontWeight: 500 }}>Placement Cell</p>
         </div>
       </div>
 

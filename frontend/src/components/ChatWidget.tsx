@@ -2,13 +2,86 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   X, Send, History, Maximize2, MoreVertical,
   Paperclip, Sparkles, Mic, RefreshCw, Plus,
-  Copy, ThumbsUp, ThumbsDown, RotateCcw, Check
+  Copy, ThumbsUp, ThumbsDown, RotateCcw, Check, Bot
 } from 'lucide-react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { API_BASE_URL } from '../config';
 import { useAuthStore } from '../store/authStore';
 import AttendanceWidget from './AttendanceWidget';
+
+export const RobotIcon: React.FC<{ className?: string; size?: number }> = ({ className = "w-full h-full", size }) => (
+  <svg
+    viewBox="0 0 100 100"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    style={size ? { width: size, height: size } : undefined}
+  >
+    <defs>
+      {/* Head & Body Gradient */}
+      <linearGradient id="robotBodyGrad" x1="50" y1="12" x2="50" y2="88" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#38BDF8" />
+        <stop offset="100%" stopColor="#0284C7" />
+      </linearGradient>
+      {/* Antenna Ball Gradient */}
+      <radialGradient id="robotBallGrad" cx="38%" cy="32%" r="68%">
+        <stop offset="0%" stopColor="#BAE6FD" />
+        <stop offset="55%" stopColor="#0EA5E9" />
+        <stop offset="100%" stopColor="#0369A1" />
+      </radialGradient>
+      {/* Ear Left Gradient */}
+      <linearGradient id="robotEarLeftGrad" x1="10" y1="42" x2="19" y2="68" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#38BDF8" />
+        <stop offset="100%" stopColor="#0369A1" />
+      </linearGradient>
+      {/* Ear Right Gradient */}
+      <linearGradient id="robotEarRightGrad" x1="81" y1="42" x2="90" y2="68" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#38BDF8" />
+        <stop offset="100%" stopColor="#0369A1" />
+      </linearGradient>
+      {/* Face Screen Gradient */}
+      <linearGradient id="robotScreenGrad" x1="50" y1="33" x2="50" y2="75" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#252F3F" />
+        <stop offset="100%" stopColor="#111827" />
+      </linearGradient>
+    </defs>
+
+    {/* Antenna Stem */}
+    <rect x="47" y="19" width="6" height="9" rx="3" fill="#0284C7" />
+    
+    {/* Antenna Ball */}
+    <circle cx="50" cy="14.5" r="7.5" fill="url(#robotBallGrad)" />
+
+    {/* Left Ear */}
+    <rect x="10" y="42" width="9" height="26" rx="4.5" fill="url(#robotEarLeftGrad)" />
+    
+    {/* Right Ear */}
+    <rect x="81" y="42" width="9" height="26" rx="4.5" fill="url(#robotEarRightGrad)" />
+
+    {/* Main Head Body */}
+    <rect x="16" y="24" width="68" height="60" rx="22" fill="url(#robotBodyGrad)" />
+    
+    {/* Head Top Subtle Highlight */}
+    <path d="M 28 27 Q 50 24 72 27" stroke="#BAE6FD" strokeWidth="2.2" strokeLinecap="round" opacity="0.65" />
+
+    {/* Dark Inner Screen */}
+    <rect x="23.5" y="33" width="53" height="42" rx="14" fill="url(#robotScreenGrad)" />
+
+    {/* Eyes */}
+    <ellipse cx="38" cy="50" rx="4.5" ry="5.5" fill="#FFFFFF" />
+    <ellipse cx="62" cy="50" rx="4.5" ry="5.5" fill="#FFFFFF" />
+
+    {/* Smile */}
+    <path
+      d="M 43 61.5 Q 50 67.5 57 61.5"
+      stroke="#FFFFFF"
+      strokeWidth="3.2"
+      strokeLinecap="round"
+      fill="none"
+    />
+  </svg>
+);
 
 interface Message {
   id: string;
@@ -334,58 +407,52 @@ const ChatWidget: React.FC = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-            className="mb-6 flex flex-col origin-bottom-right"
+            className="mb-6 flex flex-col origin-bottom-right overflow-hidden"
             style={{
-              width: isMaximized ? 'calc(100vw - 48px)' : '520px',
-              height: isMaximized ? 'calc(100vh - 48px)' : '740px',
+              width: isMaximized ? 'calc(100vw - 48px)' : '480px',
+              height: isMaximized ? 'calc(100vh - 48px)' : '700px',
               maxHeight: isMaximized ? 'calc(100vh - 48px)' : '85vh',
-              borderRadius: isMaximized ? '16px' : '28px',
-              background: 'rgba(255, 255, 255, 0.98)',
-              backdropFilter: 'blur(40px)',
-              WebkitBackdropFilter: 'blur(40px)',
-              boxShadow: '0 24px 64px rgba(0, 0, 0, 0.12), 0 8px 24px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9)',
-              border: '1px solid rgba(0, 0, 0, 0.06)',
-              overflow: 'hidden'
+              borderRadius: isMaximized ? '20px' : '28px',
+              background: 'linear-gradient(180deg, #EDE9FE 0%, #F5F3FF 40%, #FFFFFF 100%)',
+              boxShadow: '0 30px 70px rgba(88, 28, 235, 0.18), 0 10px 28px rgba(0, 0, 0, 0.08)',
+              border: '1px solid rgba(139, 92, 246, 0.12)'
             }}
           >
             {/* ========== HEADER ========== */}
             <div
-              className="flex items-center justify-between border-b"
+              className="flex items-center justify-between flex-shrink-0"
               style={{
-                height: '80px',
-                padding: '0 24px',
-                background: 'rgba(255, 255, 255, 0.6)',
+                height: '84px',
+                padding: '0 20px',
+                background: 'rgba(255, 255, 255, 0.55)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
-                borderColor: 'rgba(0, 0, 0, 0.06)'
+                borderBottom: '1px solid rgba(139, 92, 246, 0.12)'
               }}
             >
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <div className="relative flex-shrink-0">
                   <div
-                    className="flex items-center justify-center overflow-hidden bg-gradient-to-br from-purple-100 to-purple-50 border border-purple-200/50"
+                    className="flex items-center justify-center overflow-hidden p-1.5"
                     style={{
-                      width: '44px',
-                      height: '44px',
-                      borderRadius: '50%'
+                      width: '52px',
+                      height: '52px',
+                      borderRadius: '18px',
+                      background: 'linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)',
+                      boxShadow: '0 6px 16px rgba(2, 132, 199, 0.35)'
                     }}
                   >
-                    <img
-                      src="/chatbot-mascot.png"
-                      alt="Yuna"
-                      className="w-[120%] h-[120%] object-cover object-top"
-                      style={{ imageRendering: 'pixelated' }}
-                    />
+                    <RobotIcon className="w-full h-full" />
                   </div>
                   <div
                     className="absolute"
                     style={{
-                      bottom: '0',
-                      right: '0',
-                      width: '12px',
-                      height: '12px',
-                      backgroundColor: '#10b981',
-                      border: '2px solid rgba(255, 255, 255, 0.98)',
+                      bottom: '-2px',
+                      right: '-2px',
+                      width: '14px',
+                      height: '14px',
+                      backgroundColor: '#22c55e',
+                      border: '3px solid #F5F3FF',
                       borderRadius: '50%'
                     }}
                   />
@@ -393,20 +460,20 @@ const ChatWidget: React.FC = () => {
                 <div>
                   <div className="flex items-center gap-2">
                     <h3
-                      className="font-bold text-slate-900"
+                      className="font-extrabold text-slate-900"
                       style={{
-                        fontSize: '17px',
+                        fontSize: '18px',
                         lineHeight: '1.2',
                         letterSpacing: '-0.02em'
                       }}
                     >
-                      Yuna
+                      ERP Assistant
                     </h3>
                     <span
                       className="font-bold px-2 py-0.5 rounded-full"
                       style={{
                         fontSize: '10px',
-                        backgroundColor: '#f3e8ff',
+                        backgroundColor: '#EDE4FF',
                         color: '#7c3aed',
                         letterSpacing: '0.02em'
                       }}
@@ -415,61 +482,46 @@ const ChatWidget: React.FC = () => {
                     </span>
                   </div>
                   <p
-                    className="text-slate-500 font-medium flex items-center gap-1.5"
+                    className="text-slate-500 font-medium"
                     style={{
                       fontSize: '13px',
                       marginTop: '2px',
                       letterSpacing: '-0.01em'
                     }}
                   >
-                    Yuna (AI Assistant)
-                    <span
-                      className="inline-flex items-center gap-1"
-                      style={{ fontSize: '12px', color: '#10b981' }}
-                    >
-                      <span
-                        style={{
-                          width: '4px',
-                          height: '4px',
-                          backgroundColor: '#10b981',
-                          borderRadius: '50%',
-                          display: 'inline-block'
-                        }}
-                      />
-                      Online
-                    </span>
+                    AI Assistant for Student ERP
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <button
                   onClick={handleClearHistory}
-                  className="flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100/80 transition-all rounded-xl"
-                  style={{ width: '36px', height: '36px' }}
+                  className="flex items-center justify-center text-slate-500 hover:text-purple-700 hover:bg-white/70 transition-all rounded-full"
+                  style={{ width: '38px', height: '38px' }}
                   title="History"
                 >
                   <History size={18} strokeWidth={2} />
                 </button>
                 <button
                   onClick={() => setIsMaximized(!isMaximized)}
-                  className="flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100/80 transition-all rounded-xl"
-                  style={{ width: '36px', height: '36px' }}
+                  className="flex items-center justify-center text-slate-500 hover:text-purple-700 hover:bg-white/70 transition-all rounded-full"
+                  style={{ width: '38px', height: '38px' }}
                   title={isMaximized ? "Minimize" : "Maximize"}
                 >
-                  <Maximize2 size={18} strokeWidth={2} />
+                  <Maximize2 size={17} strokeWidth={2} />
                 </button>
                 <button
                   onClick={() => alert("Settings coming soon!")}
-                  className="flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100/80 transition-all rounded-xl"
-                  style={{ width: '36px', height: '36px' }}
+                  className="flex items-center justify-center text-slate-500 hover:text-purple-700 hover:bg-white/70 transition-all rounded-full"
+                  style={{ width: '38px', height: '38px' }}
                   title="Settings"
                 >
                   <MoreVertical size={18} strokeWidth={2} />
                 </button>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100/80 transition-all rounded-xl ml-1"
-                  style={{ width: '36px', height: '36px' }}
+                  className="flex items-center justify-center text-slate-500 hover:text-red-500 hover:bg-white/70 transition-all rounded-full ml-0.5"
+                  style={{ width: '38px', height: '38px' }}
                   title="Close"
                 >
                   <X size={20} strokeWidth={2} />
@@ -480,339 +532,292 @@ const ChatWidget: React.FC = () => {
             {/* ========== CHAT AREA ========== */}
             <div
               className="flex-1 overflow-y-auto relative"
-              style={{
-                padding: '24px',
-                background: 'linear-gradient(180deg, rgba(249, 250, 251, 0.5) 0%, rgba(243, 244, 246, 0.8) 100%)'
-              }}
+              style={{ padding: '20px 20px 8px 20px' }}
             >
-              {!hasMessages ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
-                  className="flex flex-col items-center justify-center h-full"
-                  style={{ paddingBottom: '40px' }}
-                >
-                  <div
-                    className="mb-6 flex items-center justify-center rounded-full bg-gradient-to-br from-purple-100 to-blue-50 border-4 border-white"
-                    style={{
-                      width: '140px',
-                      height: '140px',
-                      boxShadow: '0 8px 24px rgba(139, 92, 246, 0.15)'
-                    }}
+              {hasMessages && (
+                <div className="flex justify-center mb-5">
+                  <span
+                    className="px-4 py-1.5 bg-white/80 backdrop-blur-sm rounded-full text-slate-500 font-semibold border border-purple-100"
+                    style={{ fontSize: '11.5px' }}
                   >
-                    <img
-                      src="/chatbot-mascot.png"
-                      alt="Yuna"
-                      className="w-[140%] h-[140%] object-cover object-top"
-                      style={{ imageRendering: 'pixelated' }}
-                    />
-                  </div>
-                  <h2
-                    className="font-bold text-slate-900 mb-2"
-                    style={{
-                      fontSize: '28px',
-                      letterSpacing: '-0.03em',
-                      lineHeight: '1.2'
-                    }}
+                    Today
+                  </span>
+                </div>
+              )}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                {messages.map((msg, index) => {
+                  return (
+                    <motion.div
+                      key={msg.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: 0.05 }}
+                      className={`flex ${msg.isBot ? 'justify-start' : 'justify-end'}`}
+                      onMouseEnter={() => msg.isBot && setHoveredMessageId(msg.id)}
+                      onMouseLeave={() => msg.isBot && setHoveredMessageId(null)}
+                    >
+                      <div
+                        className="flex items-start gap-2.5"
+                        style={{ maxWidth: msg.isBot ? '80%' : '78%' }}
+                      >
+                        {msg.isBot && (
+                          <div className="relative flex-shrink-0">
+                            <div
+                              className="flex items-center justify-center overflow-hidden p-1"
+                              style={{
+                                width: '38px',
+                                height: '38px',
+                                borderRadius: '13px',
+                                background: 'linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)',
+                                boxShadow: '0 3px 10px rgba(2, 132, 199, 0.3)'
+                              }}
+                            >
+                              <RobotIcon className="w-full h-full" />
+                            </div>
+                            <div
+                              className="absolute"
+                              style={{
+                                bottom: '-1px',
+                                right: '-1px',
+                                width: '10px',
+                                height: '10px',
+                                backgroundColor: '#22c55e',
+                                border: '2px solid #F5F3FF',
+                                borderRadius: '50%'
+                              }}
+                            />
+                          </div>
+                        )}
+                        <div className="flex flex-col gap-1.5 w-full">
+                          {msg.text && (
+                            <div
+                              className={`relative ${msg.isBot
+                                ? 'bg-white text-slate-800'
+                                : 'text-white'
+                                }`}
+                              style={{
+                                padding: '14px 16px',
+                                borderRadius: msg.isBot ? '18px 18px 18px 4px' : '18px 18px 4px 18px',
+                                fontSize: '14.5px',
+                                lineHeight: '1.55',
+                                letterSpacing: '-0.01em',
+                                background: msg.isBot
+                                  ? '#FFFFFF'
+                                  : 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)',
+                                boxShadow: msg.isBot
+                                  ? '0 2px 10px rgba(88, 28, 135, 0.08)'
+                                  : '0 4px 14px rgba(124, 58, 237, 0.35)',
+                                border: msg.isBot ? '1px solid rgba(139, 92, 246, 0.08)' : 'none',
+                                wordBreak: 'break-word'
+                              }}
+                            >
+                              {msg.isBot ? renderStructuredMessage(msg.text) : msg.text}
+                              <div
+                                className={`flex items-center gap-1 mt-1.5 ${msg.isBot ? 'text-slate-400' : 'text-purple-200 justify-end'
+                                  }`}
+                                style={{
+                                  fontSize: '10.5px',
+                                  fontWeight: 500
+                                }}
+                              >
+                                {msg.time}
+                                {!msg.isBot && (
+                                  <svg
+                                    width="13"
+                                    height="13"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2.5"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  >
+                                    <polyline points="9 11 12 14 22 4" />
+                                    <polyline points="5 11 8 14 18 4" />
+                                  </svg>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                          {msg.widgetData && msg.widgetData.type === 'attendance_card' && (
+                            <AttendanceWidget data={msg.widgetData.data} />
+                          )}
+                          {msg.isBot && (
+                            <div className="flex items-center gap-1 pl-1">
+                              <div
+                                className="flex items-center gap-0.5 bg-white/90 backdrop-blur-sm rounded-lg border border-purple-100 p-0.5"
+                                style={{ boxShadow: '0 2px 6px rgba(88, 28, 135, 0.06)' }}
+                              >
+                                <button
+                                  onClick={() => handleCopyMessage(msg.id, msg.text)}
+                                  className="flex items-center justify-center text-slate-500 hover:text-purple-700 hover:bg-purple-50 transition-all rounded-md"
+                                  style={{ width: '26px', height: '26px' }}
+                                  title="Copy"
+                                >
+                                  {copiedMessageId === msg.id ? (
+                                    <Check size={12} className="text-green-600" />
+                                  ) : (
+                                    <Copy size={12} strokeWidth={2} />
+                                  )}
+                                </button>
+                                <button
+                                  onClick={() => handleRegenerateMessage(msg.id)}
+                                  className="flex items-center justify-center text-slate-500 hover:text-purple-700 hover:bg-purple-50 transition-all rounded-md"
+                                  style={{ width: '26px', height: '26px' }}
+                                  title="Regenerate"
+                                >
+                                  <RotateCcw size={12} strokeWidth={2} />
+                                </button>
+                                <button
+                                  onClick={() => toggleLike(msg.id)}
+                                  className={`flex items-center justify-center transition-all rounded-md ${likedMessages[msg.id] === 'like'
+                                    ? 'text-green-600 bg-green-50'
+                                    : 'text-slate-500 hover:text-green-600 hover:bg-green-50'
+                                    }`}
+                                  style={{ width: '26px', height: '26px' }}
+                                  title="Like"
+                                >
+                                  <ThumbsUp size={12} strokeWidth={2} />
+                                </button>
+                                <button
+                                  onClick={() => toggleDislike(msg.id)}
+                                  className={`flex items-center justify-center transition-all rounded-md ${likedMessages[msg.id] === 'dislike'
+                                    ? 'text-red-600 bg-red-50'
+                                    : 'text-slate-500 hover:text-red-600 hover:bg-red-50'
+                                    }`}
+                                  style={{ width: '26px', height: '26px' }}
+                                  title="Dislike"
+                                >
+                                  <ThumbsDown size={12} strokeWidth={2} />
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+                {isLoading && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-start gap-2.5"
                   >
-                    Hi {user?.full_name?.split(' ')[0] || 'Harsh'}! 👋
-                  </h2>
-                  <p
-                    className="text-slate-600 text-center mb-8 font-medium"
-                    style={{
-                      fontSize: '15px',
-                      maxWidth: '380px',
-                      lineHeight: '1.5'
-                    }}
-                  >
-                    I'm Yuna, your StudentERP AI Assistant.<br />
-                    I can help with:
-                  </p>
-                  <div
-                    className="grid grid-cols-2 gap-3 mb-8"
-                    style={{ width: '100%', maxWidth: '400px' }}
-                  >
-                    {[
-                      { icon: '📊', label: 'Attendance', prompt: 'Show my overall attendance' },
-                      { icon: '📝', label: 'Results', prompt: 'Show my results' },
-                      { icon: '📚', label: 'Assignments', prompt: 'My pending assignments' },
-                      { icon: '📅', label: 'Timetable', prompt: "Today's timetable" },
-                      { icon: '📢', label: 'Notices', prompt: 'Latest notices' },
-                      { icon: '✍️', label: 'Leave Applications', prompt: 'Help me write leave application' }
-                    ].map((item, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => handleSend(item.prompt)}
-                        className="flex items-center gap-3 p-3 bg-white hover:bg-purple-50 rounded-2xl border border-slate-200/60 hover:border-purple-200 transition-all cursor-pointer text-left w-full"
+                    <div className="relative flex-shrink-0">
+                      <div
+                        className="flex items-center justify-center p-1"
                         style={{
-                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
+                          width: '38px',
+                          height: '38px',
+                          borderRadius: '13px',
+                          background: 'linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)',
+                          boxShadow: '0 3px 10px rgba(2, 132, 199, 0.3)'
                         }}
                       >
-                        <span style={{ fontSize: '24px' }}>{item.icon}</span>
-                        <span
-                          className="font-semibold text-slate-700"
-                          style={{ fontSize: '14px' }}
-                        >
-                          {item.label}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
-              ) : (
-                <>
-                  <div className="flex justify-center mb-6">
-                    <span
-                      className="px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full text-slate-600 font-semibold border border-slate-200/60"
+                        <RobotIcon className="w-full h-full" />
+                      </div>
+                      <div
+                        className="absolute"
+                        style={{
+                          bottom: '-1px',
+                          right: '-1px',
+                          width: '10px',
+                          height: '10px',
+                          backgroundColor: '#22c55e',
+                          border: '2px solid #F5F3FF',
+                          borderRadius: '50%'
+                        }}
+                      />
+                    </div>
+                    <div
+                      className="bg-white flex items-center justify-center"
                       style={{
-                        fontSize: '12px',
-                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
+                        padding: '14px 20px',
+                        borderRadius: '18px 18px 18px 4px',
+                        boxShadow: '0 2px 10px rgba(88, 28, 135, 0.08)',
+                        border: '1px solid rgba(139, 92, 246, 0.08)'
                       }}
                     >
-                      Today
-                    </span>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    {messages.map((msg, index) => {
-                      if (index === 0) return null;
-
-                      return (
-                        <motion.div
-                          key={msg.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.3, delay: 0.05 }}
-                          className={`flex ${msg.isBot ? 'justify-start' : 'justify-end'}`}
-                          onMouseEnter={() => msg.isBot && setHoveredMessageId(msg.id)}
-                          onMouseLeave={() => msg.isBot && setHoveredMessageId(null)}
-                        >
-                          <div
-                            className="flex items-start gap-3"
-                            style={{ maxWidth: msg.isBot ? '75%' : '70%' }}
-                          >
-                            {msg.isBot && (
-                              <div className="relative flex-shrink-0">
-                                <div
-                                  className="flex items-center justify-center overflow-hidden bg-gradient-to-br from-purple-100 to-purple-50 border border-purple-200/50"
-                                  style={{
-                                    width: '36px',
-                                    height: '36px',
-                                    borderRadius: '50%'
-                                  }}
-                                >
-                                  <img
-                                    src="/chatbot-mascot.png"
-                                    alt="Yuna"
-                                    className="w-[120%] h-[120%] object-cover object-top"
-                                    style={{ imageRendering: 'pixelated' }}
-                                  />
-                                </div>
-                                <div
-                                  className="absolute"
-                                  style={{
-                                    bottom: '0',
-                                    right: '0',
-                                    width: '10px',
-                                    height: '10px',
-                                    backgroundColor: '#10b981',
-                                    border: '2px solid rgba(243, 244, 246, 0.8)',
-                                    borderRadius: '50%'
-                                  }}
-                                />
-                              </div>
-                            )}
-                            <div className="flex flex-col gap-2 w-full">
-                              {msg.text && (
-                                <div
-                                  className={`relative ${msg.isBot
-                                      ? 'bg-white border border-slate-200/60 text-slate-800'
-                                      : 'bg-gradient-to-br from-purple-600 to-purple-500 text-white border border-purple-400/30'
-                                    }`}
-                                  style={{
-                                    padding: '16px 18px',
-                                    borderRadius: '20px',
-                                    fontSize: '15px',
-                                    lineHeight: '1.6',
-                                    letterSpacing: '-0.01em',
-                                    boxShadow: msg.isBot
-                                      ? '0 2px 12px rgba(0, 0, 0, 0.06)'
-                                      : '0 4px 16px rgba(139, 92, 246, 0.3)',
-                                    wordBreak: 'break-word'
-                                  }}
-                                >
-                                  {msg.isBot ? renderStructuredMessage(msg.text) : msg.text}
-                                  <div
-                                    className={`flex items-center gap-1 mt-2 ${msg.isBot ? 'text-slate-400' : 'text-purple-200 justify-end'
-                                      }`}
-                                    style={{
-                                      fontSize: '11px',
-                                      fontWeight: 500
-                                    }}
-                                  >
-                                    {msg.time}
-                                    {!msg.isBot && (
-                                      <svg
-                                        width="14"
-                                        height="14"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2.5"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                      >
-                                        <polyline points="9 11 12 14 22 4" />
-                                        <polyline points="5 11 8 14 18 4" />
-                                      </svg>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                              {msg.widgetData && msg.widgetData.type === 'attendance_card' && (
-                                <AttendanceWidget data={msg.widgetData.data} />
-                              )}
-                              {msg.isBot && (
-                                <div className="flex items-center gap-1 mt-1 pl-1">
-                                  <div
-                                    className="flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-xl border border-slate-200/60 p-1"
-                                    style={{
-                                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
-                                    }}
-                                  >
-                                    <button
-                                      onClick={() => handleCopyMessage(msg.id, msg.text)}
-                                      className="flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all rounded-lg"
-                                      style={{ width: '28px', height: '28px' }}
-                                      title="Copy"
-                                    >
-                                      {copiedMessageId === msg.id ? (
-                                        <Check size={13} className="text-green-600" />
-                                      ) : (
-                                        <Copy size={13} strokeWidth={2} />
-                                      )}
-                                    </button>
-                                    <button
-                                      onClick={() => handleRegenerateMessage(msg.id)}
-                                      className="flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all rounded-lg"
-                                      style={{ width: '28px', height: '28px' }}
-                                      title="Regenerate"
-                                    >
-                                      <RotateCcw size={13} strokeWidth={2} />
-                                    </button>
-                                    <button
-                                      onClick={() => toggleLike(msg.id)}
-                                      className={`flex items-center justify-center transition-all rounded-lg ${likedMessages[msg.id] === 'like'
-                                          ? 'text-green-600 bg-green-50'
-                                          : 'text-slate-600 hover:text-green-600 hover:bg-green-50'
-                                        }`}
-                                      style={{ width: '28px', height: '28px' }}
-                                      title="Like"
-                                    >
-                                      <ThumbsUp size={13} strokeWidth={2} />
-                                    </button>
-                                    <button
-                                      onClick={() => toggleDislike(msg.id)}
-                                      className={`flex items-center justify-center transition-all rounded-lg ${likedMessages[msg.id] === 'dislike'
-                                          ? 'text-red-600 bg-red-50'
-                                          : 'text-slate-600 hover:text-red-600 hover:bg-red-50'
-                                        }`}
-                                      style={{ width: '28px', height: '28px' }}
-                                      title="Dislike"
-                                    >
-                                      <ThumbsDown size={13} strokeWidth={2} />
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-                    {isLoading && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex items-start gap-3"
-                      >
-                        <div className="relative flex-shrink-0">
-                          <div
-                            className="flex items-center justify-center overflow-hidden bg-gradient-to-br from-purple-100 to-purple-50 border border-purple-200/50"
-                            style={{
-                              width: '36px',
-                              height: '36px',
-                              borderRadius: '50%'
-                            }}
-                          >
-                            <img
-                              src="/chatbot-mascot.png"
-                              alt="Yuna"
-                              className="w-[120%] h-[120%] object-cover object-top"
-                              style={{ imageRendering: 'pixelated' }}
-                            />
-                          </div>
-                          <div
-                            className="absolute"
-                            style={{
-                              bottom: '0',
-                              right: '0',
-                              width: '10px',
-                              height: '10px',
-                              backgroundColor: '#10b981',
-                              border: '2px solid rgba(243, 244, 246, 0.8)',
-                              borderRadius: '50%'
-                            }}
-                          />
-                        </div>
+                      <div className="flex gap-1.5">
                         <div
-                          className="bg-white border border-slate-200/60 flex items-center justify-center"
-                          style={{
-                            padding: '16px 24px',
-                            borderRadius: '20px',
-                            boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)'
-                          }}
-                        >
-                          <div className="flex gap-1.5">
-                            <div
-                              className="w-2 h-2 rounded-full bg-slate-400 animate-bounce"
-                              style={{ animationDelay: '0ms', animationDuration: '1s' }}
-                            />
-                            <div
-                              className="w-2 h-2 rounded-full bg-slate-400 animate-bounce"
-                              style={{ animationDelay: '150ms', animationDuration: '1s' }}
-                            />
-                            <div
-                              className="w-2 h-2 rounded-full bg-slate-400 animate-bounce"
-                              style={{ animationDelay: '300ms', animationDuration: '1s' }}
-                            />
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </div>
-                  <div ref={messagesEndRef} />
-                </>
-              )}
+                          className="w-2 h-2 rounded-full bg-purple-400 animate-bounce"
+                          style={{ animationDelay: '0ms', animationDuration: '1s' }}
+                        />
+                        <div
+                          className="w-2 h-2 rounded-full bg-purple-400 animate-bounce"
+                          style={{ animationDelay: '150ms', animationDuration: '1s' }}
+                        />
+                        <div
+                          className="w-2 h-2 rounded-full bg-purple-400 animate-bounce"
+                          style={{ animationDelay: '300ms', animationDuration: '1s' }}
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* ========== SUGGESTED PROMPTS ========== */}
+            <div
+              className="flex-shrink-0"
+              style={{
+                padding: '14px 20px 0 20px',
+                borderTop: '1px solid rgba(139, 92, 246, 0.10)'
+              }}
+            >
+              <div className="flex items-center justify-between mb-2.5">
+                <span
+                  className="font-bold text-slate-700"
+                  style={{ fontSize: '12.5px' }}
+                >
+                  Suggested for you
+                </span>
+                <button
+                  onClick={() => setMessages(prev => [...prev])}
+                  className="flex items-center gap-1 text-purple-600 hover:text-purple-800 font-semibold transition-colors"
+                  style={{ fontSize: '12px' }}
+                  title="Refresh suggestions"
+                >
+                  <RefreshCw size={12} strokeWidth={2.5} />
+                  Refresh
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2" style={{ paddingBottom: '14px' }}>
+                {suggestedPrompts.map((prompt, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleSend(prompt)}
+                    disabled={isLoading}
+                    className="bg-white hover:bg-purple-50 text-slate-700 hover:text-purple-800 font-semibold border border-purple-100 hover:border-purple-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                      fontSize: '12.5px',
+                      padding: '9px 14px',
+                      borderRadius: '999px',
+                      boxShadow: '0 1px 4px rgba(88, 28, 135, 0.05)'
+                    }}
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* ========== INPUT AREA ========== */}
             <div
-              className="flex flex-col gap-4 border-t"
+              className="flex flex-col gap-2.5 flex-shrink-0"
               style={{
-                padding: '20px 24px',
-                background: 'rgba(255, 255, 255, 0.8)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                borderColor: 'rgba(0, 0, 0, 0.06)'
+                padding: '0 20px 18px 20px',
+                background: 'transparent'
               }}
             >
               <div
-                className="relative bg-white border border-slate-200/80 focus-within:border-purple-300 transition-all"
+                className="relative bg-white border border-purple-100 focus-within:border-purple-300 transition-all"
                 style={{
-                  borderRadius: '20px',
-                  boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)',
-                  minHeight: '72px'
+                  borderRadius: '22px',
+                  boxShadow: '0 4px 16px rgba(88, 28, 135, 0.08)'
                 }}
               >
                 <textarea
@@ -824,20 +829,20 @@ const ChatWidget: React.FC = () => {
                   disabled={isLoading}
                   className="w-full bg-transparent border-none resize-none text-slate-800 placeholder:text-slate-400 font-medium"
                   style={{
-                    padding: '16px 16px 60px 16px',
-                    fontSize: '15px',
+                    padding: '14px 16px 52px 16px',
+                    fontSize: '14.5px',
                     lineHeight: '1.5',
                     outline: 'none',
-                    maxHeight: '160px',
-                    minHeight: '72px'
+                    maxHeight: '140px',
+                    minHeight: '64px'
                   }}
                   rows={1}
                 />
                 <div
                   className="absolute bottom-0 left-0 right-0 flex items-center justify-between"
-                  style={{ padding: '12px 16px' }}
+                  style={{ padding: '10px 12px' }}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     <input
                       type="file"
                       ref={fileInputRef}
@@ -846,52 +851,53 @@ const ChatWidget: React.FC = () => {
                     />
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-all rounded-xl"
-                      style={{ width: '36px', height: '36px' }}
+                      className="flex items-center justify-center text-slate-400 hover:text-purple-700 hover:bg-purple-50 transition-all rounded-full"
+                      style={{ width: '34px', height: '34px' }}
                       title="Attach file"
                     >
-                      <Plus size={18} strokeWidth={2} />
+                      <Plus size={17} strokeWidth={2} />
                     </button>
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-all rounded-xl"
-                      style={{ width: '36px', height: '36px' }}
+                      className="flex items-center justify-center text-slate-400 hover:text-purple-700 hover:bg-purple-50 transition-all rounded-full"
+                      style={{ width: '34px', height: '34px' }}
                       title="Paperclip"
                     >
-                      <Paperclip size={18} strokeWidth={2} />
+                      <Paperclip size={16} strokeWidth={2} />
                     </button>
                     <button
-                      className="flex items-center justify-center text-purple-600 hover:text-purple-700 bg-purple-50 hover:bg-purple-100 transition-all rounded-xl"
-                      style={{ width: '36px', height: '36px' }}
+                      className="flex items-center justify-center text-purple-500 hover:text-purple-700 bg-purple-50 hover:bg-purple-100 transition-all rounded-full"
+                      style={{ width: '34px', height: '34px' }}
                       title="AI features"
                     >
-                      <Sparkles size={18} strokeWidth={2} />
+                      <Sparkles size={16} strokeWidth={2} />
                     </button>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <button
                       onClick={handleMicClick}
-                      className={`flex items-center justify-center transition-all rounded-full ${isRecording ? 'text-red-500 bg-red-50 animate-pulse' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'}`}
-                      style={{ width: '40px', height: '40px' }}
+                      className={`flex items-center justify-center border transition-all rounded-full ${isRecording ? 'text-red-500 bg-red-50 border-red-200 animate-pulse' : 'text-slate-500 border-slate-200 hover:text-purple-700 hover:bg-purple-50'}`}
+                      style={{ width: '38px', height: '38px' }}
                       title="Voice input"
                     >
-                      <Mic size={18} strokeWidth={2} />
+                      <Mic size={17} strokeWidth={2} />
                     </button>
                     <button
                       onClick={() => handleSend()}
                       disabled={!inputValue.trim() || isLoading}
-                      className="flex items-center justify-center bg-gradient-to-br from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white transition-all rounded-full disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="flex items-center justify-center text-white transition-all rounded-full disabled:opacity-40 disabled:cursor-not-allowed"
                       style={{
-                        width: '44px',
-                        height: '44px',
+                        width: '42px',
+                        height: '42px',
+                        background: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)',
                         boxShadow: inputValue.trim() && !isLoading
-                          ? '0 4px 16px rgba(139, 92, 246, 0.4)'
+                          ? '0 4px 14px rgba(124, 58, 237, 0.4)'
                           : 'none'
                       }}
                       title="Send message"
                     >
                       <Send
-                        size={18}
+                        size={17}
                         strokeWidth={2}
                         className={inputValue.trim() ? 'translate-x-[1px] -translate-y-[0.5px]' : ''}
                       />
@@ -900,15 +906,12 @@ const ChatWidget: React.FC = () => {
                 </div>
               </div>
               <div
-                className="flex items-center justify-between text-slate-500 font-medium"
-                style={{
-                  fontSize: '11px',
-                  paddingTop: '4px'
-                }}
+                className="flex items-center justify-between text-slate-500 font-medium px-1"
+                style={{ fontSize: '10.5px' }}
               >
-                <div className="flex items-center gap-2">
-                  <Sparkles size={12} className="text-purple-600" fill="currentColor" />
-                  <span className="text-slate-600">Powered by Gemini AI</span>
+                <div className="flex items-center gap-1.5">
+                  <Sparkles size={11} className="text-purple-500" fill="currentColor" />
+                  <span className="text-slate-500">Powered by Gemini AI</span>
                 </div>
                 <span>AI can make mistakes. Verify important information.</span>
               </div>
@@ -919,44 +922,26 @@ const ChatWidget: React.FC = () => {
 
       {!isOpen && (
         <motion.button
-          whileHover={{
-            scale: 1.08
-          }}
-          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.1, y: -3 }}
+          whileTap={{ scale: 0.92 }}
           onClick={() => setIsOpen(true)}
-          className="flex items-center justify-center transition-all outline-none border-none cursor-pointer translate-x-6 translate-y-6"
+          className="relative flex items-center justify-center cursor-pointer transition-all outline-none rounded-full"
           style={{
-            background: 'transparent',
-            boxShadow: 'none',
-            border: 'none'
+            width: '64px',
+            height: '64px',
+            background: 'linear-gradient(135deg, #38BDF8 0%, #0284C7 60%, #0369A1 100%)',
+            boxShadow: '0 10px 25px -3px rgba(2, 132, 199, 0.45), 0 4px 10px -2px rgba(0, 0, 0, 0.1)',
+            border: '2.5px solid rgba(255, 255, 255, 0.9)',
+            padding: '8px'
           }}
+          title="ERP AI Assistant"
         >
-          <video
-            src="/chatbot.webm"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            className="w-[150px] h-[150px] md:w-[200px] md:h-[200px] lg:w-[250px] lg:h-[250px] object-contain"
+          <RobotIcon className="w-full h-full drop-shadow-sm select-none pointer-events-none" />
+          <span
+            className="absolute top-0 right-0 w-3.5 h-3.5 bg-emerald-400 border-2 border-white rounded-full"
             style={{
-              background: 'transparent',
-              backgroundColor: 'transparent',
-              border: 'none',
-              outline: 'none',
-              boxShadow: 'none'
+              boxShadow: '0 0 6px rgba(34, 197, 94, 0.6)'
             }}
-            onError={(e) => {
-              (e.target as HTMLVideoElement).style.display = 'none';
-              const img = (e.target as HTMLVideoElement).nextElementSibling as HTMLImageElement;
-              if (img) img.style.display = 'block';
-            }}
-          />
-          <img
-            src="/chatbot-mascot.png"
-            alt="Yuna"
-            className="w-[150px] h-[150px] md:w-[200px] md:h-[200px] lg:w-[250px] lg:h-[250px] object-contain hidden"
-            style={{ imageRendering: 'pixelated' }}
           />
         </motion.button>
       )}

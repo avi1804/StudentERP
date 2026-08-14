@@ -55,27 +55,31 @@ export function FacultySidebar() {
     >
       <div>
         {/* Brand Logo Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '36px', paddingLeft: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '36px', paddingLeft: '8px' }}>
           <div
             style={{
-              width: '42px',
-              height: '42px',
+              width: '46px',
+              height: '46px',
               borderRadius: '14px',
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
+              background: '#ffffff',
+              boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
+              border: '1px solid rgba(0,0,0,0.08)',
+              padding: '6px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontWeight: 800,
-              fontSize: '16px',
-              boxShadow: '0 4px 16px rgba(99, 102, 241, 0.3)',
+              flexShrink: 0
             }}
           >
-            ERP
+            <img 
+              src="/indus-logo.png" 
+              alt="Indus Logo" 
+              className="w-full h-full object-contain"
+            />
           </div>
           <div>
-            <div style={{ fontSize: '16px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.3px' }}>
-              StudentERP
+            <div style={{ fontSize: '18px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.3px' }}>
+              IndusERP
             </div>
             <div style={{ fontSize: '11px', color: '#71717a', fontWeight: 600 }}>Faculty Portal</div>
           </div>

@@ -163,11 +163,32 @@ export function StudentLayout() {
           margin: 0,
         }}
       >
-        <div className="logo-area">
-          <div className="logo-icon"><GraduationCap size={28} /></div>
+        <div className="logo-area" style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '28px 24px 20px' }}>
+          <div 
+            className="logo-icon" 
+            style={{ 
+              width: '46px', 
+              height: '46px', 
+              borderRadius: '14px', 
+              background: '#ffffff', 
+              boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
+              border: '1px solid rgba(0,0,0,0.08)',
+              padding: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}
+          >
+            <img 
+              src="/indus-logo.png" 
+              alt="Indus Logo" 
+              className="w-full h-full object-contain"
+            />
+          </div>
           <div className="logo-text">
-            <h2>Student ERP</h2>
-            <p>Learn. Manage. Grow.</p>
+            <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#111827', margin: 0, letterSpacing: '-0.02em' }}>IndusERP</h2>
+            <p style={{ fontSize: '12px', color: '#6b7280', margin: '2px 0 0 0', fontWeight: 500 }}>Learn. Manage. Grow.</p>
           </div>
         </div>
         <div className="nav-links">
