@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   X, Send, History, Maximize2, MoreVertical,
   Paperclip, Sparkles, Mic, RefreshCw, Plus,
-  Copy, ThumbsUp, ThumbsDown, RotateCcw
+  Copy, ThumbsUp, ThumbsDown, RotateCcw, Check
 } from 'lucide-react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -32,6 +32,93 @@ const processBotResponse = (rawText: string): { text: string; widgetData?: any }
     }
   }
   return { text: rawText };
+};
+
+const renderStructuredMessage = (rawText: string) => {
+  if (!rawText) return null;
+
+  const lines = rawText.split('\n');
+
+  return (
+    <div className="space-y-2 font-sans">
+      {lines.map((line, idx) => {
+        let clean = line.trim();
+        if (!clean) return <div key={idx} className="h-1" />;
+
+        // Strip any horizontal rule stars/dashes (e.g. *** or --- or * * *)
+        clean = clean.replace(/\*\s*\*\s*\*/g, '').replace(/[\*\-]{3,}/g, '').trim();
+        if (!clean) return null;
+
+        // Check if line starts with bullet marker (* or -)
+        let isBullet = false;
+        let emojiPrefix = '🔹';
+
+        if (/^[\*\-•]\s+/.test(clean)) {
+          isBullet = true;
+          const lower = clean.toLowerCase();
+          if (lower.includes('present') || lower.includes('attended') || lower.includes('pass') || lower.includes('completed')) {
+            emojiPrefix = '✅';
+          } else if (lower.includes('absent') || lower.includes('missed') || lower.includes('fail') || lower.includes('pending')) {
+            emojiPrefix = '❌';
+          } else if (lower.includes('total') || lower.includes('summary') || lower.includes('score') || lower.includes('marks')) {
+            emojiPrefix = '📊';
+          } else if (lower.includes('important') || lower.includes('note') || lower.includes('notice')) {
+            emojiPrefix = '📌';
+          } else if (lower.includes('time') || lower.includes('schedule') || lower.includes('date') || lower.includes('day')) {
+            emojiPrefix = '📅';
+          } else {
+            emojiPrefix = '➡️';
+          }
+          clean = clean.replace(/^[\*\-•]\s+/, '');
+        }
+
+        // If line already starts with an emoji, don't add duplicate emoji prefix
+        if (isBullet && /^\p{Extended_Pictographic}/u.test(clean)) {
+          emojiPrefix = '';
+        }
+
+        // Parse **bold text** into bold spans and remove any residual asterisks or hyphens
+        const segments: React.ReactNode[] = [];
+        const boldRegex = /\*\*(.*?)\*\*/g;
+        let lastIdx = 0;
+        let match: RegExpExecArray | null;
+
+        while ((match = boldRegex.exec(clean)) !== null) {
+          if (match.index > lastIdx) {
+            const normal = clean.substring(lastIdx, match.index).replace(/[\*]/g, '');
+            if (normal) segments.push(normal);
+          }
+          const boldPart = match[1].replace(/[\*]/g, '');
+          segments.push(
+            <strong key={`b-${idx}-${lastIdx}`} className="font-semibold text-slate-900">
+              {boldPart}
+            </strong>
+          );
+          lastIdx = boldRegex.lastIndex;
+        }
+
+        if (lastIdx < clean.length) {
+          const remaining = clean.substring(lastIdx).replace(/[\*]/g, '');
+          if (remaining) segments.push(remaining);
+        }
+
+        if (isBullet) {
+          return (
+            <div key={idx} className="flex items-start gap-2.5 py-0.5 pl-0.5">
+              {emojiPrefix && <span className="text-base leading-tight flex-shrink-0">{emojiPrefix}</span>}
+              <div className="text-slate-800 leading-relaxed flex-1">{segments}</div>
+            </div>
+          );
+        }
+
+        return (
+          <p key={idx} className="text-slate-800 leading-relaxed">
+            {segments}
+          </p>
+        );
+      })}
+    </div>
+  );
 };
 
 const ChatWidget: React.FC = () => {
@@ -128,8 +215,27 @@ const ChatWidget: React.FC = () => {
     }
   }, [isOpen]);
 
-  const handleCopyMessage = (text: string) => {
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
+  const [likedMessages, setLikedMessages] = useState<Record<string, 'like' | 'dislike'>>({});
+
+  const handleCopyMessage = (id: string, text: string) => {
     navigator.clipboard.writeText(text);
+    setCopiedMessageId(id);
+    setTimeout(() => setCopiedMessageId(null), 2000);
+  };
+
+  const toggleLike = (id: string) => {
+    setLikedMessages(prev => ({
+      ...prev,
+      [id]: prev[id] === 'like' ? undefined as any : 'like'
+    }));
+  };
+
+  const toggleDislike = (id: string) => {
+    setLikedMessages(prev => ({
+      ...prev,
+      [id]: prev[id] === 'dislike' ? undefined as any : 'dislike'
+    }));
   };
 
   const handleRegenerateMessage = (messageId: string) => {
@@ -518,98 +624,106 @@ const ChatWidget: React.FC = () => {
                             )}
                             <div className="flex flex-col gap-2 w-full">
                               {msg.text && (
-                                <div className="relative group">
+                                <div
+                                  className={`relative ${msg.isBot
+                                      ? 'bg-white border border-slate-200/60 text-slate-800'
+                                      : 'bg-gradient-to-br from-purple-600 to-purple-500 text-white border border-purple-400/30'
+                                    }`}
+                                  style={{
+                                    padding: '16px 18px',
+                                    borderRadius: '20px',
+                                    fontSize: '15px',
+                                    lineHeight: '1.6',
+                                    letterSpacing: '-0.01em',
+                                    boxShadow: msg.isBot
+                                      ? '0 2px 12px rgba(0, 0, 0, 0.06)'
+                                      : '0 4px 16px rgba(139, 92, 246, 0.3)',
+                                    wordBreak: 'break-word'
+                                  }}
+                                >
+                                  {msg.isBot ? renderStructuredMessage(msg.text) : msg.text}
                                   <div
-                                    className={`relative ${msg.isBot
-                                        ? 'bg-white border border-slate-200/60 text-slate-800'
-                                        : 'bg-gradient-to-br from-purple-600 to-purple-500 text-white border border-purple-400/30'
+                                    className={`flex items-center gap-1 mt-2 ${msg.isBot ? 'text-slate-400' : 'text-purple-200 justify-end'
                                       }`}
                                     style={{
-                                      padding: '16px 18px',
-                                      borderRadius: '20px',
-                                      fontSize: '15px',
-                                      lineHeight: '1.6',
-                                      letterSpacing: '-0.01em',
-                                      boxShadow: msg.isBot
-                                        ? '0 2px 12px rgba(0, 0, 0, 0.06)'
-                                        : '0 4px 16px rgba(139, 92, 246, 0.3)',
-                                      whiteSpace: 'pre-wrap',
-                                      wordBreak: 'break-word'
+                                      fontSize: '11px',
+                                      fontWeight: 500
                                     }}
                                   >
-                                    {msg.text}
-                                    <div
-                                      className={`flex items-center gap-1 mt-2 ${msg.isBot ? 'text-slate-400' : 'text-purple-200 justify-end'
-                                        }`}
-                                      style={{
-                                        fontSize: '11px',
-                                        fontWeight: 500
-                                      }}
-                                    >
-                                      {msg.time}
-                                      {!msg.isBot && (
-                                        <svg
-                                          width="14"
-                                          height="14"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          strokeWidth="2.5"
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                        >
-                                          <polyline points="9 11 12 14 22 4" />
-                                          <polyline points="5 11 8 14 18 4" />
-                                        </svg>
-                                      )}
-                                    </div>
+                                    {msg.time}
+                                    {!msg.isBot && (
+                                      <svg
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2.5"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                      >
+                                        <polyline points="9 11 12 14 22 4" />
+                                        <polyline points="5 11 8 14 18 4" />
+                                      </svg>
+                                    )}
                                   </div>
-                                  {msg.isBot && hoveredMessageId === msg.id && (
-                                    <motion.div
-                                      initial={{ opacity: 0, y: -5 }}
-                                      animate={{ opacity: 1, y: 0 }}
-                                      transition={{ duration: 0.15 }}
-                                      className="absolute -bottom-10 left-0 flex items-center gap-1 bg-white rounded-xl border border-slate-200/60 p-1"
-                                      style={{
-                                        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)'
-                                      }}
-                                    >
-                                      <button
-                                        onClick={() => handleCopyMessage(msg.text)}
-                                        className="flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all rounded-lg"
-                                        style={{ width: '32px', height: '32px' }}
-                                        title="Copy"
-                                      >
-                                        <Copy size={14} strokeWidth={2} />
-                                      </button>
-                                      <button
-                                        onClick={() => handleRegenerateMessage(msg.id)}
-                                        className="flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all rounded-lg"
-                                        style={{ width: '32px', height: '32px' }}
-                                        title="Regenerate"
-                                      >
-                                        <RotateCcw size={14} strokeWidth={2} />
-                                      </button>
-                                      <button
-                                        className="flex items-center justify-center text-slate-600 hover:text-green-600 hover:bg-green-50 transition-all rounded-lg"
-                                        style={{ width: '32px', height: '32px' }}
-                                        title="Like"
-                                      >
-                                        <ThumbsUp size={14} strokeWidth={2} />
-                                      </button>
-                                      <button
-                                        className="flex items-center justify-center text-slate-600 hover:text-red-600 hover:bg-red-50 transition-all rounded-lg"
-                                        style={{ width: '32px', height: '32px' }}
-                                        title="Dislike"
-                                      >
-                                        <ThumbsDown size={14} strokeWidth={2} />
-                                      </button>
-                                    </motion.div>
-                                  )}
                                 </div>
                               )}
                               {msg.widgetData && msg.widgetData.type === 'attendance_card' && (
                                 <AttendanceWidget data={msg.widgetData.data} />
+                              )}
+                              {msg.isBot && (
+                                <div className="flex items-center gap-1 mt-1 pl-1">
+                                  <div
+                                    className="flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-xl border border-slate-200/60 p-1"
+                                    style={{
+                                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
+                                    }}
+                                  >
+                                    <button
+                                      onClick={() => handleCopyMessage(msg.id, msg.text)}
+                                      className="flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all rounded-lg"
+                                      style={{ width: '28px', height: '28px' }}
+                                      title="Copy"
+                                    >
+                                      {copiedMessageId === msg.id ? (
+                                        <Check size={13} className="text-green-600" />
+                                      ) : (
+                                        <Copy size={13} strokeWidth={2} />
+                                      )}
+                                    </button>
+                                    <button
+                                      onClick={() => handleRegenerateMessage(msg.id)}
+                                      className="flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all rounded-lg"
+                                      style={{ width: '28px', height: '28px' }}
+                                      title="Regenerate"
+                                    >
+                                      <RotateCcw size={13} strokeWidth={2} />
+                                    </button>
+                                    <button
+                                      onClick={() => toggleLike(msg.id)}
+                                      className={`flex items-center justify-center transition-all rounded-lg ${likedMessages[msg.id] === 'like'
+                                          ? 'text-green-600 bg-green-50'
+                                          : 'text-slate-600 hover:text-green-600 hover:bg-green-50'
+                                        }`}
+                                      style={{ width: '28px', height: '28px' }}
+                                      title="Like"
+                                    >
+                                      <ThumbsUp size={13} strokeWidth={2} />
+                                    </button>
+                                    <button
+                                      onClick={() => toggleDislike(msg.id)}
+                                      className={`flex items-center justify-center transition-all rounded-lg ${likedMessages[msg.id] === 'dislike'
+                                          ? 'text-red-600 bg-red-50'
+                                          : 'text-slate-600 hover:text-red-600 hover:bg-red-50'
+                                        }`}
+                                      style={{ width: '28px', height: '28px' }}
+                                      title="Dislike"
+                                    >
+                                      <ThumbsDown size={13} strokeWidth={2} />
+                                    </button>
+                                  </div>
+                                </div>
                               )}
                             </div>
                           </div>
@@ -693,42 +807,6 @@ const ChatWidget: React.FC = () => {
                 borderColor: 'rgba(0, 0, 0, 0.06)'
               }}
             >
-              {hasMessages && (
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center justify-between">
-                    <span
-                      className="text-slate-700 font-bold"
-                      style={{ fontSize: '13px' }}
-                    >
-                      Suggested for you
-                    </span>
-                    <button
-                      className="flex items-center gap-1.5 text-purple-600 hover:text-purple-700 font-semibold transition-colors"
-                      style={{ fontSize: '13px' }}
-                    >
-                      <RefreshCw size={14} strokeWidth={2.5} />
-                      Refresh
-                    </button>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {suggestedPrompts.map((prompt, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => handleSend(prompt)}
-                        className="px-4 py-2 bg-white hover:bg-purple-50 border border-slate-200/80 hover:border-purple-300 text-slate-700 hover:text-purple-700 font-medium rounded-full transition-all"
-                        style={{
-                          fontSize: '13px',
-                          boxShadow: '0 1px 4px rgba(0, 0, 0, 0.04)',
-                          height: '40px'
-                        }}
-                        disabled={isLoading}
-                      >
-                        {prompt}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
               <div
                 className="relative bg-white border border-slate-200/80 focus-within:border-purple-300 transition-all"
                 style={{

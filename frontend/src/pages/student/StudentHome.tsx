@@ -584,28 +584,27 @@ export function StudentHome() {
         .catch(() => {});
     }
 
-    // Fetch real-time KPI data
-    const ttStats = TimetableAttendanceService.getAttendanceStats();
-    api.get('/student-dash/dashboard')
-      .then(res => {
-        if (res.data) {
-          setDashData({
-            enrollment_number: res.data.enrollment_number || 'ENR20260481',
-            attendance_rate: ttStats.overallPercentage,
-            total_classes: ttStats.totalDelivered,
-            present_classes: ttStats.totalAttended,
-            cgpa: res.data.cgpa ?? 8.4,
-          });
-        }
-      })
-      .catch(() => {
-        setDashData(prev => ({
-          ...prev,
-          attendance_rate: ttStats.overallPercentage,
-          total_classes: ttStats.totalDelivered,
-          present_classes: ttStats.totalAttended,
-        }));
+    // Fetch real-time KPI data from backend APIs
+    Promise.all([
+      api.get('/student-dash/dashboard').catch(() => null),
+      api.get('/student-dash/attendance').catch(() => null),
+    ]).then(([dashRes, attRes]) => {
+      const dash = dashRes?.data || {};
+      const att = attRes?.data;
+
+      const attRate = att?.overallPercentage ?? dash.attendance_rate ?? 0;
+      const totalCls = att?.totalDelivered ?? dash.total_classes ?? 0;
+      const presentCls = att?.totalAttended ?? dash.present_classes ?? 0;
+      const realCgpa = typeof dash.cgpa === 'number' ? dash.cgpa : 8.4;
+
+      setDashData({
+        enrollment_number: dash.enrollment_number || 'ENR20260481',
+        attendance_rate: attRate,
+        total_classes: totalCls,
+        present_classes: presentCls,
+        cgpa: realCgpa,
       });
+    });
 
     // Fetch real-time student complaints
     api.get('/complaints/kpi')
