@@ -48,10 +48,12 @@ class Settings(BaseSettings):
     SMTP_USER: Optional[str] = None
     SMTP_PASSWORD: Optional[str] = None
     
-    # Gemini API Key
+    # AI Assistant (Puter AI & Legacy Gemini)
+    PUTER_AUTH_TOKEN: Optional[str] = None
+    PUTER_MODEL: str = "gpt-5.4-nano"
     GEMINI_API_KEY: Optional[str] = None
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", case_sensitive=True, extra="ignore")
+    model_config = SettingsConfigDict(env_file=(".env", "backend/.env"), env_file_encoding="utf-8", case_sensitive=True, extra="ignore")
 
 
 settings = Settings()

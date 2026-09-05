@@ -911,7 +911,7 @@ const ChatWidget: React.FC = () => {
               >
                 <div className="flex items-center gap-1.5">
                   <Sparkles size={11} className="text-purple-500" fill="currentColor" />
-                  <span className="text-slate-500">Powered by Gemini AI</span>
+                  <span className="text-slate-500">Powered by Puter AI</span>
                 </div>
                 <span>AI can make mistakes. Verify important information.</span>
               </div>
