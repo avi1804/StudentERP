@@ -8,6 +8,7 @@ import { AdminMobileDrawer } from "@/components/mobile/AdminMobileDrawer";
 import { useAuthStore } from "@/store/authStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Bell, User, ChevronUp, ChevronDown, LogOut, Shield } from "lucide-react";
+import GradualBlur from "@/components/GradualBlur";
 
 export function AdminLayout() {
   const { isMobile } = useIsMobile();
@@ -105,20 +106,9 @@ export function AdminLayout() {
   return (
     <div style={{ height: '100vh', width: '100vw', overflow: 'hidden', background: '#f4f5f8', position: 'relative' }}>
       <Sidebar />
-      <div 
-        id="main" 
-        className="premium-main"
-        style={{
-          marginLeft: '320px',
-          height: '100vh',
-          overflowY: 'auto',
-          padding: '100px 32px 40px',
-          boxSizing: 'border-box',
-        }}
-      >
-        {/* ── Permanently Fixed Dynamic Island Navbar ── */}
-        <div
-          id="topbar"
+      {/* ── Permanently Fixed Dynamic Island Navbar ── */}
+      <div
+        id="topbar"
           style={{
             position: 'fixed',
             top: '16px',
@@ -136,11 +126,11 @@ export function AdminLayout() {
               layout
               transition={{ type: 'spring', stiffness: 420, damping: 32 }}
               style={{
-                background: 'rgba(255, 255, 255, 0.88)',
+                background: 'rgba(247, 245, 236, 0.94)',
                 backdropFilter: 'blur(18px)',
                 WebkitBackdropFilter: 'blur(18px)',
-                border: '1px solid rgba(0,0,0,0.08)',
-                boxShadow: '0 10px 35px rgba(0,0,0,0.08)',
+                border: '1px solid rgba(40, 43, 74, 0.12)',
+                boxShadow: '0 10px 35px rgba(40, 43, 74, 0.1)',
                 borderRadius: 9999,
                 overflow: 'hidden',
               }}
@@ -163,7 +153,7 @@ export function AdminLayout() {
                       title="Search"
                       style={{
                         width: 44, height: 44, borderRadius: '50%',
-                        background: 'rgba(245,245,245,0.9)', border: '1px solid rgba(0,0,0,0.06)',
+                        background: 'rgba(40, 43, 74, 0.06)', border: '1px solid rgba(40, 43, 74, 0.08)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         cursor: 'pointer', flexShrink: 0,
                         transition: 'transform 0.18s ease',
@@ -171,7 +161,7 @@ export function AdminLayout() {
                       onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.07)')}
                       onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
                     >
-                      <Search size={19} color="#333" strokeWidth={1.6} />
+                      <Search size={19} color="#282B4A" strokeWidth={1.8} />
                     </button>
 
                     {/* Notification circle */}
@@ -180,7 +170,7 @@ export function AdminLayout() {
                       title="Notifications"
                       style={{
                         width: 44, height: 44, borderRadius: '50%',
-                        background: 'rgba(245,245,245,0.9)', border: '1px solid rgba(0,0,0,0.06)',
+                        background: 'rgba(40, 43, 74, 0.06)', border: '1px solid rgba(40, 43, 74, 0.08)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         cursor: 'pointer', flexShrink: 0,
                         transition: 'transform 0.18s ease',
@@ -189,22 +179,22 @@ export function AdminLayout() {
                       onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.07)')}
                       onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
                     >
-                      <Bell size={19} color="#333" strokeWidth={1.6} />
+                      <Bell size={19} color="#282B4A" strokeWidth={1.8} />
                       {/* Unread dot */}
                       <span style={{
                         position: 'absolute', top: 8, right: 8,
                         width: 8, height: 8, borderRadius: '50%',
-                        background: '#ef4444', border: '2px solid #F5F5F5',
+                        background: '#ef4444', border: '2px solid #EEEBDA',
                       }} />
                     </button>
 
                     {/* Profile circle */}
                     <button
-                      onClick={() => setActiveState(activeState === 'profile' ? 'idle' : 'profile')}
+                      onClick={() => setActiveState('profile')}
                       title="Profile"
                       style={{
                         width: 44, height: 44, borderRadius: '50%',
-                        background: 'rgba(245,245,245,0.9)', border: '1px solid rgba(0,0,0,0.06)',
+                        background: 'rgba(40, 43, 74, 0.06)', border: '1px solid rgba(40, 43, 74, 0.08)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         cursor: 'pointer', flexShrink: 0,
                         transition: 'transform 0.18s ease',
@@ -212,7 +202,7 @@ export function AdminLayout() {
                       onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.07)')}
                       onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
                     >
-                      <User size={19} color="#333" strokeWidth={1.6} />
+                      <User size={19} color="#282B4A" strokeWidth={1.8} />
                     </button>
                   </motion.div>
                 )}
@@ -231,7 +221,7 @@ export function AdminLayout() {
                       padding: '0 20px', gap: 10,
                     }}
                   >
-                    <Search size={18} color="#9CA3AF" strokeWidth={1.6} style={{ flexShrink: 0 }} />
+                    <Search size={18} color="#282B4A" strokeWidth={1.8} style={{ flexShrink: 0 }} />
                     <input
                       autoFocus
                       type="text"
@@ -240,8 +230,8 @@ export function AdminLayout() {
                         flex: 1, background: 'transparent',
                         border: 'none', outline: 'none',
                         fontSize: 15, fontWeight: 500,
-                        color: '#111', fontFamily: 'Space Grotesk, sans-serif',
-                        caretColor: '#555',
+                        color: '#282B4A', fontFamily: 'Space Grotesk, sans-serif',
+                        caretColor: '#282B4A',
                       }}
                     />
                   </motion.div>
@@ -266,47 +256,47 @@ export function AdminLayout() {
                       onClick={() => navigate('/admin/dashboard/notify/student')}
                       style={{
                         display: 'flex', alignItems: 'center', gap: 6,
-                        background: '#6366f1', color: '#ffffff',
+                        background: '#282B4A', color: '#EEEBDA',
                         padding: '7px 13px', borderRadius: 9999, border: 'none',
                         fontSize: 12, fontWeight: 700, letterSpacing: '0.04em',
-                        boxShadow: '0 4px 14px rgba(99, 102, 241, 0.35)',
+                        boxShadow: '0 4px 14px rgba(40, 43, 74, 0.25)',
                         flexShrink: 0, cursor: 'pointer',
                         transition: 'transform 0.15s, background 0.15s',
                       }}
                       onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.04)')}
                       onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
                     >
-                      <Bell size={13} color="#fff" strokeWidth={2.5} />
+                      <Bell size={13} color="#EEEBDA" strokeWidth={2.5} />
                       <span>{notificationsList[notifIndex].badge}</span>
                     </button>
 
                     {/* Single Notification Content */}
                     <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#282B4A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {notificationsList[notifIndex].title}
                       </div>
-                      <div style={{ fontSize: 11, color: '#6B7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {notificationsList[notifIndex].subtitle} · <span style={{ color: '#9CA3AF', fontWeight: 500 }}>{notificationsList[notifIndex].time}</span>
+                      <div style={{ fontSize: 11, color: '#525677', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {notificationsList[notifIndex].subtitle} · <span style={{ color: '#7E82A4', fontWeight: 500 }}>{notificationsList[notifIndex].time}</span>
                       </div>
                     </div>
 
                     {/* Next / Previous Switcher */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, background: '#f3f4f6', borderRadius: 999, padding: '3px 6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, background: 'rgba(40, 43, 74, 0.08)', borderRadius: 999, padding: '3px 6px' }}>
                       <button
                         onClick={() => setNotifIndex(prev => (prev > 0 ? prev - 1 : notificationsList.length - 1))}
                         title="Previous Notification"
                         style={{
                           width: 24, height: 24, borderRadius: '50%', border: 'none',
                           background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          cursor: 'pointer', color: '#374151', transition: 'background 0.15s',
+                          cursor: 'pointer', color: '#282B4A', transition: 'background 0.15s',
                         }}
-                        onMouseEnter={e => (e.currentTarget.style.background = '#e5e7eb')}
+                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(40, 43, 74, 0.12)')}
                         onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                       >
                         <ChevronUp size={14} strokeWidth={2.5} />
                       </button>
 
-                      <span style={{ fontSize: 11, fontWeight: 700, color: '#4b5563', padding: '0 2px', userSelect: 'none' }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: '#282B4A', padding: '0 2px', userSelect: 'none' }}>
                         {notifIndex + 1}/{notificationsList.length}
                       </span>
 
@@ -316,9 +306,9 @@ export function AdminLayout() {
                         style={{
                           width: 24, height: 24, borderRadius: '50%', border: 'none',
                           background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          cursor: 'pointer', color: '#374151', transition: 'background 0.15s',
+                          cursor: 'pointer', color: '#282B4A', transition: 'background 0.15s',
                         }}
-                        onMouseEnter={e => (e.currentTarget.style.background = '#e5e7eb')}
+                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(40, 43, 74, 0.12)')}
                         onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                       >
                         <ChevronDown size={14} strokeWidth={2.5} />
@@ -353,10 +343,10 @@ export function AdminLayout() {
                     >
                       <div style={{
                         width: 38, height: 38, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #f472b6, #e11d48)',
-                        color: '#ffffff', fontWeight: 700, fontSize: 13,
+                        background: 'linear-gradient(135deg, #282B4A, #353960)',
+                        color: '#EEEBDA', fontWeight: 700, fontSize: 13,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: '0 2px 10px rgba(225, 29, 72, 0.3)', flexShrink: 0
+                        boxShadow: '0 2px 10px rgba(40, 43, 74, 0.3)', flexShrink: 0
                       }}>
                         {user?.full_name?.substring(0, 2).toUpperCase() || 'AD'}
                       </div>
@@ -397,20 +387,53 @@ export function AdminLayout() {
           </div>
         </div>
 
-        {/* ── Main Scrollable Container Box Card (Matching Student Dashboard) ── */}
-        <div 
-          style={{ 
-            background: '#ffffff', 
-            borderRadius: '28px', 
-            padding: '32px', 
-            minHeight: 'calc(100vh - 140px)', 
-            boxShadow: '0 10px 40px rgba(0,0,0,0.03)', 
-            border: '1px solid rgba(0,0,0,0.06)',
-            boxSizing: 'border-box'
+      {/* ── Main Professional Box Container (Starts BELOW Dynamic Island, Scrolls ONLY Inside) ── */}
+      <div
+        style={{
+          position: 'fixed',
+          top: '84px',
+          bottom: '20px',
+          left: '320px',
+          right: '20px',
+          background: 'rgba(247, 245, 236, 0.94)',
+          backdropFilter: 'blur(18px)',
+          WebkitBackdropFilter: 'blur(18px)',
+          borderRadius: '28px',
+          boxShadow: '0 10px 35px rgba(40, 43, 74, 0.1)',
+          border: '1px solid rgba(40, 43, 74, 0.12)',
+          overflow: 'hidden',
+          zIndex: 10,
+        }}
+      >
+        {/* ── Scrollable Dashboard Content Area ── */}
+        <div
+          id="dashboard-scroll-area"
+          style={{
+            height: '100%',
+            width: '100%',
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            scrollBehavior: 'smooth',
+            paddingTop: '36px',
+            paddingBottom: '40px',
+            paddingLeft: '40px',
+            paddingRight: '40px',
           }}
         >
           <Outlet />
         </div>
+
+        {/* ── Bottom Gradual Blur ── */}
+        <GradualBlur
+          target="parent"
+          position="bottom"
+          height="4rem"
+          strength={1.5}
+          divCount={5}
+          curve="bezier"
+          exponential={true}
+          opacity={0.9}
+        />
       </div>
     </div>
   );

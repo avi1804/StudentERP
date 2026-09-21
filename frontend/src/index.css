@@ -109,7 +109,6 @@ body {
 .absent-btn { border-color: rgba(239,68,68,0.2); }
 .absent-btn:hover { background: rgba(239,68,68,0.1); border-color: var(--red); color: var(--red); box-shadow: 0 0 15px rgba(239,68,68,0.1); }
 .absent-btn:hover span { color: var(--red); }
-
 .late-btn { border-color: rgba(245,158,11,0.2); }
 .late-btn:hover { background: rgba(245,158,11,0.1); border-color: var(--amber); color: var(--amber); box-shadow: 0 0 15px rgba(245,158,11,0.1); }
 .late-btn:hover svg { color: var(--amber); }
@@ -156,15 +155,11 @@ body {
   margin-bottom: 12px;
   transition: all 0.2s ease;
 }
-.subject-breakdown-row:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(183, 142, 254, 0.2);
-}
 
 .glass-btn {
-  background: linear-gradient(135deg, rgba(183, 142, 254, 0.2), rgba(87, 46, 153, 0.4));
-  border: 1px solid rgba(183, 142, 254, 0.3);
-  color: #fff;
+  background: linear-gradient(135deg, #282B4A, #353960);
+  border: 1px solid rgba(238, 235, 218, 0.2);
+  color: #EEEBDA;
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: 600;
@@ -173,8 +168,8 @@ body {
   backdrop-filter: blur(4px);
 }
 .glass-btn:hover {
-  background: linear-gradient(135deg, rgba(183, 142, 254, 0.4), rgba(87, 46, 153, 0.6));
-  box-shadow: 0 0 15px rgba(183, 142, 254, 0.3);
+  background: linear-gradient(135deg, #353960, #414674);
+  box-shadow: 0 0 15px rgba(40, 43, 74, 0.4);
 }
 .glass-btn:disabled {
   opacity: 0.5;
@@ -185,8 +180,8 @@ body {
 
 /* Fix for native select dropdown options readability */
 .premium-fg select option {
-  background-color: #1a1e29;
-  color: #ebedfb;
+  background-color: #282B4A;
+  color: #EEEBDA;
 }
 
 
@@ -197,7 +192,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #09090B;
+  background-color: #1B1D33;
   position: relative;
   overflow: hidden;
   font-family: 'Space Grotesk', sans-serif;
@@ -208,13 +203,13 @@ body {
   z-index: 10;
   width: 100%;
   max-width: 440px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(40, 43, 74, 0.65);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(238, 235, 218, 0.15);
   border-radius: 32px;
   padding: 48px;
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(238, 235, 218, 0.1);
   display: flex;
   flex-direction: column;
 }
@@ -243,7 +238,7 @@ body {
   position: absolute;
   inset: -1px;
   border-radius: 13px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+  background: linear-gradient(135deg, rgba(238, 235, 218, 0.15), rgba(238, 235, 218, 0));
   z-index: -1;
   transition: opacity 0.3s ease;
   opacity: 0;
@@ -257,8 +252,8 @@ body {
 .premium-input-element {
   width: 100%;
   background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #fff;
+  border: 1px solid rgba(238, 235, 218, 0.15);
+  color: #EEEBDA;
   padding: 14px 16px 14px 48px;
   border-radius: 12px;
   font-size: 14px;
@@ -267,13 +262,13 @@ body {
 }
 
 .premium-input-element::placeholder {
-  color: var(--text3);
+  color: #B5B8D0;
 }
 
 .premium-input-element:focus {
   background: rgba(0, 0, 0, 0.4);
   border-color: transparent;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(238, 235, 218, 0.2);
 }
 
 .premium-input-wrapper:focus-within .premium-input-icon {
@@ -284,9 +279,9 @@ body {
   width: 100%;
   padding: 16px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #3B82F6, #8B5CF6);
-  color: white;
-  font-weight: 600;
+  background: #EEEBDA;
+  color: #282B4A;
+  font-weight: 700;
   font-size: 15px;
   border: none;
   cursor: pointer;
@@ -296,7 +291,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 16px rgba(40, 43, 74, 0.25);
 }
 
 .premium-submit-btn::before {
@@ -306,14 +301,15 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0));
+  background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0));
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 .premium-submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+  background: #FAF9F2;
+  box-shadow: 0 8px 24px rgba(238, 235, 218, 0.3);
 }
 
 .premium-submit-btn:hover::before {

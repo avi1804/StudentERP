@@ -15,14 +15,14 @@ interface AttendanceWidgetProps {
 
 const AttendanceWidget: React.FC<AttendanceWidgetProps> = ({ data }) => {
   const chartData = [
-    { name: 'Present', value: data.present, color: '#7c3aed' }, // purple
+    { name: 'Present', value: data.present, color: '#282B4A' }, // midnight indigo
     { name: 'Absent', value: data.absent, color: '#e2e8f0' }   // light gray
   ];
 
   return (
     <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] mt-3 max-w-[340px] font-sans">
       <p className="text-sm text-slate-500 mb-1">Here is your attendance for</p>
-      <h4 className="font-semibold text-indigo-600 mb-4">{data.subject}</h4>
+      <h4 className="font-semibold mb-4" style={{ color: '#282B4A' }}>{data.subject}</h4>
       
       <div className="flex items-center gap-6">
         <div className="relative w-[100px] h-[100px] flex-shrink-0">

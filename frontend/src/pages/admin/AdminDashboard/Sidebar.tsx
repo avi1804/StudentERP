@@ -18,7 +18,16 @@ export function Sidebar({ open, onNavigate }: SidebarProps) {
   };
 
   return (
-    <div className="premium-student-sidebar">
+    <div
+      className="premium-student-sidebar"
+      style={{
+        background: 'rgba(247, 245, 236, 0.94)',
+        backdropFilter: 'blur(18px)',
+        WebkitBackdropFilter: 'blur(18px)',
+        border: '1px solid rgba(40, 43, 74, 0.12)',
+        boxShadow: '0 10px 35px rgba(40, 43, 74, 0.1)',
+      }}
+    >
       <div className="logo-area" style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '28px 24px 20px' }}>
         <div 
           className="logo-icon" 
@@ -27,8 +36,8 @@ export function Sidebar({ open, onNavigate }: SidebarProps) {
             height: '46px', 
             borderRadius: '14px', 
             background: '#ffffff', 
-            boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
-            border: '1px solid rgba(0,0,0,0.08)',
+            boxShadow: '0 4px 14px rgba(40, 43, 74, 0.06)',
+            border: '1px solid rgba(40, 43, 74, 0.1)',
             padding: '6px',
             display: 'flex',
             alignItems: 'center',
@@ -43,8 +52,8 @@ export function Sidebar({ open, onNavigate }: SidebarProps) {
           />
         </div>
         <div className="logo-text">
-          <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#111827', margin: 0, letterSpacing: '-0.02em' }}>IndusERP</h2>
-          <p style={{ fontSize: '12px', color: '#6b7280', margin: '2px 0 0 0', fontWeight: 500 }}>Admin Portal</p>
+          <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#282B4A', margin: 0, letterSpacing: '-0.02em' }}>IndusERP</h2>
+          <p style={{ fontSize: '12px', color: 'rgba(40, 43, 74, 0.7)', margin: '2px 0 0 0', fontWeight: 500 }}>Admin Portal</p>
         </div>
       </div>
 
@@ -52,7 +61,7 @@ export function Sidebar({ open, onNavigate }: SidebarProps) {
         {NAV_ITEMS.map((item, index) => {
           if ('isCategory' in item && item.isCategory) {
             return (
-              <div key={index} style={{ fontSize: '11px', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '24px 0 8px 16px' }}>
+              <div key={index} style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(40, 43, 74, 0.6)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '24px 0 8px 16px' }}>
                 {item.label}
               </div>
             );

@@ -68,11 +68,11 @@ function MobileProfile({ profile, formData, setFormData, handleUpdate, updating,
         <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.5px', margin: 0, display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <span>My</span>
           <span style={{
-            background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-            color: '#ffffff',
+            background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+            color: '#EEEBDA',
             padding: '3px 12px',
             borderRadius: '10px',
-            boxShadow: '0 4px 16px rgba(99, 102, 241, 0.3)',
+            boxShadow: '0 4px 16px rgba(40, 43, 74, 0.25)',
             display: 'inline-flex',
             alignItems: 'center',
             lineHeight: 1.2,
@@ -85,7 +85,7 @@ function MobileProfile({ profile, formData, setFormData, handleUpdate, updating,
               loop={true}
               showCursor={true}
               cursorCharacter="|"
-              style={{ color: '#ffffff' }}
+              style={{ color: '#EEEBDA' }}
             />
           </span>
         </h1>
@@ -103,11 +103,11 @@ function MobileProfile({ profile, formData, setFormData, handleUpdate, updating,
         
         <div style={{
           width: '76px', height: '76px', borderRadius: '50%',
-          background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-          color: '#ffffff',
+          background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+          color: '#EEEBDA',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: '24px', fontWeight: 800,
-          boxShadow: '0 8px 24px rgba(99, 102, 241, 0.35)',
+          boxShadow: '0 8px 24px rgba(40, 43, 74, 0.25)',
           border: '3px solid #ffffff',
           position: 'relative',
           zIndex: 2,
@@ -282,9 +282,9 @@ function MobileProfile({ profile, formData, setFormData, handleUpdate, updating,
             width: '100%',
             minHeight: '48px',
             borderRadius: '14px',
-            background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+            background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
             border: 'none',
-            color: '#fff',
+            color: '#EEEBDA',
             fontWeight: 700,
             fontSize: '15px',
             cursor: updating ? 'not-allowed' : 'pointer',
@@ -293,7 +293,7 @@ function MobileProfile({ profile, formData, setFormData, handleUpdate, updating,
             justifyContent: 'center',
             gap: '8px',
             opacity: updating ? 0.7 : 1,
-            boxShadow: '0 4px 16px rgba(99, 102, 241, 0.3)',
+            boxShadow: '0 4px 16px rgba(40, 43, 74, 0.25)',
           }}
         >
           {updating ? <RefreshCw size={16} className="animate-spin" /> : <Save size={16} />}
@@ -453,15 +453,15 @@ export function MyProfile() {
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span>My</span>
             <span style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
+              background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+              color: '#EEEBDA',
               padding: '4px 18px',
               borderRadius: '14px',
-              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
               display: 'inline-flex',
               alignItems: 'center',
               lineHeight: 1.2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
             }}>
               <TextType
                 text={["Profile", "Identity", "Academic Record", "Account Details"]}
@@ -471,7 +471,7 @@ export function MyProfile() {
                 loop={true}
                 showCursor={true}
                 cursorCharacter="|"
-                style={{ color: '#ffffff' }}
+                style={{ color: '#EEEBDA' }}
               />
             </span>
           </h1>
@@ -491,13 +491,13 @@ export function MyProfile() {
               gap: '8px',
               padding: '10px 22px',
               borderRadius: '12px',
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
+              background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+              color: '#EEEBDA',
               border: 'none',
               fontSize: '13px',
               fontWeight: 600,
               cursor: updating ? 'not-allowed' : 'pointer',
-              boxShadow: '0 4px 16px rgba(99, 102, 241, 0.3)',
+              boxShadow: '0 4px 16px rgba(40, 43, 74, 0.25)',
               transition: 'all 0.2s',
               opacity: updating ? 0.7 : 1
             }}
@@ -727,14 +727,14 @@ export function MyProfile() {
               width: '84px',
               height: '84px',
               borderRadius: '24px',
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
+              background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+              color: '#EEEBDA',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '28px',
               fontWeight: 800,
-              boxShadow: '0 8px 24px rgba(99, 102, 241, 0.35)',
+              boxShadow: '0 8px 24px rgba(40, 43, 74, 0.25)',
               position: 'relative',
               flexShrink: 0
             }}>
@@ -897,10 +897,10 @@ export function MyProfile() {
                         width: '100%',
                         height: '8px',
                         borderRadius: '4px',
-                        background: isCompleted ? '#22c55e' : isCurrent ? 'linear-gradient(135deg, #6366f1, #4f46e5)' : '#e2e8f0',
-                        boxShadow: isCurrent ? '0 0 8px rgba(99, 102, 241, 0.5)' : 'none'
+                        background: isCompleted ? '#22c55e' : isCurrent ? 'linear-gradient(135deg, #282B4A, #3a3e68)' : '#e2e8f0',
+                        boxShadow: isCurrent ? '0 0 8px rgba(40, 43, 74, 0.4)' : 'none'
                       }} />
-                      <span style={{ fontSize: '10px', fontWeight: isCurrent ? 800 : 600, color: isCurrent ? '#4f46e5' : isCompleted ? '#15803d' : '#94a3b8' }}>
+                      <span style={{ fontSize: '10px', fontWeight: isCurrent ? 800 : 600, color: isCurrent ? '#282B4A' : isCompleted ? '#15803d' : '#94a3b8' }}>
                         S{sem}
                       </span>
                     </div>
@@ -1197,8 +1197,8 @@ export function MyProfile() {
                 flex: 1,
                 padding: '14px 20px',
                 borderRadius: '14px',
-                background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-                color: '#ffffff',
+                background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+                color: '#EEEBDA',
                 border: 'none',
                 fontSize: '14px',
                 fontWeight: 700,
@@ -1207,7 +1207,7 @@ export function MyProfile() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                boxShadow: '0 4px 16px rgba(99, 102, 241, 0.3)',
+                boxShadow: '0 4px 16px rgba(40, 43, 74, 0.25)',
                 transition: 'all 0.2s ease',
                 opacity: updating ? 0.7 : 1,
               }}

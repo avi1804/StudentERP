@@ -54,13 +54,13 @@ export function MySubjects() {
 
   const getColorStyles = (type: string) => {
     switch(type) {
-      case "purple": return { bg: "#f3f0ff", text: "#573cfa" };
+      case "purple": return { bg: "rgba(40,43,74,0.08)", text: "#282B4A" };
       case "green": return { bg: "#e8f5e9", text: "#10b981" };
       case "yellow": return { bg: "#fffbeb", text: "#f59e0b" };
       case "blue": return { bg: "#eff6ff", text: "#3b82f6" };
       case "pink": return { bg: "#fdf2f8", text: "#ec4899" };
       case "teal": return { bg: "#e6fffa", text: "#14b8a6" };
-      default: return { bg: "#f3f0ff", text: "#573cfa" };
+      default: return { bg: "rgba(40,43,74,0.08)", text: "#282B4A" };
     }
   };
 
@@ -74,15 +74,15 @@ export function MySubjects() {
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span>My</span>
             <span style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
+              background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+              color: '#EEEBDA',
               padding: '4px 18px',
               borderRadius: '14px',
-              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
               display: 'inline-flex',
               alignItems: 'center',
               lineHeight: 1.2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
             }}>
               <TextType
                 text={["Subjects", "Courses", "Curriculum"]}
@@ -92,7 +92,7 @@ export function MySubjects() {
                 loop={true}
                 showCursor={true}
                 cursorCharacter="|"
-                style={{ color: '#ffffff' }}
+                style={{ color: '#EEEBDA' }}
               />
             </span>
           </h1>
@@ -144,8 +144,8 @@ export function MySubjects() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(87,60,250,0.08)' }}>
-                <BookOpen size={18} color="#573cfa" strokeWidth={2} />
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(40,43,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(40,43,74,0.08)' }}>
+                <BookOpen size={18} color="#282B4A" strokeWidth={2} />
               </div>
               <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Subjects</span>
             </div>
@@ -158,7 +158,7 @@ export function MySubjects() {
               {totalSubjects}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#573cfa', fontWeight: 600 }}>100%</span> · Enrolled Curriculum
+              <span style={{ color: '#282B4A', fontWeight: 600 }}>100%</span> · Enrolled Curriculum
             </div>
           </div>
         </motion.div>
@@ -292,14 +292,14 @@ export function MySubjects() {
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: 'rgba(87,60,250,0.08)', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <BookOpen size={20} color="#573cfa" strokeWidth={2} />
+              <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: 'rgba(40,43,74,0.08)', border: '1px solid rgba(40,43,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <BookOpen size={20} color="#282B4A" strokeWidth={2} />
               </div>
               <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#09090b', margin: 0 }}>
                 Subject Overview
               </h3>
             </div>
-            <span style={{ fontSize: '12px', color: '#573cfa', fontWeight: 700, background: '#e8e5ff', padding: '5px 14px', borderRadius: '16px' }}>
+            <span style={{ fontSize: '12px', color: '#282B4A', fontWeight: 700, background: 'rgba(40, 43, 74, 0.08)', padding: '5px 14px', borderRadius: '16px' }}>
               {totalSubjects} Enrolled
             </span>
           </div>
@@ -335,7 +335,7 @@ export function MySubjects() {
           </div>
 
           <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '16px', borderTop: '1px solid #f4f4f5' }}>
-            <CalendarDays size={14} color="#573cfa" /> All {totalSubjects} subjects actively tracked for Semester 7
+            <CalendarDays size={14} color="#282B4A" /> All {totalSubjects} subjects actively tracked for Semester 7
           </div>
         </div>
 
@@ -369,7 +369,7 @@ export function MySubjects() {
               <svg viewBox="0 0 200 100" style={{ width: '100%', height: '100%' }}>
                 <defs>
                   <linearGradient id="creditGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#573cfa" />
+                    <stop offset="0%" stopColor="#282B4A" />
                     <stop offset="100%" stopColor="#10b981" />
                   </linearGradient>
                 </defs>
@@ -387,7 +387,7 @@ export function MySubjects() {
 
           <div style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
             <div style={{ flex: 1, background: '#f4f4f5', padding: '14px 18px', borderRadius: '18px', border: '1px solid rgba(0,0,0,0.03)', textAlign: 'center' }}>
-              <div style={{ fontSize: '20px', fontWeight: 800, color: '#573cfa' }}>{totalCredits}</div>
+              <div style={{ fontSize: '20px', fontWeight: 800, color: '#282B4A' }}>{totalCredits}</div>
               <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 600, marginTop: '2px' }}>Registered</div>
             </div>
             <div style={{ flex: 1, background: '#f4f4f5', padding: '14px 18px', borderRadius: '18px', border: '1px solid rgba(0,0,0,0.03)', textAlign: 'center' }}>

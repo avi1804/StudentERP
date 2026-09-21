@@ -43,10 +43,10 @@ export function AdminMobileTopBar({ onMenuClick }: AdminMobileTopBarProps) {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 16px',
-        background: 'rgba(10, 14, 23, 0.8)',
+        background: 'rgba(40, 43, 74, 0.95)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+        borderBottom: '1px solid rgba(238, 235, 218, 0.12)',
       }}
     >
       {/* Left: Hamburger + Title */}
@@ -57,9 +57,9 @@ export function AdminMobileTopBar({ onMenuClick }: AdminMobileTopBarProps) {
             width: '36px',
             height: '36px',
             borderRadius: '8px',
-            background: 'rgba(255, 255, 255, 0.05)',
+            background: 'rgba(238, 235, 218, 0.1)',
             border: 'none',
-            color: '#ebedfb',
+            color: '#EEEBDA',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -72,7 +72,7 @@ export function AdminMobileTopBar({ onMenuClick }: AdminMobileTopBarProps) {
           style={{
             fontSize: '16px',
             fontWeight: 600,
-            color: '#ebedfb',
+            color: '#EEEBDA',
             letterSpacing: '-0.02em',
           }}
         >
@@ -87,13 +87,14 @@ export function AdminMobileTopBar({ onMenuClick }: AdminMobileTopBarProps) {
             width: '32px',
             height: '32px',
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
+            background: 'linear-gradient(135deg, #282B4A, #3a3e68)',
+            border: '1px solid rgba(238, 235, 218, 0.3)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: '11px',
             fontWeight: 700,
-            color: '#fff',
+            color: '#EEEBDA',
             flexShrink: 0,
           }}
         >
@@ -105,9 +106,9 @@ export function AdminMobileTopBar({ onMenuClick }: AdminMobileTopBarProps) {
             width: '32px',
             height: '32px',
             borderRadius: '8px',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(238, 235, 218, 0.15)',
             background: 'transparent',
-            color: '#7a80a1',
+            color: 'rgba(238, 235, 218, 0.7)',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',

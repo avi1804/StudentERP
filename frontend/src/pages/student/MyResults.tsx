@@ -172,15 +172,15 @@ export function MyResults() {
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span>My</span>
             <span style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
+              background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+              color: '#EEEBDA',
               padding: '4px 18px',
               borderRadius: '14px',
-              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
               display: 'inline-flex',
               alignItems: 'center',
               lineHeight: 1.2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
             }}>
               <TextType
                 text={["Exam Results", "Grade Card", "Academic Marks"]}
@@ -190,7 +190,7 @@ export function MyResults() {
                 loop={true}
                 showCursor={true}
                 cursorCharacter="|"
-                style={{ color: '#ffffff' }}
+                style={{ color: '#EEEBDA' }}
               />
             </span>
           </h1>
@@ -255,8 +255,8 @@ export function MyResults() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(87,60,250,0.08)' }}>
-                <Award size={18} color="#573cfa" strokeWidth={2} />
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(40,43,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(40,43,74,0.08)' }}>
+                <Award size={18} color="#282B4A" strokeWidth={2} />
               </div>
               <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>SGPA</span>
             </div>
@@ -269,7 +269,7 @@ export function MyResults() {
               8.75
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#573cfa', fontWeight: 600 }}>+0.25</span> · Semester 7 Grade Point
+              <span style={{ color: '#282B4A', fontWeight: 600 }}>+0.25</span> · Semester 7 Grade Point
             </div>
           </div>
         </motion.div>
@@ -352,7 +352,7 @@ export function MyResults() {
         
         {/* Left Column: Subject-wise Marks */}
         <div className="res-card">
-          <h3 style={{ fontSize: '16px', fontWeight: 'bold', color: '#573cfa', marginBottom: '24px' }}>Subject-wise Marks</h3>
+          <h3 style={{ fontSize: '16px', fontWeight: 'bold', color: '#282B4A', marginBottom: '24px' }}>Subject-wise Marks</h3>
           
           <div className="res-table-header">
             <div>SUBJECT CODE</div>
@@ -379,7 +379,7 @@ export function MyResults() {
                     {r.subjectName || `Subject ${i+1}`}
                   </div>
                   <div style={{ textAlign: 'center', fontSize: '13px', color: '#4b5563' }}>4</div>
-                  <div style={{ textAlign: 'center', fontSize: '14px', fontWeight: 'bold', color: '#573cfa' }}>
+                  <div style={{ textAlign: 'center', fontSize: '14px', fontWeight: 'bold', color: '#282B4A' }}>
                     {r.marksObtained}
                   </div>
                   <div style={{ textAlign: 'center', fontSize: '13px', color: '#4b5563' }}>{r.totalMarks}</div>
@@ -397,11 +397,11 @@ export function MyResults() {
           )}
 
           <div className="res-banner">
-            <div style={{ width: '48px', height: '48px', background: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(87,60,250,0.1)' }}>
-              <Trophy size={24} color="#573cfa" />
+            <div style={{ width: '48px', height: '48px', background: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(40,43,74,0.1)' }}>
+              <Trophy size={24} color="#282B4A" />
             </div>
             <div>
-              <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#573cfa', marginBottom: '2px' }}>Great Job! Keep up the excellent work.</div>
+              <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#282B4A', marginBottom: '2px' }}>Great Job! Keep up the excellent work.</div>
               <div style={{ fontSize: '13px', color: '#4b5563' }}>You are performing brilliantly!</div>
             </div>
           </div>
@@ -411,7 +411,7 @@ export function MyResults() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           <div className="res-card">
-            <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#573cfa', marginBottom: '16px' }}>Grade Distribution</h3>
+            <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#282B4A', marginBottom: '16px' }}>Grade Distribution</h3>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               <div style={{ width: '140px', height: '140px', position: 'relative' }}>
                 <ResponsiveContainer width="100%" height="100%">
@@ -445,11 +445,11 @@ export function MyResults() {
           </div>
 
           <div className="res-card">
-            <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#573cfa', marginBottom: '16px' }}>Performance Summary</h3>
+            <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#282B4A', marginBottom: '16px' }}>Performance Summary</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '13px', color: '#4b5563', fontWeight: 500 }}>
-                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(40,43,74,0.08)', color: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Building2 size={16} />
                   </div>
                   Class Average

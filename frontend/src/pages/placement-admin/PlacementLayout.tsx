@@ -8,6 +8,7 @@ import {
   LayoutDashboard, Building2, CalendarDays, FileText, GraduationCap,
   BarChart3, Download, Settings, Menu, X, ChevronRight
 } from "lucide-react";
+import GradualBlur from "@/components/GradualBlur";
 
 const NAV_ITEMS = [
   { path: '/placement-admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -29,7 +30,16 @@ function PlacementSidebar({ onNavigate }: { onNavigate?: () => void }) {
   };
 
   return (
-    <div className="premium-student-sidebar">
+    <div
+      className="premium-student-sidebar"
+      style={{
+        background: 'rgba(247, 245, 236, 0.94)',
+        backdropFilter: 'blur(18px)',
+        WebkitBackdropFilter: 'blur(18px)',
+        border: '1px solid rgba(40, 43, 74, 0.12)',
+        boxShadow: '0 10px 35px rgba(40, 43, 74, 0.1)',
+      }}
+    >
       <div className="logo-area" style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '28px 24px 20px' }}>
         <div 
           className="logo-icon" 
@@ -38,8 +48,8 @@ function PlacementSidebar({ onNavigate }: { onNavigate?: () => void }) {
             height: '46px', 
             borderRadius: '14px', 
             background: '#ffffff', 
-            boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
-            border: '1px solid rgba(0,0,0,0.08)',
+            boxShadow: '0 4px 14px rgba(40, 43, 74, 0.06)',
+            border: '1px solid rgba(40, 43, 74, 0.1)',
             padding: '6px',
             display: 'flex',
             alignItems: 'center',
@@ -54,13 +64,13 @@ function PlacementSidebar({ onNavigate }: { onNavigate?: () => void }) {
           />
         </div>
         <div className="logo-text">
-          <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#111827', margin: 0, letterSpacing: '-0.02em' }}>IndusERP</h2>
-          <p style={{ fontSize: '12px', color: '#6b7280', margin: '2px 0 0 0', fontWeight: 500 }}>Placement Cell</p>
+          <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#282B4A', margin: 0, letterSpacing: '-0.02em' }}>IndusERP</h2>
+          <p style={{ fontSize: '12px', color: 'rgba(40, 43, 74, 0.7)', margin: '2px 0 0 0', fontWeight: 500 }}>Placement Cell</p>
         </div>
       </div>
 
       <div className="nav-links">
-        <div style={{ fontSize: '11px', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '24px 0 8px 16px' }}>
+        <div style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(40, 43, 74, 0.6)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '24px 0 8px 16px' }}>
           Main Menu
         </div>
         {NAV_ITEMS.map((item) => {
@@ -204,20 +214,9 @@ export function PlacementLayout() {
     <div style={{ height: '100vh', width: '100vw', overflow: 'hidden', background: '#f4f5f8', position: 'relative' }}>
       <PlacementSidebar />
 
-      <div 
-        id="main" 
-        className="premium-main"
-        style={{
-          marginLeft: '320px',
-          height: '100vh',
-          overflowY: 'auto',
-          padding: '100px 32px 40px',
-          boxSizing: 'border-box',
-        }}
-      >
-        {/* ── Permanently Fixed Dynamic Island Navbar ── */}
-        <div
-          id="topbar"
+      {/* ── Permanently Fixed Dynamic Island Navbar ── */}
+      <div
+        id="topbar"
           style={{
             position: 'fixed',
             top: '16px',
@@ -233,11 +232,11 @@ export function PlacementLayout() {
               layout
               transition={{ type: 'spring', stiffness: 420, damping: 32 }}
               style={{
-                background: 'rgba(255, 255, 255, 0.88)',
+                background: 'rgba(247, 245, 236, 0.94)',
                 backdropFilter: 'blur(18px)',
                 WebkitBackdropFilter: 'blur(18px)',
-                border: '1px solid rgba(0,0,0,0.08)',
-                boxShadow: '0 10px 35px rgba(0,0,0,0.08)',
+                border: '1px solid rgba(40, 43, 74, 0.12)',
+                boxShadow: '0 10px 35px rgba(40, 43, 74, 0.1)',
                 borderRadius: 9999,
                 overflow: 'hidden',
               }}
@@ -259,7 +258,7 @@ export function PlacementLayout() {
                       title="Search"
                       style={{
                         width: 44, height: 44, borderRadius: '50%',
-                        background: 'rgba(245,245,245,0.9)', border: '1px solid rgba(0,0,0,0.06)',
+                        background: 'rgba(40, 43, 74, 0.06)', border: '1px solid rgba(40, 43, 74, 0.08)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         cursor: 'pointer', flexShrink: 0,
                         transition: 'transform 0.18s ease',
@@ -267,7 +266,7 @@ export function PlacementLayout() {
                       onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.07)')}
                       onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
                     >
-                      <Search size={19} color="#333" strokeWidth={1.6} />
+                      <Search size={19} color="#282B4A" strokeWidth={1.8} />
                     </button>
 
                     {/* Notifications button */}
@@ -276,7 +275,7 @@ export function PlacementLayout() {
                       title="Notifications"
                       style={{
                         width: 44, height: 44, borderRadius: '50%',
-                        background: 'rgba(245,245,245,0.9)', border: '1px solid rgba(0,0,0,0.06)',
+                        background: 'rgba(40, 43, 74, 0.06)', border: '1px solid rgba(40, 43, 74, 0.08)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         cursor: 'pointer', flexShrink: 0,
                         transition: 'transform 0.18s ease',
@@ -285,11 +284,11 @@ export function PlacementLayout() {
                       onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.07)')}
                       onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
                     >
-                      <Bell size={19} color="#333" strokeWidth={1.6} />
+                      <Bell size={19} color="#282B4A" strokeWidth={1.8} />
                       <span style={{
                         position: 'absolute', top: 8, right: 8,
                         width: 8, height: 8, borderRadius: '50%',
-                        background: '#ef4444', border: '2px solid #F5F5F5',
+                        background: '#ef4444', border: '2px solid #EEEBDA',
                       }} />
                     </button>
 
@@ -299,7 +298,7 @@ export function PlacementLayout() {
                       title="Profile"
                       style={{
                         width: 44, height: 44, borderRadius: '50%',
-                        background: 'rgba(245,245,245,0.9)', border: '1px solid rgba(0,0,0,0.06)',
+                        background: 'rgba(40, 43, 74, 0.06)', border: '1px solid rgba(40, 43, 74, 0.08)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         cursor: 'pointer', flexShrink: 0,
                         transition: 'transform 0.18s ease',
@@ -307,7 +306,7 @@ export function PlacementLayout() {
                       onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.07)')}
                       onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
                     >
-                      <User size={19} color="#333" strokeWidth={1.6} />
+                      <User size={19} color="#282B4A" strokeWidth={1.8} />
                     </button>
                   </motion.div>
                 )}
@@ -326,7 +325,7 @@ export function PlacementLayout() {
                       padding: '0 20px', gap: 10,
                     }}
                   >
-                    <Search size={18} color="#9CA3AF" strokeWidth={1.6} style={{ flexShrink: 0 }} />
+                    <Search size={18} color="#282B4A" strokeWidth={1.8} style={{ flexShrink: 0 }} />
                     <input
                       autoFocus
                       type="text"
@@ -335,8 +334,8 @@ export function PlacementLayout() {
                         flex: 1, background: 'transparent',
                         border: 'none', outline: 'none',
                         fontSize: 15, fontWeight: 500,
-                        color: '#111', fontFamily: 'Space Grotesk, sans-serif',
-                        caretColor: '#555',
+                        color: '#282B4A', fontFamily: 'Space Grotesk, sans-serif',
+                        caretColor: '#282B4A',
                       }}
                     />
                   </motion.div>
@@ -360,43 +359,43 @@ export function PlacementLayout() {
                       onClick={() => navigate('/placement-admin/notifications')}
                       style={{
                         display: 'flex', alignItems: 'center', gap: 6,
-                        background: '#3b82f6', color: '#ffffff',
+                        background: '#282B4A', color: '#EEEBDA',
                         padding: '7px 13px', borderRadius: 9999, border: 'none',
                         fontSize: 12, fontWeight: 700, letterSpacing: '0.04em',
-                        boxShadow: '0 4px 14px rgba(59, 130, 246, 0.35)',
+                        boxShadow: '0 4px 14px rgba(40, 43, 74, 0.25)',
                         flexShrink: 0, cursor: 'pointer',
                         transition: 'transform 0.15s, background 0.15s',
                       }}
                       onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.04)')}
                       onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
                     >
-                      <Bell size={13} color="#fff" strokeWidth={2.5} />
+                      <Bell size={13} color="#EEEBDA" strokeWidth={2.5} />
                       <span>{notificationsList[notifIndex].badge}</span>
                     </button>
 
                     <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#282B4A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {notificationsList[notifIndex].title}
                       </div>
-                      <div style={{ fontSize: 11, color: '#6B7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {notificationsList[notifIndex].subtitle} · <span style={{ color: '#9CA3AF', fontWeight: 500 }}>{notificationsList[notifIndex].time}</span>
+                      <div style={{ fontSize: 11, color: '#525677', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {notificationsList[notifIndex].subtitle} · <span style={{ color: '#7E82A4', fontWeight: 500 }}>{notificationsList[notifIndex].time}</span>
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, background: '#f3f4f6', borderRadius: 999, padding: '3px 6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, background: 'rgba(40, 43, 74, 0.08)', borderRadius: 999, padding: '3px 6px' }}>
                       <button
                         onClick={() => setNotifIndex(prev => (prev > 0 ? prev - 1 : notificationsList.length - 1))}
                         title="Previous"
                         style={{
                           width: 24, height: 24, borderRadius: '50%', border: 'none',
                           background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          cursor: 'pointer', color: '#374151',
+                          cursor: 'pointer', color: '#282B4A',
                         }}
                       >
                         <ChevronUp size={14} strokeWidth={2.5} />
                       </button>
 
-                      <span style={{ fontSize: 11, fontWeight: 700, color: '#4b5563', padding: '0 2px', userSelect: 'none' }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: '#282B4A', padding: '0 2px', userSelect: 'none' }}>
                         {notifIndex + 1}/{notificationsList.length}
                       </span>
 
@@ -406,7 +405,7 @@ export function PlacementLayout() {
                         style={{
                           width: 24, height: 24, borderRadius: '50%', border: 'none',
                           background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          cursor: 'pointer', color: '#374151',
+                          cursor: 'pointer', color: '#282B4A',
                         }}
                       >
                         <ChevronDown size={14} strokeWidth={2.5} />
@@ -440,18 +439,18 @@ export function PlacementLayout() {
                     >
                       <div style={{
                         width: 38, height: 38, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #3b82f6, #6366f1)',
-                        color: '#ffffff', fontWeight: 700, fontSize: 13,
+                        background: 'linear-gradient(135deg, #282B4A, #3a3e68)',
+                        color: '#EEEBDA', fontWeight: 700, fontSize: 13,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: '0 2px 10px rgba(59, 130, 246, 0.3)', flexShrink: 0
+                        boxShadow: '0 2px 10px rgba(40, 43, 74, 0.25)', flexShrink: 0
                       }}>
                         {user?.full_name?.substring(0, 2).toUpperCase() || 'PA'}
                       </div>
                       <div style={{ textAlign: 'left' }}>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', lineHeight: 1.2 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: '#282B4A', lineHeight: 1.2 }}>
                           {user?.full_name || 'Placement Officer'}
                         </div>
-                        <div style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>
+                        <div style={{ fontSize: 11, color: '#525677', marginTop: 2 }}>
                           Placement Admin
                         </div>
                       </div>
@@ -479,20 +478,53 @@ export function PlacementLayout() {
           </div>
         </div>
 
-        {/* ── Main Scrollable Container Box Card (Matching Admin/Student Dashboard) ── */}
-        <div 
-          style={{ 
-            background: '#ffffff', 
-            borderRadius: '28px', 
-            padding: '32px', 
-            minHeight: 'calc(100vh - 140px)', 
-            boxShadow: '0 10px 40px rgba(0,0,0,0.03)', 
-            border: '1px solid rgba(0,0,0,0.06)',
-            boxSizing: 'border-box'
+      {/* ── Main Professional Box Container (Starts BELOW Dynamic Island, Scrolls ONLY Inside) ── */}
+      <div
+        style={{
+          position: 'fixed',
+          top: '84px',
+          bottom: '20px',
+          left: '320px',
+          right: '20px',
+          background: 'rgba(247, 245, 236, 0.94)',
+          backdropFilter: 'blur(18px)',
+          WebkitBackdropFilter: 'blur(18px)',
+          borderRadius: '28px',
+          boxShadow: '0 10px 35px rgba(40, 43, 74, 0.1)',
+          border: '1px solid rgba(40, 43, 74, 0.12)',
+          overflow: 'hidden',
+          zIndex: 10,
+        }}
+      >
+        {/* ── Scrollable Dashboard Content Area ── */}
+        <div
+          id="dashboard-scroll-area"
+          style={{
+            height: '100%',
+            width: '100%',
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            scrollBehavior: 'smooth',
+            paddingTop: '36px',
+            paddingBottom: '40px',
+            paddingLeft: '40px',
+            paddingRight: '40px',
           }}
         >
           <Outlet />
         </div>
+
+        {/* ── Bottom Gradual Blur ── */}
+        <GradualBlur
+          target="parent"
+          position="bottom"
+          height="4rem"
+          strength={1.5}
+          divCount={5}
+          curve="bezier"
+          exponential={true}
+          opacity={0.9}
+        />
       </div>
     </div>
   );

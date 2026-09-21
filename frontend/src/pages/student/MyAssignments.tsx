@@ -79,15 +79,15 @@ export function MyAssignments() {
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span>My</span>
             <span style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
+              background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+              color: '#EEEBDA',
               padding: '4px 18px',
               borderRadius: '14px',
-              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
               display: 'inline-flex',
               alignItems: 'center',
               lineHeight: 1.2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
             }}>
               <TextType
                 text={["Assignments", "Homework", "Submissions"]}
@@ -97,7 +97,7 @@ export function MyAssignments() {
                 loop={true}
                 showCursor={true}
                 cursorCharacter="|"
-                style={{ color: '#ffffff' }}
+                style={{ color: '#EEEBDA' }}
               />
             </span>
           </h1>
@@ -157,8 +157,8 @@ export function MyAssignments() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(87,60,250,0.08)' }}>
-                <ClipboardList size={18} color="#573cfa" strokeWidth={2} />
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(40,43,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(40,43,74,0.08)' }}>
+                <ClipboardList size={18} color="#282B4A" strokeWidth={2} />
               </div>
               <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Assignments</span>
             </div>
@@ -168,7 +168,7 @@ export function MyAssignments() {
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
             <div style={{ fontSize: '44px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>{totalCount}</div>
-            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}><span style={{ color: '#573cfa', fontWeight: 600 }}>Enrolled</span> · Sem 7 Subjects</div>
+            <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}><span style={{ color: '#282B4A', fontWeight: 600 }}>Enrolled</span> · Sem 7 Subjects</div>
           </div>
         </motion.div>
 
@@ -250,8 +250,8 @@ export function MyAssignments() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 style={{
-                  background: activeTab === tab ? '#6366f1' : 'transparent',
-                  color: activeTab === tab ? '#ffffff' : '#64748b',
+                  background: activeTab === tab ? '#282B4A' : 'transparent',
+                  color: activeTab === tab ? '#EEEBDA' : '#64748b',
                   border: 'none',
                   padding: '8px 16px',
                   borderRadius: '12px',
@@ -273,7 +273,7 @@ export function MyAssignments() {
                 <div key={a.id} style={{ background: '#ffffff', border: '1.5px solid rgba(0,0,0,0.06)', borderRadius: '20px', padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#6366f1', background: 'rgba(99,102,241,0.08)', padding: '2px 8px', borderRadius: '6px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#282B4A', background: 'rgba(40,43,74,0.08)', padding: '2px 8px', borderRadius: '6px' }}>
                         {a.subject_code}
                       </span>
                       <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>Prof. {a.faculty_name}</span>
@@ -281,7 +281,7 @@ export function MyAssignments() {
                     <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#09090b', margin: '6px 0 4px 0' }}>{a.title}</h3>
                     <div style={{ fontSize: '12px', color: '#71717a' }}>{a.subject_name} • Due: {a.due_date} ({a.due_time})</div>
                     {a.remarks && (
-                      <div style={{ marginTop: '8px', fontSize: '12px', background: '#f8fafc', padding: '6px 10px', borderRadius: '8px', borderLeft: '3px solid #6366f1', color: '#475569' }}>
+                      <div style={{ marginTop: '8px', fontSize: '12px', background: '#f8fafc', padding: '6px 10px', borderRadius: '8px', borderLeft: '3px solid #282B4A', color: '#475569' }}>
                         <strong>Feedback:</strong> {a.remarks}
                       </div>
                     )}
@@ -299,7 +299,7 @@ export function MyAssignments() {
                     {a.status === 'PENDING' && (
                       <button
                         onClick={() => setSubmitModalAssignment(a)}
-                        style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', color: '#ffffff', border: 'none', padding: '8px 16px', borderRadius: '12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                        style={{ background: 'linear-gradient(135deg, #282B4A, #3a3e68)', color: '#EEEBDA', border: 'none', padding: '8px 16px', borderRadius: '12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 14px rgba(40,43,74,0.25)' }}
                       >
                         <FileUp size={14} /> Submit Work
                       </button>
@@ -309,7 +309,7 @@ export function MyAssignments() {
                         href={a.submitted_file}
                         target="_blank"
                         rel="noreferrer"
-                        style={{ color: '#6366f1', fontSize: '12px', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                        style={{ color: '#282B4A', fontSize: '12px', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                       >
                         <Download size={14} /> View Submission
                       </a>
@@ -411,7 +411,7 @@ export function MyAssignments() {
                   <button type="button" onClick={() => setSubmitModalAssignment(null)} style={{ background: '#f4f4f5', border: 'none', padding: '10px 18px', borderRadius: '12px', fontWeight: 600, color: '#52525b', cursor: 'pointer' }}>
                     Cancel
                   </button>
-                  <button type="submit" style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', border: 'none', padding: '10px 22px', borderRadius: '12px', fontWeight: 700, color: '#ffffff', cursor: 'pointer', boxShadow: '0 4px 16px rgba(99,102,241,0.3)' }}>
+                  <button type="submit" style={{ background: 'linear-gradient(135deg, #282B4A, #3a3e68)', border: 'none', padding: '10px 22px', borderRadius: '12px', fontWeight: 700, color: '#EEEBDA', cursor: 'pointer', boxShadow: '0 4px 16px rgba(40,43,74,0.25)' }}>
                     Confirm & Submit
                   </button>
                 </div>

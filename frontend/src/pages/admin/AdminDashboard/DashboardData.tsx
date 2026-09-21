@@ -1,4 +1,4 @@
-import React, { ComponentType, SVGProps } from "react";
+import React, { type ComponentType, type SVGProps } from "react";
 import {
   Home,
   BookMarked,
@@ -24,7 +24,7 @@ import {
   AlertCircle
 } from "lucide-react";
 
-export type IconType = ComponentType<SVGProps<SVGSVGElement>>;
+export type IconType = ComponentType<{ size?: number | string; className?: string; [key: string]: any }>;
 
 export interface StatCardData {
   label: string;

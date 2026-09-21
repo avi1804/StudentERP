@@ -120,8 +120,8 @@ export function FeeStructure() {
         <button
           onClick={() => { handleSemesterChange(1); setShowAddModal(true); }}
           style={{
-            background: '#573cfa',
-            color: '#fff',
+            background: '#282B4A',
+            color: '#EEEBDA',
             padding: '10px 18px',
             borderRadius: '12px',
             fontWeight: 700,
@@ -131,7 +131,7 @@ export function FeeStructure() {
             alignItems: 'center',
             gap: '8px',
             cursor: 'pointer',
-            boxShadow: '0 4px 14px rgba(87, 60, 250, 0.3)',
+            boxShadow: '0 4px 14px rgba(40, 43, 74, 0.25)',
           }}
         >
           <Plus size={16} /> Add Semester Fee Structure
@@ -147,7 +147,7 @@ export function FeeStructure() {
 
         <div style={{ background: '#f4f4f5', padding: '20px', borderRadius: '18px', border: '1px solid rgba(0,0,0,0.06)' }}>
           <div style={{ fontSize: '13px', fontWeight: 600, color: '#52525b', marginBottom: '8px' }}>Odd Sem Fee (Sem 1, 3, 5, 7)</div>
-          <div style={{ fontSize: '28px', fontWeight: 700, color: '#573cfa' }}>₹ 90,000</div>
+          <div style={{ fontSize: '28px', fontWeight: 700, color: '#282B4A' }}>₹ 90,000</div>
         </div>
 
         <div style={{ background: '#f4f4f5', padding: '20px', borderRadius: '18px', border: '1px solid rgba(0,0,0,0.06)' }}>
@@ -217,7 +217,7 @@ export function FeeStructure() {
                     <td style={{ padding: '16px 20px' }}>
                       <span style={{
                         padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700,
-                        background: isOdd ? '#f3f0ff' : '#e0f2fe', color: isOdd ? '#573cfa' : '#0369a1'
+                        background: isOdd ? 'rgba(40,43,74,0.08)' : '#e0f2fe', color: isOdd ? '#282B4A' : '#0369a1'
                       }}>
                         {isOdd ? 'Odd Semester (₹90k)' : 'Even Semester (₹100k)'}
                       </span>
@@ -228,7 +228,7 @@ export function FeeStructure() {
                     <td style={{ padding: '16px 20px', color: '#334155' }}>
                       ₹ {((struct.library_fee || 0) + (struct.development_fee || 0) + (struct.laboratory_fee || 0)).toLocaleString('en-IN')}
                     </td>
-                    <td style={{ padding: '16px 20px', fontWeight: 800, color: '#573cfa', fontSize: '14px' }}>
+                    <td style={{ padding: '16px 20px', fontWeight: 800, color: '#282B4A', fontSize: '14px' }}>
                       ₹ {struct.total_amount?.toLocaleString('en-IN')}
                     </td>
                     <td style={{ padding: '16px 20px', textAlign: 'right' }}>
@@ -277,7 +277,7 @@ export function FeeStructure() {
                     <select
                       value={formData.semester}
                       onChange={(e) => handleSemesterChange(Number(e.target.value))}
-                      style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid #573cfa', fontSize: '13px', fontWeight: 700, color: '#573cfa', background: '#f3f0ff' }}
+                      style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1.5px solid #282B4A', fontSize: '13px', fontWeight: 700, color: '#282B4A', background: 'rgba(40,43,74,0.06)' }}
                     >
                       {[1, 2, 3, 4, 5, 6, 7, 8].map(s => (
                         <option key={s} value={s}>Semester {s} ({s % 2 !== 0 ? 'Odd - ₹90,000' : 'Even - ₹1,00,000'})</option>
@@ -353,9 +353,9 @@ export function FeeStructure() {
                 </div>
 
                 {/* Total Preview */}
-                <div style={{ background: '#f3f0ff', padding: '12px 16px', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#573cfa' }}>Calculated Total Semester Fee:</span>
-                  <span style={{ fontSize: '18px', fontWeight: 800, color: '#573cfa' }}>₹ {calculateTotal(formData).toLocaleString('en-IN')}</span>
+                <div style={{ background: 'rgba(40,43,74,0.05)', padding: '12px 16px', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#282B4A' }}>Calculated Total Semester Fee:</span>
+                  <span style={{ fontSize: '18px', fontWeight: 800, color: '#282B4A' }}>₹ {calculateTotal(formData).toLocaleString('en-IN')}</span>
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px' }}>
@@ -368,7 +368,7 @@ export function FeeStructure() {
                   </button>
                   <button
                     type="submit"
-                    style={{ padding: '10px 18px', borderRadius: '10px', border: 'none', background: '#573cfa', color: '#fff', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
+                    style={{ padding: '10px 18px', borderRadius: '10px', border: 'none', background: '#282B4A', color: '#EEEBDA', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
                   >
                     Save Semester Structure
                   </button>
@@ -469,9 +469,9 @@ export function FeeStructure() {
                 </div>
 
                 {/* Total Preview */}
-                <div style={{ background: '#f3f0ff', padding: '12px 16px', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#573cfa' }}>Updated Total Semester Fee:</span>
-                  <span style={{ fontSize: '18px', fontWeight: 800, color: '#573cfa' }}>₹ {calculateTotal(editingStructure).toLocaleString('en-IN')}</span>
+                <div style={{ background: 'rgba(40,43,74,0.05)', padding: '12px 16px', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#282B4A' }}>Updated Total Semester Fee:</span>
+                  <span style={{ fontSize: '18px', fontWeight: 800, color: '#282B4A' }}>₹ {calculateTotal(editingStructure).toLocaleString('en-IN')}</span>
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px' }}>
@@ -484,7 +484,7 @@ export function FeeStructure() {
                   </button>
                   <button
                     type="submit"
-                    style={{ padding: '10px 18px', borderRadius: '10px', border: 'none', background: '#573cfa', color: '#fff', fontSize: '13px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    style={{ padding: '10px 18px', borderRadius: '10px', border: 'none', background: '#282B4A', color: '#EEEBDA', fontSize: '13px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
                   >
                     <Save size={16} /> Save Changes
                   </button>

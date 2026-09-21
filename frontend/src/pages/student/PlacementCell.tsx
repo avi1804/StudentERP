@@ -128,7 +128,7 @@ export function PlacementCell() {
   if (loading && !dashboardData) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '400px', gap: '16px', fontFamily: 'Space Grotesk, sans-serif' }}>
-        <Loader2 size={36} className="animate-spin" color="#573cfa" />
+        <Loader2 size={36} className="animate-spin" color="#282B4A" />
         <div style={{ fontSize: '15px', fontWeight: 600, color: '#4b5563' }}>Loading Placement Opportunities...</div>
       </div>
     );
@@ -198,15 +198,15 @@ export function PlacementCell() {
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span>Placement</span>
             <span style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
+              background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+              color: '#EEEBDA',
               padding: '4px 18px',
               borderRadius: '14px',
-              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
               display: 'inline-flex',
               alignItems: 'center',
               lineHeight: 1.2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
             }}>
               <TextType
                 text={["Cell", "Portal", "Opportunities"]}
@@ -216,7 +216,7 @@ export function PlacementCell() {
                 loop={true}
                 showCursor={true}
                 cursorCharacter="|"
-                style={{ color: '#ffffff' }}
+                style={{ color: '#EEEBDA' }}
               />
             </span>
           </h1>
@@ -225,7 +225,7 @@ export function PlacementCell() {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', fontSize: '13px', fontWeight: 600, color: '#374151' }}>
-            <Sparkles size={14} color="#573cfa" /> Real-Time Live Feed
+            <Sparkles size={14} color="#282B4A" /> Real-Time Live Feed
           </div>
         </div>
       </div>
@@ -254,8 +254,8 @@ export function PlacementCell() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(87,60,250,0.08)' }}>
-                <BarChart2 size={18} color="#573cfa" strokeWidth={2} />
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(40,43,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(40,43,74,0.08)' }}>
+                <BarChart2 size={18} color="#282B4A" strokeWidth={2} />
               </div>
               <span style={{ fontSize: '13px', fontWeight: 500, color: '#52525b' }}>Dream Offers</span>
             </div>
@@ -268,7 +268,7 @@ export function PlacementCell() {
               {kpis.dream_offers}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#573cfa', fontWeight: 600 }}>≥10 LPA</span> · High Value Drives
+              <span style={{ color: '#282B4A', fontWeight: 600 }}>≥10 LPA</span> · High Value Drives
             </div>
           </div>
         </motion.div>
@@ -428,7 +428,7 @@ export function PlacementCell() {
               <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#111827', margin: 0 }}>Upcoming Placement Drives</h3>
               <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>Real-time database drives open for student application</div>
             </div>
-            <span style={{ fontSize: '12px', color: '#573cfa', fontWeight: 600, background: '#f3f0ff', padding: '4px 10px', borderRadius: '8px' }}>
+            <span style={{ fontSize: '12px', color: '#282B4A', fontWeight: 600, background: 'rgba(40, 43, 74, 0.08)', padding: '4px 10px', borderRadius: '8px' }}>
               {upcomingDrives.length} Drives Available
             </span>
           </div>
@@ -480,7 +480,7 @@ export function PlacementCell() {
                             <span style={{ fontSize: '11px', fontWeight: 500, color: '#6b7280' }}>· {drive.title}</span>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                            <span style={{ background: '#f3f0ff', color: '#573cfa', padding: '2px 8px', borderRadius: '6px', fontSize: '10px', fontWeight: 600 }}>
+                            <span style={{ background: 'rgba(40, 43, 74, 0.08)', color: '#282B4A', padding: '2px 8px', borderRadius: '6px', fontSize: '10px', fontWeight: 600 }}>
                               {drive.package_offered}
                             </span>
                             <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '2px 8px', borderRadius: '6px', fontSize: '10px', fontWeight: 600 }}>
@@ -520,9 +520,9 @@ export function PlacementCell() {
                             onClick={(e) => handleApply(drive.id, e)}
                             style={{ 
                               padding: '8px 18px', 
-                              background: '#573cfa', 
+                              background: '#282B4A', 
                               border: 'none', 
-                              color: 'white', 
+                              color: '#EEEBDA', 
                               borderRadius: '10px', 
                               fontSize: '12px', 
                               fontWeight: 700, 
@@ -530,7 +530,7 @@ export function PlacementCell() {
                               display: 'flex',
                               alignItems: 'center',
                               gap: '6px',
-                              boxShadow: '0 4px 12px rgba(87, 60, 250, 0.25)',
+                              boxShadow: '0 4px 12px rgba(40, 43, 74, 0.25)',
                               opacity: isApplying ? 0.7 : 1
                             }}
                           >
@@ -611,7 +611,7 @@ export function PlacementCell() {
           <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #f3f4f6', padding: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: 0 }}>Preparation Progress</h3>
-              <span style={{ fontSize: '12px', color: '#573cfa', fontWeight: 600 }}>82% Average Score</span>
+              <span style={{ fontSize: '12px', color: '#282B4A', fontWeight: 600 }}>82% Average Score</span>
             </div>
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
@@ -664,7 +664,7 @@ export function PlacementCell() {
             
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px', border: '1px solid #f3f4f6', borderRadius: '12px', cursor: 'pointer' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><FileText size={18} /></div>
+                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(40, 43, 74, 0.08)', color: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><FileText size={18} /></div>
                 <div>
                   <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827', marginBottom: '2px' }}>Resume Builder</div>
                   <div style={{ fontSize: '11px', color: '#6b7280' }}>Create & optimize ATS resume</div>
@@ -675,7 +675,7 @@ export function PlacementCell() {
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px', border: '1px solid #f3f4f6', borderRadius: '12px', cursor: 'pointer' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><MonitorPlay size={18} /></div>
+                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(40, 43, 74, 0.08)', color: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><MonitorPlay size={18} /></div>
                 <div>
                   <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827', marginBottom: '2px' }}>Mock Interviews</div>
                   <div style={{ fontSize: '11px', color: '#6b7280' }}>Practice AI tech & HR interviews</div>
@@ -686,7 +686,7 @@ export function PlacementCell() {
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px', border: '1px solid #f3f4f6', borderRadius: '12px', cursor: 'pointer' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Brain size={18} /></div>
+                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(40, 43, 74, 0.08)', color: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Brain size={18} /></div>
                 <div>
                   <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827', marginBottom: '2px' }}>Aptitude Tests</div>
                   <div style={{ fontSize: '11px', color: '#6b7280' }}>Quant, Reasoning & Verbal</div>
@@ -697,7 +697,7 @@ export function PlacementCell() {
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px', border: '1px solid #f3f4f6', borderRadius: '12px', cursor: 'pointer' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Building2 size={18} /></div>
+                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(40, 43, 74, 0.08)', color: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Building2 size={18} /></div>
                 <div>
                   <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827', marginBottom: '2px' }}>Company Insights</div>
                   <div style={{ fontSize: '11px', color: '#6b7280' }}>Explore tech stacks & packages</div>
@@ -713,7 +713,7 @@ export function PlacementCell() {
         <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #f3f4f6', padding: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
             <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: 0 }}>Placement Announcements</h3>
-            <span style={{ fontSize: '11px', color: '#573cfa', fontWeight: 600 }}>Live Feed</span>
+            <span style={{ fontSize: '11px', color: '#282B4A', fontWeight: 600 }}>Live Feed</span>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -723,7 +723,7 @@ export function PlacementCell() {
               announcements.map((item, i) => (
                 <React.Fragment key={item.id}>
                   <div style={{ display: 'flex', gap: '14px' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(40, 43, 74, 0.08)', color: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
                       <Megaphone size={16} />
                     </div>
                     <div style={{ flex: 1 }}>
@@ -859,12 +859,12 @@ export function PlacementCell() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
           <div>
             <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#111827', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Building2 size={20} color="#573cfa" />
+              <Building2 size={20} color="#282B4A" />
               Our Partner Companies
             </h3>
             <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '4px' }}>Explore top organizations hiring from our campus</div>
           </div>
-          <span style={{ fontSize: '12px', color: '#573cfa', fontWeight: 600, background: '#f3f0ff', padding: '4px 10px', borderRadius: '8px' }}>
+          <span style={{ fontSize: '12px', color: '#282B4A', fontWeight: 600, background: 'rgba(40, 43, 74, 0.08)', padding: '4px 10px', borderRadius: '8px' }}>
             {companies.length} Registered Partners
           </span>
         </div>
@@ -976,7 +976,7 @@ export function PlacementCell() {
               </button>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
-                <div style={{ width: '54px', height: '54px', borderRadius: '16px', background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', fontWeight: 700 }}>
+                <div style={{ width: '54px', height: '54px', borderRadius: '16px', background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)', color: '#EEEBDA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', fontWeight: 700 }}>
                   {selectedDrive.company_name.charAt(0)}
                 </div>
                 <div>
@@ -988,7 +988,7 @@ export function PlacementCell() {
               <div style={{ background: '#f9fafb', borderRadius: '16px', padding: '16px', marginBottom: '20px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
                 <div>
                   <div style={{ fontSize: '11px', color: '#6b7280' }}>Package Offered</div>
-                  <div style={{ fontSize: '15px', fontWeight: 700, color: '#573cfa' }}>{selectedDrive.package_offered}</div>
+                  <div style={{ fontSize: '15px', fontWeight: 700, color: '#282B4A' }}>{selectedDrive.package_offered}</div>
                 </div>
                 <div>
                   <div style={{ fontSize: '11px', color: '#6b7280' }}>Eligibility CGPA</div>
@@ -1014,7 +1014,7 @@ export function PlacementCell() {
                   href={selectedDrive.company_website} 
                   target="_blank" 
                   rel="noreferrer"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#573cfa', textDecoration: 'none', fontWeight: 600, marginBottom: '24px' }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#282B4A', textDecoration: 'none', fontWeight: 600, marginBottom: '24px' }}
                 >
                   Visit Company Career Portal <ExternalLink size={14} />
                 </a>
@@ -1035,7 +1035,7 @@ export function PlacementCell() {
                   <button
                     disabled={applyingId === selectedDrive.id}
                     onClick={() => handleApply(selectedDrive.id)}
-                    style={{ padding: '10px 24px', background: '#573cfa', border: 'none', color: 'white', borderRadius: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                    style={{ padding: '10px 24px', background: '#282B4A', border: 'none', color: '#EEEBDA', borderRadius: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
                   >
                     {applyingId === selectedDrive.id ? <Loader2 size={16} className="animate-spin" /> : "Confirm Application"}
                   </button>

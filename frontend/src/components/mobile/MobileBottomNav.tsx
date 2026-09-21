@@ -42,10 +42,10 @@ export function MobileBottomNav() {
         left: 0,
         right: 0,
         zIndex: 50,
-        background: 'rgba(10, 14, 23, 0.85)',
+        background: 'rgba(40, 43, 74, 0.95)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        borderTop: '1px solid rgba(183, 142, 254, 0.1)',
+        borderTop: '1px solid rgba(238, 235, 218, 0.15)',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
     >
@@ -77,8 +77,8 @@ export function MobileBottomNav() {
               width: '32px',
               height: '3px',
               borderRadius: '0 0 4px 4px',
-              background: 'linear-gradient(90deg, #9aa8ff, #b78efe)',
-              boxShadow: '0 0 12px rgba(183, 142, 254, 0.5)',
+              background: '#EEEBDA',
+              boxShadow: '0 0 12px rgba(238, 235, 218, 0.5)',
             }}
           />
         </motion.div>
@@ -118,7 +118,7 @@ export function MobileBottomNav() {
                   size={22}
                   strokeWidth={isActive ? 2.5 : 1.8}
                   style={{
-                    color: isActive ? '#b78efe' : '#7a80a1',
+                    color: isActive ? '#EEEBDA' : 'rgba(238, 235, 218, 0.55)',
                     transition: 'color 0.2s ease',
                   }}
                 />
@@ -126,7 +126,7 @@ export function MobileBottomNav() {
                   style={{
                     fontSize: '10px',
                     fontWeight: isActive ? 600 : 400,
-                    color: isActive ? '#b78efe' : '#7a80a1',
+                    color: isActive ? '#EEEBDA' : 'rgba(238, 235, 218, 0.55)',
                     letterSpacing: '0.02em',
                     transition: 'all 0.2s ease',
                   }}

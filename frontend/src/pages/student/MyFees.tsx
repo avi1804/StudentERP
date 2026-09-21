@@ -121,15 +121,15 @@ export function MyFees() {
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span>Fee</span>
             <span style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
+              background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+              color: '#EEEBDA',
               padding: '4px 18px',
               borderRadius: '14px',
-              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
               display: 'inline-flex',
               alignItems: 'center',
               lineHeight: 1.2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
             }}>
               <TextType
                 text={["Management", "Payments", "Structure"]}
@@ -139,7 +139,7 @@ export function MyFees() {
                 loop={true}
                 showCursor={true}
                 cursorCharacter="|"
-                style={{ color: '#ffffff' }}
+                style={{ color: '#EEEBDA' }}
               />
             </span>
           </h1>
@@ -151,15 +151,15 @@ export function MyFees() {
             <button
               onClick={() => handleOpenPayModal("ALL")}
               style={{
-                background: '#573cfa',
-                color: '#ffffff',
+                background: '#282B4A',
+                color: '#EEEBDA',
                 border: 'none',
                 padding: '10px 24px',
                 borderRadius: '14px',
                 fontSize: '14px',
                 fontWeight: 700,
                 cursor: 'pointer',
-                boxShadow: '0 4px 16px rgba(87, 60, 250, 0.3)',
+                boxShadow: '0 4px 16px rgba(40, 43, 74, 0.25)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px'
@@ -195,8 +195,8 @@ export function MyFees() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(87,60,250,0.08)' }}>
-                <Wallet size={18} color="#573cfa" strokeWidth={2} />
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(40,43,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(40,43,74,0.08)' }}>
+                <Wallet size={18} color="#282B4A" strokeWidth={2} />
               </div>
               <span style={{ fontSize: '13px', fontWeight: 500, color: '#52525b' }}>Total Fee</span>
             </div>
@@ -206,7 +206,7 @@ export function MyFees() {
               ₹ {kpis.total_fee.toLocaleString('en-IN')}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#573cfa', fontWeight: 600 }}>Total</span> · Allocated Bill
+              <span style={{ color: '#282B4A', fontWeight: 600 }}>Total</span> · Allocated Bill
             </div>
           </div>
         </motion.div>
@@ -356,7 +356,7 @@ export function MyFees() {
           <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #f3f4f6', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
               <h3 style={{ fontSize: '17px', fontWeight: 'bold', color: '#111827', margin: 0 }}>Category-Wise Fee Structure & Payment</h3>
-              <span style={{ fontSize: '11px', color: '#573cfa', background: '#f3f0ff', padding: '4px 10px', borderRadius: '10px', fontWeight: 700 }}>Categorical Select</span>
+              <span style={{ fontSize: '11px', color: '#282B4A', background: 'rgba(40,43,74,0.08)', padding: '4px 10px', borderRadius: '10px', fontWeight: 700 }}>Categorical Select</span>
             </div>
 
             {breakdown.length === 0 ? (
@@ -383,8 +383,8 @@ export function MyFees() {
                         <button
                           onClick={() => handleOpenPayModal(item.component, item.total)}
                           style={{
-                            background: '#573cfa',
-                            color: '#ffffff',
+                            background: '#282B4A',
+                            color: '#EEEBDA',
                             border: 'none',
                             padding: '6px 14px',
                             borderRadius: '10px',
@@ -394,7 +394,7 @@ export function MyFees() {
                             display: 'flex',
                             alignItems: 'center',
                             gap: '4px',
-                            boxShadow: '0 2px 8px rgba(87,60,250,0.25)'
+                            boxShadow: '0 2px 8px rgba(40,43,74,0.25)'
                           }}
                         >
                           <CreditCard size={13} /> Pay This Category
@@ -426,7 +426,7 @@ export function MyFees() {
                       <div>
                         <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>{pay.receipt_no}</div>
                         <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                          Mode: <span style={{ fontWeight: 600, color: '#573cfa' }}>{pay.mode}</span> • {new Date(pay.date).toLocaleString()}
+                          Mode: <span style={{ fontWeight: 600, color: '#282B4A' }}>{pay.mode}</span> • {new Date(pay.date).toLocaleString()}
                         </div>
                       </div>
                     </div>
@@ -459,14 +459,14 @@ export function MyFees() {
           <div style={{ background: 'white', borderRadius: '24px', border: '1px solid #f3f4f6', padding: '24px' }}>
             <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: '0 0 16px 0' }}>Outstanding Balance</h3>
             
-            <div style={{ background: '#f3f0ff', padding: '20px', borderRadius: '14px', border: '1px solid #ede9fe', marginBottom: '16px' }}>
+            <div style={{ background: 'rgba(40,43,74,0.05)', padding: '20px', borderRadius: '14px', border: '1px solid rgba(40,43,74,0.1)', marginBottom: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827', marginBottom: '4px' }}>Total Pending Balance</div>
                   <div style={{ fontSize: '11px', color: '#4b5563' }}>Real-time database balance</div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#573cfa' }}>₹ {kpis.pending_fee.toLocaleString('en-IN')}</div>
+                  <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#282B4A' }}>₹ {kpis.pending_fee.toLocaleString('en-IN')}</div>
                 </div>
               </div>
             </div>
@@ -477,14 +477,14 @@ export function MyFees() {
               style={{
                 width: '100%',
                 padding: '14px',
-                background: kpis.pending_fee > 0 ? '#573cfa' : '#9ca3af',
-                color: 'white',
+                background: kpis.pending_fee > 0 ? '#282B4A' : '#9ca3af',
+                color: '#EEEBDA',
                 borderRadius: '12px',
                 fontSize: '14px',
                 fontWeight: 700,
                 border: 'none',
                 cursor: kpis.pending_fee > 0 ? 'pointer' : 'not-allowed',
-                boxShadow: kpis.pending_fee > 0 ? '0 4px 16px rgba(87, 60, 250, 0.3)' : 'none'
+                boxShadow: kpis.pending_fee > 0 ? '0 4px 16px rgba(40, 43, 74, 0.25)' : 'none'
               }}
             >
               {kpis.pending_fee > 0 ? "Pay Full Outstanding Fee" : "Fees Fully Settled ✓"}
@@ -507,7 +507,7 @@ export function MyFees() {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <div>
                   <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#09090b', margin: 0 }}>Fee Payment Gateway</h3>
-                  <span style={{ fontSize: '11px', color: '#573cfa', fontWeight: 700 }}>Categorical Fee Payment</span>
+                  <span style={{ fontSize: '11px', color: '#282B4A', fontWeight: 700 }}>Categorical Fee Payment</span>
                 </div>
                 <button onClick={() => setIsPayModalOpen(false)} style={{ background: '#f4f4f5', border: 'none', borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <X size={18} color="#71717a" />
@@ -530,7 +530,7 @@ export function MyFees() {
                   <select
                     value={selectedCategory}
                     onChange={e => handleCategoryDropdownChange(e.target.value)}
-                    style={{ width: '100%', padding: '12px 14px', borderRadius: '12px', border: '1.5px solid #573cfa', fontSize: '13px', fontWeight: 700, background: '#f3f0ff', color: '#573cfa', outline: 'none' }}
+                    style={{ width: '100%', padding: '12px 14px', borderRadius: '12px', border: '1.5px solid #282B4A', fontSize: '13px', fontWeight: 700, background: 'rgba(40,43,74,0.06)', color: '#282B4A', outline: 'none' }}
                   >
                     <option value="ALL">Full Outstanding Dues (₹ {kpis.pending_fee.toLocaleString('en-IN')})</option>
                     
@@ -592,7 +592,7 @@ export function MyFees() {
                 <button
                   type="submit"
                   disabled={isPaying}
-                  style={{ width: '100%', padding: '14px', background: '#573cfa', color: '#ffffff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 4px 16px rgba(87, 60, 250, 0.3)' }}
+                  style={{ width: '100%', padding: '14px', background: '#282B4A', color: '#EEEBDA', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 4px 16px rgba(40, 43, 74, 0.25)' }}
                 >
                   {isPaying ? "Processing Payment..." : `Confirm Payment of ₹ ${payAmount.toLocaleString('en-IN')}`}
                 </button>
@@ -623,13 +623,13 @@ export function MyFees() {
 
               <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                 <div style={{ fontSize: '12px', textTransform: 'uppercase', color: '#6b7280', fontWeight: 700, letterSpacing: '1px' }}>INSTITUTE FEE RECEIPT</div>
-                <div style={{ fontSize: '24px', fontWeight: 800, color: '#573cfa', marginTop: '4px' }}>{receiptData.receipt_no || receiptData.receiptNo}</div>
+                <div style={{ fontSize: '24px', fontWeight: 800, color: '#282B4A', marginTop: '4px' }}>{receiptData.receipt_no || receiptData.receiptNo}</div>
               </div>
 
               <div style={{ background: '#f8fafc', borderRadius: '16px', padding: '20px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '13px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ color: '#64748b' }}>Category Paid:</span>
-                  <strong style={{ color: '#573cfa', fontSize: '14px' }}>{receiptData.fee_category || selectedCategory || 'Tuition Fee'}</strong>
+                  <strong style={{ color: '#282B4A', fontSize: '14px' }}>{receiptData.fee_category || selectedCategory || 'Tuition Fee'}</strong>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ color: '#64748b' }}>Paid Amount:</span>
@@ -662,7 +662,7 @@ export function MyFees() {
                 </button>
                 <button
                   onClick={() => setReceiptData(null)}
-                  style={{ flex: 1, padding: '12px', background: '#573cfa', color: 'white', border: 'none', borderRadius: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
+                  style={{ flex: 1, padding: '12px', background: '#282B4A', color: '#EEEBDA', border: 'none', borderRadius: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
                 >
                   Done
                 </button>

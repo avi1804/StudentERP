@@ -102,8 +102,8 @@ export function PlacementDashboard() {
   const kpis = data?.kpis || {};
 
   const KPIS = [
-    { label: 'Total Students', value: kpis.total_students ?? '—', icon: Users, color: '#3b82f6', sub: 'Enrolled across branches', highlight: 'Enrolled' },
-    { label: 'Companies Visited', value: kpis.total_companies ?? '—', icon: Building2, color: '#8b5cf6', sub: 'This placement season', highlight: 'Recruiting' },
+    { label: 'Total Students', value: kpis.total_students ?? '—', icon: Users, color: '#282B4A', sub: 'Enrolled across branches', highlight: 'Enrolled' },
+    { label: 'Companies Visited', value: kpis.total_companies ?? '—', icon: Building2, color: '#282B4A', sub: 'This placement season', highlight: 'Recruiting' },
     { label: 'Active Drives', value: kpis.total_drives ?? '—', icon: CalendarDays, color: '#f59e0b', sub: 'Campus drives', highlight: 'Live' },
     { label: 'Students Placed', value: kpis.placed_students ?? '—', icon: CheckCircle2, color: '#10b981', sub: 'Successfully offered', highlight: 'Placed' },
     { label: 'Avg Package', value: kpis.average_package ?? '—', icon: TrendingUp, color: '#06b6d4', sub: 'Across all offers', highlight: 'Average' },
@@ -120,15 +120,15 @@ export function PlacementDashboard() {
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span>Placement</span>
             <span style={{
-              background: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)',
-              color: '#ffffff',
+              background: '#282B4A',
+              color: '#EEEBDA',
               padding: '4px 18px',
               borderRadius: '14px',
-              boxShadow: '0 4px 20px rgba(59, 130, 246, 0.3)',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
               display: 'inline-flex',
               alignItems: 'center',
               lineHeight: 1.2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
             }}>
               <TextType
                 text={["Dashboard", "Analytics", "Recruitment Hub"]}
@@ -138,7 +138,7 @@ export function PlacementDashboard() {
                 loop={true}
                 showCursor={true}
                 cursorCharacter="|"
-                style={{ color: '#ffffff' }}
+                style={{ color: '#EEEBDA' }}
               />
             </span>
           </h1>
@@ -191,15 +191,18 @@ export function PlacementDashboard() {
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
           style={{ background: '#ffffff', border: '1.5px solid #f4f4f5', borderRadius: '24px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
         >
-          <div style={{ fontSize: '15px', fontWeight: 700, color: '#09090b', marginBottom: '20px' }}>Placement Hiring Trend</div>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: '#282B4A', marginBottom: '20px' }}>Placement Hiring Trend</div>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={TREND_DATA}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f4f4f5" />
               <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#71717a' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: '#71717a' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e4e4e7', fontSize: '12px' }} />
-              <Line type="monotone" dataKey="placed" stroke="#3b82f6" strokeWidth={2.5} dot={{ r: 4, fill: '#3b82f6' }} name="Students Placed" />
-              <Line type="monotone" dataKey="drives" stroke="#8b5cf6" strokeWidth={2} strokeDasharray="4 3" dot={false} name="Campus Drives" />
+              <Tooltip
+                contentStyle={{ borderRadius: '12px', border: '1px solid rgba(40,43,74,0.12)', fontSize: '12px', background: '#282B4A', color: '#EEEBDA' }}
+                itemStyle={{ color: '#EEEBDA' }}
+              />
+              <Line type="monotone" dataKey="placed" stroke="#282B4A" strokeWidth={2.5} dot={{ r: 4, fill: '#282B4A' }} name="Students Placed" />
+              <Line type="monotone" dataKey="drives" stroke="rgba(40,43,74,0.4)" strokeWidth={2} strokeDasharray="4 3" dot={false} name="Campus Drives" />
             </LineChart>
           </ResponsiveContainer>
         </motion.div>
@@ -209,14 +212,17 @@ export function PlacementDashboard() {
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
           style={{ background: '#ffffff', border: '1.5px solid #f4f4f5', borderRadius: '24px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
         >
-          <div style={{ fontSize: '15px', fontWeight: 700, color: '#09090b', marginBottom: '20px' }}>Package Distribution (LPA)</div>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: '#282B4A', marginBottom: '20px' }}>Package Distribution (LPA)</div>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={PKG_DATA} barSize={32}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f4f4f5" vertical={false} />
               <XAxis dataKey="range" tick={{ fontSize: 11, fill: '#71717a' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: '#71717a' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e4e4e7', fontSize: '12px' }} />
-              <Bar dataKey="count" fill="#3b82f6" radius={[8, 8, 0, 0]} name="Students" />
+              <Tooltip
+                contentStyle={{ borderRadius: '12px', border: '1px solid rgba(40,43,74,0.12)', fontSize: '12px', background: '#282B4A', color: '#EEEBDA' }}
+                itemStyle={{ color: '#EEEBDA' }}
+              />
+              <Bar dataKey="count" fill="#282B4A" radius={[8, 8, 0, 0]} name="Students" />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
@@ -230,8 +236,8 @@ export function PlacementDashboard() {
           style={{ background: '#ffffff', border: '1.5px solid #f4f4f5', borderRadius: '24px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
-            <div style={{ fontSize: '15px', fontWeight: 700, color: '#09090b' }}>Upcoming Campus Drives</div>
-            <button onClick={() => navigate('/placement-admin/drives')} style={{ fontSize: '12px', color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>View all</button>
+            <div style={{ fontSize: '15px', fontWeight: 700, color: '#282B4A' }}>Upcoming Campus Drives</div>
+            <button onClick={() => navigate('/placement-admin/drives')} style={{ fontSize: '12px', color: '#282B4A', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>View all</button>
           </div>
           {loading ? (
             <div style={{ color: '#a1a1aa', fontSize: '13px' }}>Loading...</div>
@@ -241,7 +247,7 @@ export function PlacementDashboard() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {(data?.upcoming_drives || []).map((drive) => (
                 <div key={drive.id} style={{ display: 'flex', gap: '12px', alignItems: 'center', padding: '12px', background: '#f4f4f5', borderRadius: '14px' }}>
-                  <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'linear-gradient(135deg, #3b82f6, #6366f1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '13px', fontWeight: 700, flexShrink: 0 }}>
+                  <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#EEEBDA', fontSize: '13px', fontWeight: 700, flexShrink: 0 }}>
                     {drive.company_name.substring(0, 2).toUpperCase()}
                   </div>
                   <div style={{ minWidth: 0, flex: 1 }}>
@@ -250,7 +256,7 @@ export function PlacementDashboard() {
                   </div>
                   <button
                     onClick={() => navigate('/placement-admin/drives')}
-                    style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '8px', padding: '6px 12px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                    style={{ background: '#282B4A', color: '#EEEBDA', border: 'none', borderRadius: '8px', padding: '6px 12px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
                   >
                     View
                   </button>
@@ -265,7 +271,7 @@ export function PlacementDashboard() {
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
           style={{ background: '#ffffff', border: '1.5px solid #f4f4f5', borderRadius: '24px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
         >
-          <div style={{ fontSize: '15px', fontWeight: 700, color: '#09090b', marginBottom: '18px' }}>Recent Student Applications</div>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: '#282B4A', marginBottom: '18px' }}>Recent Student Applications</div>
           {loading ? (
             <div style={{ color: '#a1a1aa', fontSize: '13px' }}>Loading...</div>
           ) : data?.recent_activity?.length === 0 ? (

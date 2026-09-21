@@ -144,7 +144,7 @@ function SubjectCalendarAccordionContent({
   isMobile = false
 }: {
   subjectStat: SubjectAttendanceStat;
-  calendarData: Record<string, { date: string; records: Record<string, unknown>[] }>;
+  calendarData?: Record<string, { date: string; records: any[] }>;
   isMobile?: boolean;
 }) {
   const [currentMonthDate, setCurrentMonthDate] = useState(new Date(2026, 7, 1)); // August 2026
@@ -179,8 +179,8 @@ function SubjectCalendarAccordionContent({
     let dots: string[] = [];
     if (dayData && dayData.records) {
       dots = dayData.records
-        .filter(r => r.subjectId === subjectStat.subjectId)
-        .map(r => r.status);
+        .filter((r: any) => r.subjectId === subjectStat.subjectId)
+        .map((r: any) => String(r.status));
     }
     
     gridCells.push({
@@ -259,7 +259,7 @@ function SubjectCalendarAccordionContent({
                 justifyContent: 'center',
                 height: '42px',
                 borderRadius: '10px',
-                background: isSelected ? '#573cfa' : hoveredDay === cell.day && cell.isCurrentMonth ? (isMobile ? 'rgba(255,255,255,0.06)' : '#f4f4f5') : 'transparent',
+                background: isSelected ? '#282B4A' : hoveredDay === cell.day && cell.isCurrentMonth ? (isMobile ? 'rgba(255,255,255,0.06)' : '#f4f4f5') : 'transparent',
                 transition: 'all 0.15s',
                 cursor: cell.isCurrentMonth ? 'pointer' : 'default',
                 position: 'relative',
@@ -268,7 +268,7 @@ function SubjectCalendarAccordionContent({
               <span style={{
                 fontSize: '13px',
                 fontWeight: isSelected || cell.isCurrentMonth ? 700 : 400,
-                color: isSelected ? '#ffffff' : cell.isCurrentMonth ? textColor : (isMobile ? 'rgba(255,255,255,0.2)' : '#d4d4d8'),
+                color: isSelected ? '#EEEBDA' : cell.isCurrentMonth ? textColor : (isMobile ? 'rgba(255,255,255,0.2)' : '#d4d4d8'),
               }}>
                 {cell.day}
               </span>
@@ -326,7 +326,7 @@ function SubjectCalendarAccordionContent({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
           <div>
             <div style={{ fontSize: '13px', fontWeight: 700, color: textColor, display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Calendar size={14} color="#573cfa" />
+              <Calendar size={14} color="#282B4A" />
               <span>{formattedSelectedDate}</span>
             </div>
             <div style={{ fontSize: '11px', color: subtextColor, marginTop: '2px' }}>
@@ -373,8 +373,8 @@ function SubjectCalendarAccordionContent({
                     <span style={{
                       fontSize: '11px',
                       fontWeight: 700,
-                      color: '#573cfa',
-                      background: isMobile ? 'rgba(87,60,250,0.15)' : '#f3f0ff',
+                      color: '#282B4A',
+                      background: isMobile ? 'rgba(40,43,74,0.15)' : 'rgba(40,43,74,0.08)',
                       padding: '2px 8px',
                       borderRadius: '8px',
                     }}>
@@ -399,7 +399,7 @@ function SubjectCalendarAccordionContent({
                     textTransform: 'uppercase',
                     letterSpacing: '0.5px',
                   }}>
-                    {currentStatus === 'not_marked' ? 'Pending' : currentStatus}
+                    {currentStatus === 'not_marked' ? 'Pending' : String(currentStatus)}
                   </span>
                 </div>
               );
@@ -421,7 +421,7 @@ function SubjectAccordionCard({
   onAttendanceUpdated,
 }: {
   subjectStat: SubjectAttendanceStat;
-  calendarData: Record<string, { date: string; records: Record<string, unknown>[] }>;
+  calendarData?: Record<string, { date: string; records: any[] }>;
   isExpanded: boolean;
   onToggle: () => void;
   onAttendanceUpdated: () => void;
@@ -430,7 +430,7 @@ function SubjectAccordionCard({
 
   // Color map for subject icon backgrounds
   const colorMap: Record<string, { bg: string; border: string; icon: string }> = {
-    purple: { bg: 'rgba(87,60,250,0.08)', border: 'rgba(87,60,250,0.15)', icon: '#573cfa' },
+    purple: { bg: 'rgba(40,43,74,0.08)', border: 'rgba(40,43,74,0.15)', icon: '#282B4A' },
     green: { bg: 'rgba(34,197,94,0.08)', border: 'rgba(34,197,94,0.15)', icon: '#22c55e' },
     yellow: { bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.15)', icon: '#f59e0b' },
     blue: { bg: 'rgba(59,130,246,0.08)', border: 'rgba(59,130,246,0.15)', icon: '#3b82f6' },
@@ -441,11 +441,11 @@ function SubjectAccordionCard({
   return (
     <div style={{
       background: '#ffffff',
-      border: isExpanded ? '1.5px solid rgba(87,60,250,0.15)' : '1.5px solid rgba(0,0,0,0.06)',
+      border: isExpanded ? '1.5px solid rgba(40,43,74,0.2)' : '1.5px solid rgba(0,0,0,0.06)',
       borderRadius: '20px',
       overflow: 'hidden',
       transition: 'border-color 0.25s, box-shadow 0.25s',
-      boxShadow: isExpanded ? '0 8px 32px rgba(87,60,250,0.08)' : '0 2px 8px rgba(0,0,0,0.02)',
+      boxShadow: isExpanded ? '0 8px 32px rgba(40,43,74,0.08)' : '0 2px 8px rgba(0,0,0,0.02)',
     }}>
       {/* Header Row — always visible */}
       <div
@@ -713,15 +713,15 @@ export function MyAttendance() {
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span>My</span>
             <span style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
+              background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+              color: '#EEEBDA',
               padding: '4px 18px',
               borderRadius: '14px',
-              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
               display: 'inline-flex',
               alignItems: 'center',
               lineHeight: 1.2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
             }}>
               <TextType
                 text={["Attendance", "7th Semester", "Aug – Dec 2026"]}
@@ -731,7 +731,7 @@ export function MyAttendance() {
                 loop={true}
                 showCursor={true}
                 cursorCharacter="|"
-                style={{ color: '#ffffff' }}
+                style={{ color: '#EEEBDA' }}
               />
             </span>
           </h1>
@@ -815,8 +815,8 @@ export function MyAttendance() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(87,60,250,0.08)' }}>
-                <Book size={18} color="#573cfa" strokeWidth={2} />
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(40,43,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(40,43,74,0.08)' }}>
+                <Book size={18} color="#282B4A" strokeWidth={2} />
               </div>
               <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Lectures Delivered</span>
             </div>
@@ -829,7 +829,7 @@ export function MyAttendance() {
               {activeStats.totalDelivered}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#573cfa', fontWeight: 600 }}>100%</span> · Timetable Synced
+              <span style={{ color: '#282B4A', fontWeight: 600 }}>100%</span> · Timetable Synced
             </div>
           </div>
         </motion.div>

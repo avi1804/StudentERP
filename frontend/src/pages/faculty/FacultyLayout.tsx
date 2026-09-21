@@ -11,6 +11,7 @@ import { FacultyMobileDrawer } from "../../components/mobile/FacultyMobileDrawer
 import { useAuthStore } from "../../store/authStore";
 import { apiClient as api } from "../../api/axios";
 import { motion, AnimatePresence } from "framer-motion";
+import GradualBlur from "../../components/GradualBlur";
 
 export function FacultySidebar() {
   const navigate = useNavigate();
@@ -35,94 +36,65 @@ export function FacultySidebar() {
 
   return (
     <div
+      className="premium-student-sidebar"
       style={{
-        position: 'fixed',
-        top: '20px',
-        left: '20px',
-        bottom: '20px',
-        width: '280px',
-        background: '#ffffff',
-        borderRadius: '28px',
-        boxShadow: '0 10px 40px rgba(0,0,0,0.03)',
-        border: '1px solid rgba(0,0,0,0.06)',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        padding: '24px',
-        boxSizing: 'border-box',
-        zIndex: 100,
+        background: 'rgba(247, 245, 236, 0.94)',
+        backdropFilter: 'blur(18px)',
+        WebkitBackdropFilter: 'blur(18px)',
+        border: '1px solid rgba(40, 43, 74, 0.12)',
+        boxShadow: '0 10px 35px rgba(40, 43, 74, 0.1)',
       }}
     >
-      <div>
-        {/* Brand Logo Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '36px', paddingLeft: '8px' }}>
-          <div
-            style={{
-              width: '46px',
-              height: '46px',
-              borderRadius: '14px',
-              background: '#ffffff',
-              boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
-              border: '1px solid rgba(0,0,0,0.08)',
-              padding: '6px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0
-            }}
-          >
-            <img 
-              src="/indus-logo.png" 
-              alt="Indus Logo" 
-              className="w-full h-full object-contain"
-            />
-          </div>
-          <div>
-            <div style={{ fontSize: '18px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.3px' }}>
-              IndusERP
-            </div>
-            <div style={{ fontSize: '11px', color: '#71717a', fontWeight: 600 }}>Faculty Portal</div>
-          </div>
+      <div className="logo-area" style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '28px 24px 20px' }}>
+        <div
+          className="logo-icon"
+          style={{
+            width: '46px',
+            height: '46px',
+            borderRadius: '14px',
+            background: '#ffffff',
+            boxShadow: '0 4px 14px rgba(40, 43, 74, 0.06)',
+            border: '1px solid rgba(40, 43, 74, 0.1)',
+            padding: '6px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0
+          }}
+        >
+          <img 
+            src="/indus-logo.png" 
+            alt="Indus Logo" 
+            className="w-full h-full object-contain"
+          />
+        </div>
+        <div className="logo-text">
+          <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#282B4A', margin: 0, letterSpacing: '-0.02em' }}>
+            IndusERP
+          </h2>
+          <p style={{ fontSize: '12px', color: 'rgba(40, 43, 74, 0.7)', margin: '2px 0 0 0', fontWeight: 500 }}>Faculty Portal</p>
+        </div>
+      </div>
+
+      <div className="nav-links">
+        <div style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(40, 43, 74, 0.6)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '24px 0 8px 16px' }}>
+          Academic Controls
         </div>
 
-        {/* Navigation Items */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#a1a1aa', paddingLeft: '12px', marginBottom: '8px', letterSpacing: '0.5px' }}>
-            ACADEMIC CONTROLS
-          </div>
-
-          {navLinks.map((link) => {
-            const Icon = link.icon;
-            return (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                end={link.end}
-                style={({ isActive }) => ({
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 16px',
-                  borderRadius: '16px',
-                  fontSize: '14px',
-                  fontWeight: isActive ? 700 : 600,
-                  color: isActive ? '#6366f1' : '#52525b',
-                  background: isActive ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
-                  textDecoration: 'none',
-                  transition: 'all 0.2s ease',
-                  border: isActive ? '1px solid rgba(99, 102, 241, 0.15)' : '1px solid transparent',
-                })}
-              >
-                {({ isActive }) => (
-                  <>
-                    <Icon size={18} color={isActive ? '#6366f1' : '#71717a'} strokeWidth={isActive ? 2.2 : 1.8} />
-                    <span>{link.label}</span>
-                  </>
-                )}
-              </NavLink>
-            );
-          })}
-        </div>
+        {navLinks.map((link) => {
+          const Icon = link.icon;
+          return (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              end={link.end}
+              className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")}
+            >
+              <span className="nav-icon"><Icon size={20} /></span>
+              <span className="nav-text">{link.label}</span>
+            </NavLink>
+          );
+        })}
       </div>
     </div>
   );
@@ -239,20 +211,10 @@ export function FacultyLayout() {
   return (
     <div style={{ height: '100vh', width: '100vw', overflow: 'hidden', background: '#f4f5f8', position: 'relative' }}>
       <FacultySidebar />
-      <div 
-        id="main" 
-        className="premium-main"
-        style={{
-          marginLeft: '320px',
-          height: '100vh',
-          overflowY: 'auto',
-          padding: '100px 32px 40px',
-          boxSizing: 'border-box',
-        }}
-      >
-        {/* ── Permanently Fixed Dynamic Island Navbar ── */}
-        <div
-          id="topbar"
+
+      {/* ── Permanently Fixed Dynamic Island Navbar ── */}
+      <div
+        id="topbar"
           style={{
             position: 'fixed',
             top: '16px',
@@ -270,11 +232,11 @@ export function FacultyLayout() {
               layout
               transition={{ type: 'spring', stiffness: 420, damping: 32 }}
               style={{
-                background: 'rgba(255, 255, 255, 0.88)',
+                background: 'rgba(247, 245, 236, 0.94)',
                 backdropFilter: 'blur(18px)',
                 WebkitBackdropFilter: 'blur(18px)',
-                border: '1px solid rgba(0,0,0,0.08)',
-                boxShadow: '0 10px 35px rgba(0,0,0,0.08)',
+                border: '1px solid rgba(40, 43, 74, 0.12)',
+                boxShadow: '0 10px 35px rgba(40, 43, 74, 0.1)',
                 borderRadius: 9999,
                 overflow: 'hidden',
               }}
@@ -297,7 +259,7 @@ export function FacultyLayout() {
                       title="Search"
                       style={{
                         width: 44, height: 44, borderRadius: '50%',
-                        background: 'rgba(245,245,245,0.9)', border: '1px solid rgba(0,0,0,0.06)',
+                        background: 'rgba(40, 43, 74, 0.06)', border: '1px solid rgba(40, 43, 74, 0.08)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         cursor: 'pointer', flexShrink: 0,
                         transition: 'transform 0.18s ease',
@@ -305,7 +267,7 @@ export function FacultyLayout() {
                       onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.07)')}
                       onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
                     >
-                      <Search size={19} color="#333" strokeWidth={1.6} />
+                      <Search size={19} color="#282B4A" strokeWidth={1.8} />
                     </button>
 
                     {/* Notification circle */}
@@ -314,7 +276,7 @@ export function FacultyLayout() {
                       title="Notifications"
                       style={{
                         width: 44, height: 44, borderRadius: '50%',
-                        background: 'rgba(245,245,245,0.9)', border: '1px solid rgba(0,0,0,0.06)',
+                        background: 'rgba(40, 43, 74, 0.06)', border: '1px solid rgba(40, 43, 74, 0.08)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         cursor: 'pointer', flexShrink: 0,
                         transition: 'transform 0.18s ease',
@@ -323,22 +285,22 @@ export function FacultyLayout() {
                       onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.07)')}
                       onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
                     >
-                      <Bell size={19} color="#333" strokeWidth={1.6} />
+                      <Bell size={19} color="#282B4A" strokeWidth={1.8} />
                       {/* Unread dot */}
                       <span style={{
                         position: 'absolute', top: 8, right: 8,
                         width: 8, height: 8, borderRadius: '50%',
-                        background: '#ef4444', border: '2px solid #F5F5F5',
+                        background: '#ef4444', border: '2px solid #EEEBDA',
                       }} />
                     </button>
 
                     {/* Profile circle */}
                     <button
-                      onClick={() => setActiveState(activeState === 'profile' ? 'idle' : 'profile')}
+                      onClick={() => setActiveState('profile')}
                       title="Profile"
                       style={{
                         width: 44, height: 44, borderRadius: '50%',
-                        background: 'rgba(245,245,245,0.9)', border: '1px solid rgba(0,0,0,0.06)',
+                        background: 'rgba(40, 43, 74, 0.06)', border: '1px solid rgba(40, 43, 74, 0.08)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         cursor: 'pointer', flexShrink: 0,
                         transition: 'transform 0.18s ease',
@@ -346,7 +308,7 @@ export function FacultyLayout() {
                       onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.07)')}
                       onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
                     >
-                      <User size={19} color="#333" strokeWidth={1.6} />
+                      <User size={19} color="#282B4A" strokeWidth={1.8} />
                     </button>
                   </motion.div>
                 )}
@@ -365,7 +327,7 @@ export function FacultyLayout() {
                       padding: '0 20px', gap: 10,
                     }}
                   >
-                    <Search size={18} color="#9CA3AF" strokeWidth={1.6} style={{ flexShrink: 0 }} />
+                    <Search size={18} color="#282B4A" strokeWidth={1.8} style={{ flexShrink: 0 }} />
                     <input
                       autoFocus
                       type="text"
@@ -374,8 +336,8 @@ export function FacultyLayout() {
                         flex: 1, background: 'transparent',
                         border: 'none', outline: 'none',
                         fontSize: 15, fontWeight: 500,
-                        color: '#111', fontFamily: 'Space Grotesk, sans-serif',
-                        caretColor: '#555',
+                        color: '#282B4A', fontFamily: 'Space Grotesk, sans-serif',
+                        caretColor: '#282B4A',
                       }}
                     />
                   </motion.div>
@@ -398,40 +360,40 @@ export function FacultyLayout() {
                     <button
                       style={{
                         display: 'flex', alignItems: 'center', gap: 6,
-                        background: '#6366f1', color: '#ffffff',
+                        background: '#282B4A', color: '#EEEBDA',
                         padding: '7px 13px', borderRadius: 9999, border: 'none',
                         fontSize: 12, fontWeight: 700, letterSpacing: '0.04em',
-                        boxShadow: '0 4px 14px rgba(99, 102, 241, 0.35)',
+                        boxShadow: '0 4px 14px rgba(40, 43, 74, 0.25)',
                         flexShrink: 0, cursor: 'pointer',
                       }}
                     >
-                      <Bell size={13} color="#fff" strokeWidth={2.5} />
+                      <Bell size={13} color="#EEEBDA" strokeWidth={2.5} />
                       <span>{notificationsList[notifIndex].badge}</span>
                     </button>
 
                     <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#282B4A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {notificationsList[notifIndex].title}
                       </div>
-                      <div style={{ fontSize: 11, color: '#6B7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {notificationsList[notifIndex].subtitle} · <span style={{ color: '#9CA3AF', fontWeight: 500 }}>{notificationsList[notifIndex].time}</span>
+                      <div style={{ fontSize: 11, color: '#525677', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {notificationsList[notifIndex].subtitle} · <span style={{ color: '#7E82A4', fontWeight: 500 }}>{notificationsList[notifIndex].time}</span>
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, background: '#f3f4f6', borderRadius: 999, padding: '3px 6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, background: 'rgba(40, 43, 74, 0.08)', borderRadius: 999, padding: '3px 6px' }}>
                       <button
                         onClick={() => setNotifIndex(prev => (prev > 0 ? prev - 1 : notificationsList.length - 1))}
                         title="Previous Notification"
                         style={{
                           width: 24, height: 24, borderRadius: '50%', border: 'none',
                           background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          cursor: 'pointer', color: '#374151',
+                          cursor: 'pointer', color: '#282B4A',
                         }}
                       >
                         <ChevronUp size={14} strokeWidth={2.5} />
                       </button>
 
-                      <span style={{ fontSize: 11, fontWeight: 700, color: '#4b5563', padding: '0 2px', userSelect: 'none' }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: '#282B4A', padding: '0 2px', userSelect: 'none' }}>
                         {notifIndex + 1}/{notificationsList.length}
                       </span>
 
@@ -441,7 +403,7 @@ export function FacultyLayout() {
                         style={{
                           width: 24, height: 24, borderRadius: '50%', border: 'none',
                           background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          cursor: 'pointer', color: '#374151',
+                          cursor: 'pointer', color: '#282B4A',
                         }}
                       >
                         <ChevronDown size={14} strokeWidth={2.5} />
@@ -473,18 +435,18 @@ export function FacultyLayout() {
                     >
                       <div style={{
                         width: 38, height: 38, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
-                        color: '#ffffff', fontWeight: 700, fontSize: 13,
+                        background: 'linear-gradient(135deg, #282B4A, #3a3e68)',
+                        color: '#EEEBDA', fontWeight: 700, fontSize: 13,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: '0 2px 10px rgba(99, 102, 241, 0.3)', flexShrink: 0
+                        boxShadow: '0 2px 10px rgba(40, 43, 74, 0.25)', flexShrink: 0
                       }}>
                         {(teacherName || user?.full_name || 'Babita Patel').substring(0, 2).toUpperCase()}
                       </div>
                       <div style={{ textAlign: 'left' }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', lineHeight: 1.2 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#282B4A', lineHeight: 1.2 }}>
                           {teacherName || user?.full_name || 'Babita Patel'}
                         </div>
-                        <div style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>
+                        <div style={{ fontSize: 11, color: '#525677', marginTop: 2 }}>
                           Academic Faculty Staff
                         </div>
                       </div>
@@ -513,20 +475,53 @@ export function FacultyLayout() {
           </div>
         </div>
 
-        {/* ── Main Scrollable Container Box Card (Matching Admin & Student Dashboard) ── */}
-        <div 
-          style={{ 
-            background: '#ffffff', 
-            borderRadius: '28px', 
-            padding: '32px', 
-            minHeight: 'calc(100vh - 140px)', 
-            boxShadow: '0 10px 40px rgba(0,0,0,0.03)', 
-            border: '1px solid rgba(0,0,0,0.06)',
-            boxSizing: 'border-box'
+      {/* ── Main Professional Box Container (Starts BELOW Dynamic Island, Scrolls ONLY Inside) ── */}
+      <div
+        style={{
+          position: 'fixed',
+          top: '84px',
+          bottom: '20px',
+          left: '320px',
+          right: '20px',
+          background: 'rgba(247, 245, 236, 0.94)',
+          backdropFilter: 'blur(18px)',
+          WebkitBackdropFilter: 'blur(18px)',
+          borderRadius: '28px',
+          boxShadow: '0 10px 35px rgba(40, 43, 74, 0.1)',
+          border: '1px solid rgba(40, 43, 74, 0.12)',
+          overflow: 'hidden',
+          zIndex: 10,
+        }}
+      >
+        {/* ── Scrollable Dashboard Content Area ── */}
+        <div
+          id="dashboard-scroll-area"
+          style={{
+            height: '100%',
+            width: '100%',
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            scrollBehavior: 'smooth',
+            paddingTop: '36px',
+            paddingBottom: '40px',
+            paddingLeft: '40px',
+            paddingRight: '40px',
           }}
         >
           <Outlet />
         </div>
+
+        {/* ── Bottom Gradual Blur ── */}
+        <GradualBlur
+          target="parent"
+          position="bottom"
+          height="4rem"
+          strength={1.5}
+          divCount={5}
+          curve="bezier"
+          exponential={true}
+          opacity={0.9}
+        />
       </div>
     </div>
   );

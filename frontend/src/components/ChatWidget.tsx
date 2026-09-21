@@ -243,7 +243,7 @@ const ChatWidget: React.FC = () => {
     // Snapshot the current input text before the mic session starts
     const textBeforeMic = inputRef.current?.value || '';
 
-    const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
 
     recognition.continuous = true; // allow continuous within the single session
@@ -473,8 +473,8 @@ const ChatWidget: React.FC = () => {
                       className="font-bold px-2 py-0.5 rounded-full"
                       style={{
                         fontSize: '10px',
-                        backgroundColor: '#EDE4FF',
-                        color: '#7c3aed',
+                        backgroundColor: 'rgba(40,43,74,0.08)',
+                        color: '#282B4A',
                         letterSpacing: '0.02em'
                       }}
                     >
@@ -603,11 +603,12 @@ const ChatWidget: React.FC = () => {
                                 letterSpacing: '-0.01em',
                                 background: msg.isBot
                                   ? '#FFFFFF'
-                                  : 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)',
+                                  : 'linear-gradient(135deg, #282B4A 0%, #1B1D33 100%)',
+                                color: msg.isBot ? undefined : '#EEEBDA',
                                 boxShadow: msg.isBot
-                                  ? '0 2px 10px rgba(88, 28, 135, 0.08)'
-                                  : '0 4px 14px rgba(124, 58, 237, 0.35)',
-                                border: msg.isBot ? '1px solid rgba(139, 92, 246, 0.08)' : 'none',
+                                  ? '0 2px 10px rgba(40, 43, 74, 0.08)'
+                                  : '0 4px 14px rgba(40, 43, 74, 0.25)',
+                                border: msg.isBot ? '1px solid rgba(40, 43, 74, 0.08)' : 'none',
                                 wordBreak: 'break-word'
                               }}
                             >
@@ -889,9 +890,10 @@ const ChatWidget: React.FC = () => {
                       style={{
                         width: '42px',
                         height: '42px',
-                        background: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)',
+                        background: 'linear-gradient(135deg, #282B4A 0%, #1B1D33 100%)',
+                        color: '#EEEBDA',
                         boxShadow: inputValue.trim() && !isLoading
-                          ? '0 4px 14px rgba(124, 58, 237, 0.4)'
+                          ? '0 4px 14px rgba(40, 43, 74, 0.25)'
                           : 'none'
                       }}
                       title="Send message"

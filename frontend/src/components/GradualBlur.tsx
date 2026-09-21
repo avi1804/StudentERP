@@ -247,7 +247,7 @@ function GradualBlur(props: GradualBlurProps) {
   );
 }
 
-const GradualBlurMemo = React.memo(GradualBlur) as React.NamedExoticComponent<GradualBlurProps> & {
+const GradualBlurMemo = (React.memo(GradualBlur) as unknown) as React.NamedExoticComponent<GradualBlurProps> & {
   PRESETS: typeof PRESETS;
   CURVE_FUNCTIONS: typeof CURVE_FUNCTIONS;
 };

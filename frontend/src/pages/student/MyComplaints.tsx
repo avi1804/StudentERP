@@ -177,15 +177,15 @@ export function MyComplaints() {
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span>My</span>
             <span style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
+              background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+              color: '#EEEBDA',
               padding: '4px 18px',
               borderRadius: '14px',
-              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
               display: 'inline-flex',
               alignItems: 'center',
               lineHeight: 1.2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
             }}>
               <TextType
                 text={["Complaints", "Grievances", "Support"]}
@@ -195,7 +195,7 @@ export function MyComplaints() {
                 loop={true}
                 showCursor={true}
                 cursorCharacter="|"
-                style={{ color: '#ffffff' }}
+                style={{ color: '#EEEBDA' }}
               />
             </span>
           </h1>
@@ -204,7 +204,7 @@ export function MyComplaints() {
 
         <button 
           onClick={() => setIsModalOpen(true)}
-          style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 22px', background: '#573cfa', color: 'white', borderRadius: '14px', fontSize: '14px', fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(87, 60, 250, 0.3)', transition: 'all 0.2s' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 22px', background: '#282B4A', color: '#EEEBDA', borderRadius: '14px', fontSize: '14px', fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(40, 43, 74, 0.25)', transition: 'all 0.2s' }}
         >
           <Plus size={18} /> Raise New Complaint
         </button>
@@ -234,8 +234,8 @@ export function MyComplaints() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(87,60,250,0.08)' }}>
-                <ClipboardList size={18} color="#573cfa" strokeWidth={2} />
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(40,43,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(40,43,74,0.08)' }}>
+                <ClipboardList size={18} color="#282B4A" strokeWidth={2} />
               </div>
               <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Complaints</span>
             </div>
@@ -245,7 +245,7 @@ export function MyComplaints() {
               {kpis.total}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#573cfa', fontWeight: 600 }}>Real-time</span> · Database Sync
+              <span style={{ color: '#282B4A', fontWeight: 600 }}>Real-time</span> · Database Sync
             </div>
           </div>
         </motion.div>
@@ -373,8 +373,8 @@ export function MyComplaints() {
                       fontWeight: 700,
                       border: 'none',
                       cursor: 'pointer',
-                      background: statusFilter === st ? '#573cfa' : '#f4f4f5',
-                      color: statusFilter === st ? '#ffffff' : '#6b7280',
+                      background: statusFilter === st ? '#282B4A' : '#f4f4f5',
+                      color: statusFilter === st ? '#EEEBDA' : '#6b7280',
                       transition: 'all 0.15s'
                     }}
                   >
@@ -412,14 +412,14 @@ export function MyComplaints() {
                       return (
                         <tr key={c.id} style={{ borderBottom: '1px solid #f9fafb' }}>
                           <td style={{ padding: '16px 12px' }}>
-                            <span style={{ background: '#f3f0ff', color: '#573cfa', padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700 }}>
+                            <span style={{ background: 'rgba(40,43,74,0.08)', color: '#282B4A', padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700 }}>
                               {c.ticket_number}
                             </span>
                           </td>
                           <td style={{ padding: '16px 12px' }}>
                             <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827', marginBottom: '2px' }}>{c.subject}</div>
                             <div style={{ fontSize: '11px', color: '#6b7280' }}>
-                              Category: <span style={{ color: '#573cfa', fontWeight: 600 }}>{c.category || 'General'}</span>
+                              Category: <span style={{ color: '#282B4A', fontWeight: 600 }}>{c.category || 'General'}</span>
                             </div>
                           </td>
                           <td style={{ padding: '16px 12px' }}>
@@ -572,7 +572,7 @@ export function MyComplaints() {
                   <button type="button" onClick={() => setIsModalOpen(false)} style={{ padding: '10px 18px', background: '#f3f4f6', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
                     Cancel
                   </button>
-                  <button type="submit" disabled={submitting} style={{ padding: '10px 22px', background: '#573cfa', color: 'white', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <button type="submit" disabled={submitting} style={{ padding: '10px 22px', background: '#282B4A', color: '#EEEBDA', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Send size={15} /> {submitting ? "Submitting..." : "Submit Complaint"}
                   </button>
                 </div>
@@ -594,7 +594,7 @@ export function MyComplaints() {
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <div>
-                  <span style={{ background: '#f3f0ff', color: '#573cfa', padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700 }}>
+                  <span style={{ background: 'rgba(40,43,74,0.08)', color: '#282B4A', padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700 }}>
                     {selectedComplaint.ticket_number}
                   </span>
                   <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#09090b', margin: '8px 0 0 0' }}>
@@ -638,7 +638,7 @@ export function MyComplaints() {
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-                <button onClick={() => setSelectedComplaint(null)} style={{ padding: '8px 20px', background: '#573cfa', color: 'white', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
+                <button onClick={() => setSelectedComplaint(null)} style={{ padding: '8px 20px', background: '#282B4A', color: '#EEEBDA', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
                   Close
                 </button>
               </div>

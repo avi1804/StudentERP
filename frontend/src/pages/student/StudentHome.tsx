@@ -116,7 +116,7 @@ function InteractiveCalendar() {
             <button
               onClick={jumpToToday}
               style={{
-                fontSize: 11, fontWeight: 600, color: '#573cfa', background: 'rgba(87, 60, 250, 0.08)',
+                fontSize: 11, fontWeight: 600, color: '#282B4A', background: 'rgba(40, 43, 74, 0.08)',
                 border: 'none', borderRadius: 12, padding: '3px 10px', cursor: 'pointer',
                 transition: 'all 0.15s'
               }}
@@ -172,15 +172,15 @@ function InteractiveCalendar() {
           let boxShadow = 'none';
 
           if (cell.isToday) {
-            bg = 'linear-gradient(135deg, #573cfa 0%, #7c3aed 100%)';
-            textColor = '#ffffff';
+            bg = 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)';
+            textColor = '#EEEBDA';
             fontWeight = 700;
-            boxShadow = '0 4px 14px rgba(87, 60, 250, 0.45)';
+            boxShadow = '0 4px 14px rgba(40, 43, 74, 0.35)';
           } else if (cell.isSelected && cell.isCurrentMonth) {
-            bg = 'rgba(87, 60, 250, 0.12)';
-            textColor = '#573cfa';
+            bg = 'rgba(40, 43, 74, 0.12)';
+            textColor = '#282B4A';
             fontWeight = 700;
-            border = '2px solid #573cfa';
+            border = '2px solid #282B4A';
           }
 
           return (
@@ -262,8 +262,8 @@ function InteractiveCalendar() {
             <div
               style={{
                 width: 32, height: 32, borderRadius: '50%',
-                background: selectedEvent ? '#573cfa' : '#e4e4e7',
-                color: selectedEvent ? '#ffffff' : '#71717a',
+                background: selectedEvent ? '#282B4A' : '#e4e4e7',
+                color: selectedEvent ? '#EEEBDA' : '#71717a',
                 fontSize: 12, fontWeight: 700,
                 display: 'flex', alignItems: 'center', justifyContent: 'center'
               }}
@@ -285,7 +285,7 @@ function InteractiveCalendar() {
             </div>
           </div>
           {selectedEvent && (
-            <span style={{ fontSize: 11, fontWeight: 600, color: '#573cfa', background: '#ffffff', padding: '4px 10px', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: '#282B4A', background: '#ffffff', padding: '4px 10px', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
               Details
             </span>
           )}
@@ -305,13 +305,13 @@ function CurrentClassCard() {
   }, []);
 
   const schedule = [
-    { name: 'Software Group Project', code: 'CS01', room: 'Room 301', prof: 'Parth Nirmal', startH: 9, startM: 0, endH: 10, endM: 0, icon: Monitor, color: '#573cfa', bg: '#f0f3ff' },
+    { name: 'Software Group Project', code: 'CS01', room: 'Room 301', prof: 'Parth Nirmal', startH: 9, startM: 0, endH: 10, endM: 0, icon: Monitor, color: '#282B4A', bg: 'rgba(40, 43, 74, 0.08)' },
     { name: 'Machine Learning', code: 'CS02', room: 'Lab 2', prof: 'Babita Patel', startH: 10, startM: 0, endH: 11, endM: 0, icon: Brain, color: '#10b981', bg: '#e8f5e9' },
     { name: 'NLP', code: 'CS03', room: 'Room 302', prof: 'Ashwin Patni', startH: 11, startM: 0, endH: 12, endM: 0, icon: Network, color: '#f59e0b', bg: '#fffbeb' },
     { name: 'Cloud Computing', code: 'CS04', room: 'Room 204', prof: 'Vrushali', startH: 12, startM: 0, endH: 13, endM: 0, icon: Database, color: '#3b82f6', bg: '#eff6ff' },
     { name: 'Lunch Break 🍱', code: 'LUNCH', room: 'Cafeteria', prof: 'Rest & Refreshment', startH: 13, startM: 0, endH: 14, endM: 0, icon: Clock, color: '#ec4899', bg: '#fdf2f8', isLunch: true },
     { name: 'Flat', code: 'CS05', room: 'Room 105', prof: 'Dipali Jeetya', startH: 14, startM: 0, endH: 15, endM: 0, icon: Code2, color: '#8b5cf6', bg: '#f3e8ff' },
-    { name: 'Software Project Lab', code: 'CS01-L', room: 'Lab 3', prof: 'Parth Nirmal', startH: 15, startM: 0, endH: 16, endM: 0, icon: Monitor, color: '#573cfa', bg: '#f0f3ff' },
+    { name: 'Software Project Lab', code: 'CS01-L', room: 'Lab 3', prof: 'Parth Nirmal', startH: 15, startM: 0, endH: 16, endM: 0, icon: Monitor, color: '#282B4A', bg: 'rgba(40, 43, 74, 0.08)' },
   ];
 
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
@@ -365,13 +365,13 @@ function CurrentClassCard() {
               width: '10px',
               height: '10px',
               borderRadius: '50%',
-              background: '#10b981',
-              boxShadow: '0 0 10px #10b981',
+              background: '#282B4A',
+              boxShadow: '0 0 10px rgba(40, 43, 74, 0.5)',
             }} />
             <span style={{
               fontSize: '12px',
               fontWeight: 800,
-              color: '#10b981',
+              color: '#282B4A',
               letterSpacing: '0.5px',
             }}>
               CLASSES COMPLETED FOR TODAY
@@ -381,7 +381,7 @@ function CurrentClassCard() {
           <div style={{
             fontSize: '13px',
             fontWeight: 700,
-            color: '#52525b',
+            color: '#282B4A',
             background: '#f4f4f5',
             padding: '6px 14px',
             borderRadius: '14px',
@@ -389,7 +389,7 @@ function CurrentClassCard() {
             alignItems: 'center',
             gap: '6px',
           }}>
-            <Clock size={14} color="#573cfa" />
+            <Clock size={14} color="#282B4A" />
             {formattedTime}
           </div>
         </div>
@@ -400,25 +400,25 @@ function CurrentClassCard() {
             width: '56px',
             height: '56px',
             borderRadius: '18px',
-            background: '#e8f5e9',
-            color: '#10b981',
+            background: 'rgba(40, 43, 74, 0.08)',
+            color: '#282B4A',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
-            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.15)',
+            boxShadow: '0 4px 12px rgba(40, 43, 74, 0.1)',
           }}>
-            <CheckCircle2 size={28} color="#10b981" />
+            <CheckCircle2 size={28} color="#282B4A" />
           </div>
 
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '20px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.4px', marginBottom: '4px' }}>
+            <div style={{ fontSize: '20px', fontWeight: 800, color: '#282B4A', letterSpacing: '-0.4px', marginBottom: '4px' }}>
               All 6 Lectures Completed
             </div>
             <div style={{ fontSize: '13px', color: '#71717a', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span>7th Semester</span>
               <span>•</span>
-              <span style={{ color: '#10b981', fontWeight: 700 }}>5 Active DB Subjects</span>
+              <span style={{ color: '#282B4A', fontWeight: 700 }}>5 Active DB Subjects</span>
             </div>
           </div>
         </div>
@@ -429,7 +429,7 @@ function CurrentClassCard() {
             <span style={{ fontSize: '13px', fontWeight: 700, color: '#18181b' }}>
               09:00 AM - 04:00 PM (Full Day)
             </span>
-            <span style={{ fontSize: '13px', fontWeight: 800, color: '#10b981' }}>
+            <span style={{ fontSize: '13px', fontWeight: 800, color: '#282B4A' }}>
               100% Completed
             </span>
           </div>
@@ -438,7 +438,7 @@ function CurrentClassCard() {
             <div style={{
               width: '100%',
               height: '100%',
-              background: '#10b981',
+              background: 'linear-gradient(90deg, #282B4A, #353960)',
               borderRadius: '4px',
             }} />
           </div>
@@ -487,7 +487,7 @@ function CurrentClassCard() {
           alignItems: 'center',
           gap: '6px',
         }}>
-          <Clock size={14} color="#573cfa" />
+          <Clock size={14} color="#282B4A" />
           {formattedTime}
         </div>
       </div>
@@ -510,13 +510,13 @@ function CurrentClassCard() {
         </div>
 
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: '20px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.4px', marginBottom: '4px' }}>
+          <div style={{ fontSize: '20px', fontWeight: 800, color: '#282B4A', letterSpacing: '-0.4px', marginBottom: '4px' }}>
             {activeClass.name}
           </div>
           <div style={{ fontSize: '13px', color: '#71717a', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span>{activeClass.prof}</span>
             <span>•</span>
-            <span style={{ color: '#573cfa', fontWeight: 700 }}>{activeClass.room}</span>
+            <span style={{ color: '#282B4A', fontWeight: 700 }}>{activeClass.room}</span>
           </div>
         </div>
       </div>
@@ -527,7 +527,7 @@ function CurrentClassCard() {
           <span style={{ fontSize: '13px', fontWeight: 700, color: '#18181b' }}>
             {String(activeClass.startH).padStart(2, '0')}:{String(activeClass.startM).padStart(2, '0')} {activeClass.startH >= 12 ? 'PM' : 'AM'} - {String(activeClass.endH).padStart(2, '0')}:{String(activeClass.endM).padStart(2, '0')} {activeClass.endH >= 12 ? 'PM' : 'AM'}
           </span>
-          <span style={{ fontSize: '13px', fontWeight: 800, color: isLive ? '#573cfa' : '#10b981' }}>
+          <span style={{ fontSize: '13px', fontWeight: 800, color: isLive ? '#282B4A' : '#10b981' }}>
             {isLive ? `${progressPct}% Elapsed` : 'Scheduled'}
           </span>
         </div>
@@ -536,7 +536,7 @@ function CurrentClassCard() {
           <div style={{
             width: isLive ? `${progressPct}%` : '100%',
             height: '100%',
-            background: isLive ? 'linear-gradient(90deg, #573cfa, #6366f1)' : '#10b981',
+            background: isLive ? 'linear-gradient(90deg, #282B4A, #3a3e68)' : '#10b981',
             borderRadius: '4px',
             transition: 'width 1s linear',
           }} />
@@ -634,15 +634,15 @@ export function StudentHome() {
         <h1 style={{ fontSize: 32, fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           <span>Welcome back,</span>
           <span style={{
-            background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-            color: '#ffffff',
+            background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+            color: '#EEEBDA',
             padding: '4px 18px',
             borderRadius: '14px',
-            boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+            boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
             display: 'inline-flex',
             alignItems: 'center',
             lineHeight: 1.2,
-            border: '1px solid rgba(255, 255, 255, 0.2)',
+            border: '1px solid rgba(238, 235, 218, 0.2)',
           }}>
             <TextType
               key={displayName}
@@ -653,7 +653,7 @@ export function StudentHome() {
               loop={true}
               showCursor={true}
               cursorCharacter="|"
-              style={{ color: '#ffffff' }}
+              style={{ color: '#EEEBDA' }}
             />
           </span>
         </h1>
@@ -683,10 +683,10 @@ export function StudentHome() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.7)' }}>
-                <IdCard size={16} color="#18181b" strokeWidth={1.8} />
+              <div style={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(40,43,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(40,43,74,0.08)' }}>
+                <IdCard size={16} color="#282B4A" strokeWidth={1.8} />
               </div>
-              <span style={{ fontSize: 14, fontWeight: 500, color: '#52525b' }}>Enrollment Number</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#52525b' }}>Enrollment Number</span>
             </div>
             <div
               onClick={() => navigate('/dashboard/idcard')}
@@ -700,7 +700,7 @@ export function StudentHome() {
               {dashData.enrollment_number || 'ENR20260481'}
             </div>
             <div style={{ fontSize: 12, color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#10b981', fontWeight: 600 }}>Active</span> · Verified Student ID
+              <span style={{ color: '#282B4A', fontWeight: 700 }}>Active</span> · Verified Student ID
             </div>
           </div>
         </motion.div>
@@ -722,10 +722,10 @@ export function StudentHome() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.7)' }}>
-                <CheckCircle size={16} color="#18181b" strokeWidth={1.8} />
+              <div style={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(40,43,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(40,43,74,0.08)' }}>
+                <CheckCircle size={16} color="#282B4A" strokeWidth={1.8} />
               </div>
-              <span style={{ fontSize: 14, fontWeight: 500, color: '#52525b' }}>Attendance</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#52525b' }}>Attendance</span>
             </div>
             <div
               onClick={() => navigate('/dashboard/attendance')}
@@ -740,9 +740,9 @@ export function StudentHome() {
             </div>
             <div style={{ fontSize: 12, color: '#71717a', fontWeight: 500 }}>
               {dashData.total_classes > 0 ? (
-                <span><span style={{ color: '#10b981', fontWeight: 600 }}>{dashData.present_classes}/{dashData.total_classes}</span> classes attended</span>
+                <span><span style={{ color: '#282B4A', fontWeight: 700 }}>{dashData.present_classes}/{dashData.total_classes}</span> classes attended</span>
               ) : (
-                <span><span style={{ color: '#10b981', fontWeight: 600 }}>+3.2%</span> overall rate</span>
+                <span><span style={{ color: '#282B4A', fontWeight: 700 }}>+3.2%</span> overall rate</span>
               )}
             </div>
           </div>
@@ -799,25 +799,25 @@ export function StudentHome() {
             flexDirection: 'column',
             justifyContent: 'space-between',
             minHeight: 200,
-            boxShadow: '0 4px 20px rgba(87,60,250,0.06)',
+            boxShadow: '0 4px 20px rgba(40, 43, 74, 0.06)',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(87,60,250,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Megaphone size={18} color="#573cfa" strokeWidth={2} />
+              <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(40, 43, 74, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Megaphone size={18} color="#282B4A" strokeWidth={2} />
               </div>
               <span style={{ fontSize: 14, fontWeight: 600, color: '#18181b' }}>Complaints & Support</span>
             </div>
             <div
               onClick={() => navigate('/dashboard/complaints')}
-              style={{ width: 32, height: 32, borderRadius: '50%', background: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(87,60,250,0.3)' }}
+              style={{ width: 32, height: 32, borderRadius: '50%', background: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(40, 43, 74, 0.25)' }}
             >
-              <ArrowUpRight size={15} color="#ffffff" />
+              <ArrowUpRight size={15} color="#EEEBDA" />
             </div>
           </div>
           <div style={{ marginTop: 'auto', paddingTop: 20 }}>
-            <div style={{ fontSize: 44, fontWeight: 700, color: '#573cfa', letterSpacing: '-1.5px', lineHeight: 1, marginBottom: 6 }}>
+            <div style={{ fontSize: 44, fontWeight: 700, color: '#282B4A', letterSpacing: '-1.5px', lineHeight: 1, marginBottom: 6 }}>
               {complaintStats.total}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -826,7 +826,7 @@ export function StudentHome() {
               </span>
               <button
                 onClick={() => navigate('/dashboard/complaints')}
-                style={{ background: '#f3f0ff', color: '#573cfa', border: 'none', borderRadius: '10px', padding: '4px 10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
+                style={{ background: 'rgba(40, 43, 74, 0.08)', color: '#282B4A', border: 'none', borderRadius: '10px', padding: '4px 10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
               >
                 + Complain
               </button>
@@ -843,7 +843,7 @@ export function StudentHome() {
         style={{ marginBottom: 36 }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 700, color: '#09090b', letterSpacing: '-0.3px', margin: 0 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: '#282B4A', letterSpacing: '-0.3px', margin: 0 }}>
             Quick Access
           </h3>
           <span style={{ fontSize: 12, fontWeight: 600, color: '#71717a' }}>Direct Shortcuts</span>
@@ -851,13 +851,13 @@ export function StudentHome() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 14, width: '100%' }}>
           {[
-            { label: 'My Profile', icon: <User size={22} color="#6366f1" />, bg: 'rgba(99, 102, 241, 0.08)', path: '/dashboard/profile' },
-            { label: 'ID Card', icon: <IdCard size={22} color="#3b82f6" />, bg: 'rgba(59, 130, 246, 0.08)', path: '/dashboard/idcard' },
-            { label: 'Attendance', icon: <CheckCircle2 size={22} color="#10b981" />, bg: 'rgba(16, 185, 129, 0.08)', path: '/dashboard/attendance' },
-            { label: 'Timetable', icon: <Calendar size={22} color="#f59e0b" />, bg: 'rgba(245, 158, 11, 0.08)', path: '/dashboard/timetable' },
-            { label: 'Results', icon: <BarChart2 size={22} color="#ef4444" />, bg: 'rgba(239, 68, 68, 0.08)', path: '/dashboard/results' },
-            { label: 'Subjects', icon: <Book size={22} color="#8b5cf6" />, bg: 'rgba(139, 92, 246, 0.08)', path: '/dashboard/subjects' },
-            { label: 'Complaints', icon: <Megaphone size={22} color="#573cfa" />, bg: 'rgba(87, 60, 250, 0.12)', path: '/dashboard/complaints' },
+            { label: 'My Profile', icon: <User size={22} color="#282B4A" />, bg: 'rgba(40, 43, 74, 0.08)', path: '/dashboard/profile' },
+            { label: 'ID Card', icon: <IdCard size={22} color="#282B4A" />, bg: 'rgba(40, 43, 74, 0.08)', path: '/dashboard/idcard' },
+            { label: 'Attendance', icon: <CheckCircle2 size={22} color="#282B4A" />, bg: 'rgba(40, 43, 74, 0.08)', path: '/dashboard/attendance' },
+            { label: 'Timetable', icon: <Calendar size={22} color="#282B4A" />, bg: 'rgba(40, 43, 74, 0.08)', path: '/dashboard/timetable' },
+            { label: 'Results', icon: <BarChart2 size={22} color="#282B4A" />, bg: 'rgba(40, 43, 74, 0.08)', path: '/dashboard/results' },
+            { label: 'Subjects', icon: <Book size={22} color="#282B4A" />, bg: 'rgba(40, 43, 74, 0.08)', path: '/dashboard/subjects' },
+            { label: 'Complaints', icon: <Megaphone size={22} color="#282B4A" />, bg: 'rgba(40, 43, 74, 0.08)', path: '/dashboard/complaints' },
           ].map((item, index) => (
             <motion.div
               key={index}
@@ -892,7 +892,7 @@ export function StudentHome() {
               >
                 {item.icon}
               </div>
-              <span style={{ fontSize: 12, fontWeight: 600, color: '#18181b', textAlign: 'center' }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#282B4A', textAlign: 'center' }}>
                 {item.label}
               </span>
             </motion.div>
@@ -911,14 +911,14 @@ export function StudentHome() {
           <div style={{ background: '#ffffff', borderRadius: 28, border: '1.5px solid rgba(0,0,0,0.06)', padding: 26, boxShadow: '0 4px 24px rgba(0,0,0,0.03)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <div>
-                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#09090b', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <Megaphone size={18} color="#573cfa" /> My Complaints Status
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#282B4A', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Megaphone size={18} color="#282B4A" /> My Complaints Status
                 </h3>
                 <div style={{ fontSize: 12, color: '#71717a', marginTop: 4 }}>Real-time status of your past and current complaints</div>
               </div>
               <button
                 onClick={() => navigate('/dashboard/complaints')}
-                style={{ background: '#573cfa', color: '#ffffff', border: 'none', borderRadius: 14, padding: '8px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 2px 10px rgba(87,60,250,0.25)' }}
+                style={{ background: '#282B4A', color: '#EEEBDA', border: 'none', borderRadius: 14, padding: '8px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 2px 10px rgba(40, 43, 74, 0.25)' }}
               >
                 + Complain Now
               </button>
@@ -926,8 +926,8 @@ export function StudentHome() {
 
             {recentComplaints.length === 0 ? (
               <div style={{ background: '#f8fafc', borderRadius: 18, padding: '24px', textAlign: 'center', border: '1px dashed #e2e8f0' }}>
-                <CheckCircle2 size={32} color="#10b981" style={{ marginBottom: 8 }} />
-                <div style={{ fontSize: 14, fontWeight: 700, color: '#1e293b' }}>No active complaints</div>
+                <CheckCircle2 size={32} color="#282B4A" style={{ marginBottom: 8 }} />
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#282B4A' }}>No active complaints</div>
                 <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>You have no unresolved complaints in the system. Click above to file a grievance if needed.</div>
               </div>
             ) : (
@@ -948,11 +948,11 @@ export function StudentHome() {
                       style={{ background: '#f9fafb', borderRadius: 16, padding: '14px 18px', border: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', transition: 'all 0.15s' }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <span style={{ background: '#f3f0ff', color: '#573cfa', padding: '3px 8px', borderRadius: 8, fontSize: 11, fontWeight: 700 }}>
+                        <span style={{ background: 'rgba(40, 43, 74, 0.08)', color: '#282B4A', padding: '3px 8px', borderRadius: 8, fontSize: 11, fontWeight: 700 }}>
                           {c.ticket_number}
                         </span>
                         <div>
-                          <div style={{ fontSize: 14, fontWeight: 700, color: '#09090b' }}>{c.subject}</div>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: '#282B4A' }}>{c.subject}</div>
                           <div style={{ fontSize: 11, color: '#6b7280' }}>
                             Category: {c.category || 'General'} · Raised: {new Date(c.created_at).toLocaleDateString()}
                           </div>

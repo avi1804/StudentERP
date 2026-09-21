@@ -135,8 +135,8 @@ export function StudentFees() {
         <button
           onClick={() => { setFormError(''); setFormSuccess(''); setIsAssignModalOpen(true); }}
           style={{
-            background: '#573cfa',
-            color: '#ffffff',
+            background: '#282B4A',
+            color: '#EEEBDA',
             border: 'none',
             padding: '10px 20px',
             borderRadius: '12px',
@@ -146,7 +146,7 @@ export function StudentFees() {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            boxShadow: '0 4px 14px rgba(87, 60, 250, 0.3)'
+            boxShadow: '0 4px 14px rgba(40, 43, 74, 0.25)'
           }}
         >
           <Plus size={16} /> Assign Fee Bill
@@ -270,7 +270,7 @@ export function StudentFees() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
               <div>
                 <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#09090b', margin: 0 }}>Fee Allocation Gateway</h3>
-                <span style={{ fontSize: '11px', color: '#573cfa', fontWeight: 700 }}>Clean & Simple Fee Assignment</span>
+                <span style={{ fontSize: '11px', color: '#282B4A', fontWeight: 700 }}>Clean & Simple Fee Assignment</span>
               </div>
               <button onClick={() => setIsAssignModalOpen(false)} style={{ background: '#f4f4f5', border: 'none', borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <X size={18} color="#71717a" />
@@ -298,8 +298,8 @@ export function StudentFees() {
                   padding: '10px',
                   borderRadius: '10px',
                   border: 'none',
-                  background: assignTarget === 'BULK_SEM' ? '#573cfa' : 'transparent',
-                  color: assignTarget === 'BULK_SEM' ? '#fff' : '#52525b',
+                  background: assignTarget === 'BULK_SEM' ? '#282B4A' : 'transparent',
+                  color: assignTarget === 'BULK_SEM' ? '#EEEBDA' : '#52525b',
                   fontSize: '12px',
                   fontWeight: 700,
                   cursor: 'pointer',
@@ -319,8 +319,8 @@ export function StudentFees() {
                   padding: '10px',
                   borderRadius: '10px',
                   border: 'none',
-                  background: assignTarget === 'INDIVIDUAL' ? '#573cfa' : 'transparent',
-                  color: assignTarget === 'INDIVIDUAL' ? '#fff' : '#52525b',
+                  background: assignTarget === 'INDIVIDUAL' ? '#282B4A' : 'transparent',
+                  color: assignTarget === 'INDIVIDUAL' ? '#EEEBDA' : '#52525b',
                   fontSize: '12px',
                   fontWeight: 700,
                   cursor: 'pointer',
@@ -346,7 +346,7 @@ export function StudentFees() {
                     <select
                       value={bulkSem}
                       onChange={e => setBulkSem(Number(e.target.value))}
-                      style={{ width: '100%', padding: '12px 14px', borderRadius: '12px', border: '1.5px solid #573cfa', fontSize: '14px', fontWeight: 700, background: '#f3f0ff', color: '#573cfa', outline: 'none' }}
+                      style={{ width: '100%', padding: '12px 14px', borderRadius: '12px', border: '1.5px solid #282B4A', fontSize: '14px', fontWeight: 700, background: 'rgba(40,43,74,0.06)', color: '#282B4A', outline: 'none' }}
                     >
                       {[1, 2, 3, 4, 5, 6, 7, 8].map(s => (
                         <option key={s} value={s}>
@@ -382,7 +382,7 @@ export function StudentFees() {
                       onFocus={() => setShowSuggestions(true)}
                       onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                       required
-                      style={{ width: '100%', padding: '12px 14px', borderRadius: '12px', border: '1.5px solid #573cfa', fontSize: '14px', outline: 'none', fontWeight: 600, background: '#ffffff' }}
+                      style={{ width: '100%', padding: '12px 14px', borderRadius: '12px', border: '1.5px solid #282B4A', fontSize: '14px', outline: 'none', fontWeight: 600, background: '#ffffff' }}
                     />
 
                     {/* Floating Search Suggestions Dropdown */}
@@ -439,8 +439,8 @@ export function StudentFees() {
                                     width: '32px',
                                     height: '32px',
                                     borderRadius: '50%',
-                                    background: '#573cfa',
-                                    color: '#ffffff',
+                                    background: '#282B4A',
+                                    color: '#EEEBDA',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
@@ -451,7 +451,7 @@ export function StudentFees() {
                                   </div>
                                   <div>
                                     <div style={{ fontSize: '13px', fontWeight: 700, color: '#09090b' }}>{name}</div>
-                                    <div style={{ fontSize: '11px', color: '#71717a' }}>Roll: <span style={{ fontWeight: 700, color: '#573cfa' }}>{roll}</span></div>
+                                    <div style={{ fontSize: '11px', color: '#71717a' }}>Roll: <span style={{ fontWeight: 700, color: '#282B4A' }}>{roll}</span></div>
                                   </div>
                                 </div>
 
@@ -481,7 +481,7 @@ export function StudentFees() {
                     <select
                       value={individualCategory}
                       onChange={e => setIndividualCategory(e.target.value)}
-                      style={{ width: '100%', padding: '12px 14px', borderRadius: '12px', border: '1.5px solid #573cfa', fontSize: '14px', fontWeight: 700, background: '#f3f0ff', color: '#573cfa', outline: 'none' }}
+                      style={{ width: '100%', padding: '12px 14px', borderRadius: '12px', border: '1.5px solid #282B4A', fontSize: '14px', fontWeight: 700, background: 'rgba(40,43,74,0.06)', color: '#282B4A', outline: 'none' }}
                     >
                       <option value="Library Fee">📖 Library Fee</option>
                       <option value="Exam Fee">📝 Exam Fee</option>
@@ -526,7 +526,7 @@ export function StudentFees() {
               <button
                 type="submit"
                 disabled={submitting}
-                style={{ width: '100%', padding: '14px', background: '#573cfa', color: '#ffffff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 4px 14px rgba(87, 60, 250, 0.3)', marginTop: '8px' }}
+                style={{ width: '100%', padding: '14px', background: '#282B4A', color: '#EEEBDA', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 4px 14px rgba(40, 43, 74, 0.25)', marginTop: '8px' }}
               >
                 <Send size={16} /> {submitting ? "Assigning..." : assignTarget === 'BULK_SEM' ? `Assign Fixed Semester ${bulkSem} Fee to ALL Students` : `Assign ${individualCategory} to Student`}
               </button>

@@ -90,7 +90,7 @@ export function MyNotices() {
       case "FEE": return { bg: "#eff6ff", text: "#2563eb" };
       case "EVENT": return { bg: "#f0fdf4", text: "#16a34a" };
       case "HOLIDAY": return { bg: "#fdf2f8", text: "#db2777" };
-      default: return { bg: "#f3f0ff", text: "#573cfa" };
+      default: return { bg: "rgba(40,43,74,0.08)", text: "#282B4A" };
     }
   };
 
@@ -103,15 +103,15 @@ export function MyNotices() {
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span>My</span>
             <span style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
+              background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+              color: '#EEEBDA',
               padding: '4px 18px',
               borderRadius: '14px',
-              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
               display: 'inline-flex',
               alignItems: 'center',
               lineHeight: 1.2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
             }}>
               <TextType
                 text={["Notices", "Announcements", "Circulars"]}
@@ -121,7 +121,7 @@ export function MyNotices() {
                 loop={true}
                 showCursor={true}
                 cursorCharacter="|"
-                style={{ color: '#ffffff' }}
+                style={{ color: '#EEEBDA' }}
               />
             </span>
           </h1>
@@ -164,8 +164,8 @@ export function MyNotices() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(87,60,250,0.08)' }}>
-                <Megaphone size={18} color="#573cfa" strokeWidth={2} />
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(40,43,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(40,43,74,0.08)' }}>
+                <Megaphone size={18} color="#282B4A" strokeWidth={2} />
               </div>
               <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Notices</span>
             </div>
@@ -175,7 +175,7 @@ export function MyNotices() {
               {totalNotices}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#573cfa', fontWeight: 600 }}>Live Feed</span> · Real-time Database
+              <span style={{ color: '#282B4A', fontWeight: 600 }}>Live Feed</span> · Real-time Database
             </div>
           </div>
         </motion.div>
@@ -303,8 +303,8 @@ export function MyNotices() {
                       fontWeight: 700,
                       border: 'none',
                       cursor: 'pointer',
-                      background: activeTab === tab ? '#573cfa' : '#f4f4f5',
-                      color: activeTab === tab ? '#ffffff' : '#6b7280',
+                      background: activeTab === tab ? '#282B4A' : '#f4f4f5',
+                      color: activeTab === tab ? '#EEEBDA' : '#6b7280',
                       transition: 'all 0.15s'
                     }}
                   >
@@ -338,14 +338,14 @@ export function MyNotices() {
                         padding: '18px',
                         borderRadius: '16px',
                         background: isUnread ? '#fafafa' : '#ffffff',
-                        border: isUnread ? '1.5px solid rgba(87,60,250,0.15)' : '1px solid #f3f4f6',
+                        border: isUnread ? '1.5px solid rgba(40,43,74,0.2)' : '1px solid #f3f4f6',
                         cursor: 'pointer',
                         transition: 'all 0.15s',
-                        boxShadow: isUnread ? '0 2px 10px rgba(87,60,250,0.03)' : 'none'
+                        boxShadow: isUnread ? '0 2px 10px rgba(40,43,74,0.05)' : 'none'
                       }}
                     >
                       {/* Unread indicator dot */}
-                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: isUnread ? '#573cfa' : 'transparent', border: isUnread ? 'none' : '2px solid #e5e7eb', marginTop: '6px', marginRight: '14px', flexShrink: 0 }} />
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: isUnread ? '#282B4A' : 'transparent', border: isUnread ? 'none' : '2px solid #e5e7eb', marginTop: '6px', marginRight: '14px', flexShrink: 0 }} />
 
                       <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: badgeStyle.bg, color: badgeStyle.text, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: '16px' }}>
                         <Megaphone size={20} />
@@ -421,11 +421,11 @@ export function MyNotices() {
           </div>
 
           {/* Real-time Status Card */}
-          <div style={{ background: 'linear-gradient(135deg, #573cfa 0%, #432bb3 100%)', borderRadius: '24px', padding: '24px', color: 'white' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Bell size={18} /> Real-Time Notice Broadcast
+          <div style={{ background: 'linear-gradient(135deg, #282B4A 0%, #1B1D33 100%)', borderRadius: '24px', padding: '24px', color: '#EEEBDA' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#EEEBDA' }}>
+              <Bell size={18} color="#EEEBDA" /> Real-Time Notice Broadcast
             </h3>
-            <p style={{ fontSize: '12px', opacity: 0.85, margin: 0, lineHeight: 1.5 }}>
+            <p style={{ fontSize: '12px', opacity: 0.85, margin: 0, lineHeight: 1.5, color: '#EEEBDA' }}>
               All official notices published by institute administrators are synchronized directly from the database to your dashboard.
             </p>
           </div>
@@ -467,7 +467,7 @@ export function MyNotices() {
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '24px' }}>
-                <button onClick={() => setSelectedNotice(null)} style={{ padding: '10px 24px', background: '#573cfa', color: 'white', border: 'none', borderRadius: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
+                <button onClick={() => setSelectedNotice(null)} style={{ padding: '10px 24px', background: '#282B4A', color: '#EEEBDA', border: 'none', borderRadius: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
                   Close
                 </button>
               </div>

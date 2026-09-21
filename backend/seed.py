@@ -14,10 +14,21 @@ async def seed():
             admin_role = Role(name="admin", description="System Administrator")
             faculty_role = Role(name="faculty", description="Faculty Member")
             student_role = Role(name="student", description="Student")
-            db.add_all([admin_role, faculty_role, student_role])
+            placement_role = Role(name="placement_admin", description="Placement Cell Administrator")
+            db.add_all([admin_role, faculty_role, student_role, placement_role])
             await db.commit()
             await db.refresh(admin_role)
-            print("Created roles: admin, faculty, student")
+            await db.refresh(placement_role)
+            print("Created roles: admin, faculty, student, placement_admin")
+        else:
+            # Ensure placement_admin role exists even if other roles were already seeded
+            placement_role = (await db.execute(select(Role).where(Role.name == "placement_admin"))).scalars().first()
+            if not placement_role:
+                placement_role = Role(name="placement_admin", description="Placement Cell Administrator")
+                db.add(placement_role)
+                await db.commit()
+                await db.refresh(placement_role)
+                print("Created missing role: placement_admin")
 
         # Check if admin user exists
         admin_user = (await db.execute(select(User).where(User.email == "admin@example.com"))).scalars().first()
@@ -35,6 +46,23 @@ async def seed():
             print("Created admin user: admin@example.com / admin")
         else:
             print("Admin user already exists!")
+
+        # Check if placement admin user exists
+        placement_user = (await db.execute(select(User).where(User.email == "placement@example.com"))).scalars().first()
+        if not placement_user:
+            placement_user = User(
+                email="placement@example.com",
+                hashed_password=pwd_context.hash("placement123"),
+                full_name="Placement Officer",
+                role_id=placement_role.id,
+                is_active=True,
+                is_superuser=False
+            )
+            db.add(placement_user)
+            await db.commit()
+            print("Created placement admin user: placement@example.com / placement123")
+        else:
+            print("Placement admin user already exists!")
             
         # Check if departments exist
         from app.models.department import Department

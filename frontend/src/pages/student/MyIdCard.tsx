@@ -61,15 +61,15 @@ export function MyIdCard() {
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span>Digital</span>
             <span style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
+              background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+              color: '#EEEBDA',
               padding: '4px 18px',
               borderRadius: '14px',
-              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
               display: 'inline-flex',
               alignItems: 'center',
               lineHeight: 1.2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
             }}>
               <TextType
                 text={["ID Card", "Digital Pass", "Identity"]}
@@ -79,7 +79,7 @@ export function MyIdCard() {
                 loop={true}
                 showCursor={true}
                 cursorCharacter="|"
-                style={{ color: '#ffffff' }}
+                style={{ color: '#EEEBDA' }}
               />
             </span>
             <span style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '20px', background: '#dcfce7', color: '#15803d', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
@@ -98,14 +98,14 @@ export function MyIdCard() {
             alignItems: 'center',
             gap: '8px',
             padding: '12px 24px',
-            background: '#573cfa',
-            color: '#ffffff',
+            background: '#282B4A',
+            color: '#EEEBDA',
             borderRadius: '14px',
             fontSize: '14px',
             fontWeight: 700,
             border: 'none',
             cursor: 'pointer',
-            boxShadow: '0 6px 20px rgba(87, 60, 250, 0.35)',
+            boxShadow: '0 6px 20px rgba(40, 43, 74, 0.25)',
             transition: 'all 0.2s ease'
           }}
           onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
@@ -137,7 +137,7 @@ export function MyIdCard() {
           <div
             style={{
               width: '38%',
-              background: 'linear-gradient(145deg, #4f46e5 0%, #6366f1 50%, #8b5cf6 100%)',
+              background: 'linear-gradient(145deg, #1e2038 0%, #282B4A 60%, #3a3e68 100%)',
               padding: '32px 20px',
               display: 'flex',
               flexDirection: 'column',
@@ -171,7 +171,7 @@ export function MyIdCard() {
                   height: '96px',
                   borderRadius: '50%',
                   background: '#ffffff',
-                  color: '#4f46e5',
+                  color: '#282B4A',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -224,7 +224,7 @@ export function MyIdCard() {
                 <div style={{ fontSize: '10px', fontWeight: 700, color: '#a1a1aa', textTransform: 'uppercase', marginBottom: '3px' }}>
                   Enrollment No
                 </div>
-                <div style={{ fontSize: '13px', fontWeight: 800, color: '#4f46e5', fontFamily: 'monospace' }}>
+                <div style={{ fontSize: '13px', fontWeight: 800, color: '#282B4A', fontFamily: 'monospace' }}>
                   {enrollmentNumber}
                 </div>
               </div>

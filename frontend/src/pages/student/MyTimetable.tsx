@@ -78,7 +78,7 @@ export function MyTimetable() {
 
   const getColorStyles = (color: string) => {
     switch(color) {
-      case "purple": return { bg: "#f3f0ff", text: "#573cfa" };
+      case "purple": return { bg: "rgba(40,43,74,0.08)", text: "#282B4A" };
       case "green": return { bg: "#e8f5e9", text: "#10b981" };
       case "yellow": return { bg: "#fffbeb", text: "#f59e0b" };
       case "blue": return { bg: "#eff6ff", text: "#3b82f6" };
@@ -87,7 +87,7 @@ export function MyTimetable() {
     }
   };
 
-  const renderCell = (cellData: Record<string, string> | null) => {
+  const renderCell = (cellData: Record<string, string> | null | undefined) => {
     if (!cellData) return <div style={{ textAlign: 'center', color: '#d1d5db' }}>-</div>;
     const colors = getColorStyles(cellData.color);
     return (
@@ -197,15 +197,15 @@ export function MyTimetable() {
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span>My</span>
             <span style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
+              background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+              color: '#EEEBDA',
               padding: '4px 18px',
               borderRadius: '14px',
-              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
               display: 'inline-flex',
               alignItems: 'center',
               lineHeight: 1.2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
             }}>
               <TextType
                 text={["Timetable", "Schedule", "Routine"]}
@@ -215,7 +215,7 @@ export function MyTimetable() {
                 loop={true}
                 showCursor={true}
                 cursorCharacter="|"
-                style={{ color: '#ffffff' }}
+                style={{ color: '#EEEBDA' }}
               />
             </span>
           </h1>
@@ -226,7 +226,7 @@ export function MyTimetable() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', fontSize: '13px', fontWeight: 600, color: '#374151', cursor: 'pointer' }}>
             Week View <ChevronDown size={14} color="#6b7280" />
           </div>
-          <button style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 18px', background: 'white', border: '1.5px solid #573cfa', borderRadius: '12px', fontSize: '13px', fontWeight: 700, color: '#573cfa', cursor: 'pointer' }}>
+          <button style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 18px', background: 'white', border: '1.5px solid #282B4A', borderRadius: '12px', fontSize: '13px', fontWeight: 700, color: '#282B4A', cursor: 'pointer' }}>
             <Download size={14} /> Export
           </button>
         </div>
@@ -256,8 +256,8 @@ export function MyTimetable() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(87,60,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(87,60,250,0.08)' }}>
-                <Calendar size={18} color="#573cfa" strokeWidth={2} />
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(40,43,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(40,43,74,0.08)' }}>
+                <Calendar size={18} color="#282B4A" strokeWidth={2} />
               </div>
               <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Classes Today</span>
             </div>
@@ -270,7 +270,7 @@ export function MyTimetable() {
               {classesTodayCount}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#573cfa', fontWeight: 600 }}>{classesTodayCount} Classes</span> · Scheduled Today
+              <span style={{ color: '#282B4A', fontWeight: 600 }}>{classesTodayCount} Classes</span> · Scheduled Today
             </div>
           </div>
         </motion.div>

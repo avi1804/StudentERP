@@ -105,7 +105,7 @@ export function Payments() {
             ) : (
               filteredPayments.map((pmt) => (
                 <tr key={pmt.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={{ padding: '16px 20px', fontWeight: 700, color: '#573cfa' }}>{pmt.receipt_no}</td>
+                  <td style={{ padding: '16px 20px', fontWeight: 700, color: '#282B4A' }}>{pmt.receipt_no}</td>
                   <td style={{ padding: '16px 20px' }}>
                     <div style={{ fontWeight: 600, color: '#0f172a' }}>{pmt.student_name || 'Student'}</div>
                     <div style={{ fontSize: '11px', color: '#64748b' }}>{pmt.enrollment_number || ''}</div>

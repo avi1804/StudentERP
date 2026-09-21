@@ -168,12 +168,12 @@ export function ManageComplaints() {
               top: '20px',
               right: '20px',
               zIndex: 9999,
-              background: '#573cfa',
-              color: 'white',
+              background: '#282B4A',
+              color: '#EEEBDA',
               padding: '12px 24px',
               borderRadius: '14px',
               fontWeight: 600,
-              boxShadow: '0 8px 24px rgba(87, 60, 250, 0.4)',
+              boxShadow: '0 8px 24px rgba(40, 43, 74, 0.35)',
               display: 'flex',
               alignItems: 'center',
               gap: '10px'
@@ -216,7 +216,7 @@ export function ManageComplaints() {
         <div style={{ background: '#ffffff', borderRadius: '18px', border: '1.5px solid #e5e7eb', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
             <span style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280' }}>Total Received</span>
-            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(40,43,74,0.08)', color: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Megaphone size={18} />
             </div>
           </div>
@@ -295,8 +295,8 @@ export function ManageComplaints() {
                     fontWeight: 700,
                     border: 'none',
                     cursor: 'pointer',
-                    background: statusFilter === st ? '#573cfa' : 'transparent',
-                    color: statusFilter === st ? '#ffffff' : '#6b7280',
+                    background: statusFilter === st ? '#282B4A' : 'transparent',
+                    color: statusFilter === st ? '#EEEBDA' : '#6b7280',
                     transition: 'all 0.15s'
                   }}
                 >
@@ -348,7 +348,7 @@ export function ManageComplaints() {
                 {filteredComplaints.map((c) => (
                   <tr key={c.id} style={{ borderBottom: '1px solid #f9fafb' }}>
                     <td style={{ padding: '16px 12px' }}>
-                      <span style={{ background: '#f3f0ff', color: '#573cfa', padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700 }}>
+                      <span style={{ background: 'rgba(40,43,74,0.08)', color: '#282B4A', padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700 }}>
                         {c.ticket_number}
                       </span>
                     </td>
@@ -365,7 +365,7 @@ export function ManageComplaints() {
                         {c.subject}
                       </div>
                       <div style={{ fontSize: '11px', color: '#6b7280' }}>
-                        Category: <span style={{ color: '#573cfa', fontWeight: 600 }}>{c.category || 'General'}</span>
+                        Category: <span style={{ color: '#282B4A', fontWeight: 600 }}>{c.category || 'General'}</span>
                       </div>
                     </td>
                     <td style={{ padding: '16px 12px' }}>
@@ -380,7 +380,7 @@ export function ManageComplaints() {
                     <td style={{ padding: '16px 12px', textAlign: 'center' }}>
                       <button
                         onClick={() => handleOpenManageModal(c)}
-                        style={{ background: '#573cfa', color: '#ffffff', border: 'none', padding: '7px 14px', borderRadius: '10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '5px', boxShadow: '0 2px 6px rgba(87,60,250,0.2)' }}
+                        style={{ background: '#282B4A', color: '#EEEBDA', border: 'none', padding: '7px 14px', borderRadius: '10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '5px', boxShadow: '0 2px 6px rgba(40,43,74,0.2)' }}
                       >
                         <MessageSquare size={13} /> Respond
                       </button>
@@ -405,7 +405,7 @@ export function ManageComplaints() {
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <div>
-                  <span style={{ background: '#f3f0ff', color: '#573cfa', padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700 }}>
+                  <span style={{ background: 'rgba(40,43,74,0.08)', color: '#282B4A', padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700 }}>
                     Ticket #{selectedComplaint.ticket_number}
                   </span>
                   <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#09090b', margin: '6px 0 0 0' }}>
@@ -486,7 +486,7 @@ export function ManageComplaints() {
                   <button
                     type="submit"
                     disabled={saving}
-                    style={{ padding: '10px 22px', background: '#573cfa', color: 'white', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                    style={{ padding: '10px 22px', background: '#282B4A', color: '#EEEBDA', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
                   >
                     <Send size={15} /> {saving ? "Saving..." : "Update Complaint"}
                   </button>

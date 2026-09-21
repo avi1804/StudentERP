@@ -39,15 +39,15 @@ export const FacultyDashboard: React.FC = () => {
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span>Faculty</span>
             <span style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
+              background: '#282B4A',
+              color: '#EEEBDA',
               padding: '4px 18px',
               borderRadius: '14px',
-              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
               display: 'inline-flex',
               alignItems: 'center',
               lineHeight: 1.2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
             }}>
               <TextType
                 text={["Dashboard", "Control Center", "Academic Portal"]}
@@ -57,7 +57,7 @@ export const FacultyDashboard: React.FC = () => {
                 loop={true}
                 showCursor={true}
                 cursorCharacter="|"
-                style={{ color: '#ffffff' }}
+                style={{ color: '#EEEBDA' }}
               />
             </span>
           </h1>
@@ -68,8 +68,8 @@ export const FacultyDashboard: React.FC = () => {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{
-            background: 'rgba(99, 102, 241, 0.08)',
-            color: '#6366f1',
+            background: 'rgba(40, 43, 74, 0.08)',
+            color: '#282B4A',
             padding: '8px 16px',
             borderRadius: '14px',
             fontSize: '13px',
@@ -77,7 +77,7 @@ export const FacultyDashboard: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            border: '1px solid rgba(99, 102, 241, 0.15)',
+            border: '1px solid rgba(40, 43, 74, 0.15)',
           }}>
             <GraduationCap size={16} /> 7th Semester Lead
           </div>
@@ -108,10 +108,10 @@ export const FacultyDashboard: React.FC = () => {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(99,102,241,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(99,102,241,0.08)' }}>
-                <BookOpen size={18} color="#6366f1" strokeWidth={2} />
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(40,43,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(40,43,74,0.08)' }}>
+                <BookOpen size={18} color="#282B4A" strokeWidth={2} />
               </div>
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Assigned Subjects</span>
+              <span style={{ fontSize: '14px', fontWeight: 600, color: '#52525b' }}>Assigned Subjects</span>
             </div>
             <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
               <ArrowUpRight size={15} color="#18181b" />
@@ -122,7 +122,7 @@ export const FacultyDashboard: React.FC = () => {
               {stats?.total_assigned_subjects || 5}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#6366f1', fontWeight: 600 }}>Database Record</span> · Active Subjects
+              <span style={{ color: '#282B4A', fontWeight: 700 }}>Database Record</span> · Active Subjects
             </div>
           </div>
         </motion.div>
@@ -144,10 +144,10 @@ export const FacultyDashboard: React.FC = () => {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(59,130,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(59,130,246,0.08)' }}>
-                <Users size={18} color="#3b82f6" strokeWidth={2} />
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(40,43,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(40,43,74,0.08)' }}>
+                <Users size={18} color="#282B4A" strokeWidth={2} />
               </div>
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#52525b' }}>Total Students</span>
+              <span style={{ fontSize: '14px', fontWeight: 600, color: '#52525b' }}>Total Students</span>
             </div>
             <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
               <ArrowUpRight size={15} color="#18181b" />
@@ -158,7 +158,7 @@ export const FacultyDashboard: React.FC = () => {
               {stats?.total_students || 0}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#3b82f6', fontWeight: 600 }}>{stats?.total_students || 0} Active</span> · Enrolled Students
+              <span style={{ color: '#282B4A', fontWeight: 700 }}>{stats?.total_students || 0} Active</span> · Enrolled Students
             </div>
           </div>
         </motion.div>

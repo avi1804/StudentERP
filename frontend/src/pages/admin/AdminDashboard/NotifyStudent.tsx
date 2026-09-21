@@ -83,7 +83,7 @@ export function NotifyStudent() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px' }}>
         <div>
           <h1 style={{ fontSize: '26px', fontWeight: 800, color: '#09090b', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Megaphone color="#573cfa" size={26} /> Notice & Announcement Center
+            <Megaphone color="#282B4A" size={26} /> Notice & Announcement Center
           </h1>
           <p style={{ fontSize: '13px', color: '#6b7280', margin: '4px 0 0 0' }}>
             Broadcast real-time announcements directly to all student dashboards.
@@ -167,7 +167,7 @@ export function NotifyStudent() {
             <button
               type="submit"
               disabled={loading}
-              style={{ width: '100%', padding: '12px', background: '#573cfa', color: '#ffffff', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 4px 16px rgba(87, 60, 250, 0.3)' }}
+              style={{ width: '100%', padding: '12px', background: '#282B4A', color: '#EEEBDA', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 4px 16px rgba(40, 43, 74, 0.25)' }}
             >
               <Send size={16} /> {loading ? "Publishing..." : "Broadcast Notice Now"}
             </button>
@@ -195,7 +195,7 @@ export function NotifyStudent() {
                   EXAM: { bg: '#fffbeb', text: '#d97706' },
                   FEE: { bg: '#eff6ff', text: '#2563eb' },
                   EVENT: { bg: '#f0fdf4', text: '#16a34a' },
-                  GENERAL: { bg: '#f3f0ff', text: '#573cfa' },
+                  GENERAL: { bg: 'rgba(40,43,74,0.08)', text: '#282B4A' },
                   HOLIDAY: { bg: '#fdf2f8', text: '#db2777' }
                 };
                 const catStyle = categoryColors[n.category] || { bg: '#f3f4f6', text: '#4b5563' };

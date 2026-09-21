@@ -36,10 +36,10 @@ export function FacultyMobileBottomNav({ onMenuClick }: FacultyMobileBottomNavPr
         left: 0,
         right: 0,
         zIndex: 50,
-        background: 'rgba(10, 14, 23, 0.85)',
+        background: 'rgba(40, 43, 74, 0.95)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+        borderTop: '1px solid rgba(238, 235, 218, 0.15)',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
     >
@@ -72,8 +72,8 @@ export function FacultyMobileBottomNav({ onMenuClick }: FacultyMobileBottomNavPr
                 width: '32px',
                 height: '3px',
                 borderRadius: '0 0 4px 4px',
-                background: 'linear-gradient(90deg, #4f8ef7, #9aa8ff)',
-                boxShadow: '0 0 12px rgba(79, 142, 247, 0.5)',
+                background: '#EEEBDA',
+                boxShadow: '0 0 12px rgba(238, 235, 218, 0.5)',
               }}
             />
           </motion.div>
@@ -93,8 +93,8 @@ export function FacultyMobileBottomNav({ onMenuClick }: FacultyMobileBottomNavPr
                 }}
               >
                 <motion.div whileTap={{ scale: 0.85 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                  <Icon size={22} strokeWidth={1.8} style={{ color: '#7a80a1' }} />
-                  <span style={{ fontSize: '10px', fontWeight: 400, color: '#7a80a1', letterSpacing: '0.02em' }}>{item.label}</span>
+                  <Icon size={22} strokeWidth={1.8} style={{ color: 'rgba(238, 235, 218, 0.65)' }} />
+                  <span style={{ fontSize: '10px', fontWeight: 400, color: 'rgba(238, 235, 218, 0.65)', letterSpacing: '0.02em' }}>{item.label}</span>
                 </motion.div>
               </button>
             );
@@ -132,7 +132,7 @@ export function FacultyMobileBottomNav({ onMenuClick }: FacultyMobileBottomNavPr
                   size={22}
                   strokeWidth={isActive ? 2.5 : 1.8}
                   style={{
-                    color: isActive ? '#4f8ef7' : '#7a80a1',
+                    color: isActive ? '#EEEBDA' : 'rgba(238, 235, 218, 0.55)',
                     transition: 'color 0.2s ease',
                   }}
                 />
@@ -140,7 +140,7 @@ export function FacultyMobileBottomNav({ onMenuClick }: FacultyMobileBottomNavPr
                   style={{
                     fontSize: '10px',
                     fontWeight: isActive ? 600 : 400,
-                    color: isActive ? '#4f8ef7' : '#7a80a1',
+                    color: isActive ? '#EEEBDA' : 'rgba(238, 235, 218, 0.55)',
                     letterSpacing: '0.02em',
                     transition: 'all 0.2s ease',
                   }}

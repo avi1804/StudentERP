@@ -116,8 +116,8 @@ export default function AddStudent() {
             padding: '12px',
             borderRadius: '12px',
             border: 'none',
-            background: mode === 'single' ? '#573cfa' : 'transparent',
-            color: mode === 'single' ? '#fff' : '#52525b',
+            background: mode === 'single' ? '#282B4A' : 'transparent',
+            color: mode === 'single' ? '#EEEBDA' : '#52525b',
             fontSize: '13px',
             fontWeight: 700,
             cursor: 'pointer',
@@ -135,8 +135,8 @@ export default function AddStudent() {
             padding: '12px',
             borderRadius: '12px',
             border: 'none',
-            background: mode === 'bulk' ? '#573cfa' : 'transparent',
-            color: mode === 'bulk' ? '#fff' : '#52525b',
+            background: mode === 'bulk' ? '#282B4A' : 'transparent',
+            color: mode === 'bulk' ? '#EEEBDA' : '#52525b',
             fontSize: '13px',
             fontWeight: 700,
             cursor: 'pointer',
@@ -227,9 +227,9 @@ export default function AddStudent() {
 
             <button type="submit" disabled={loading}
               style={{
-                width: '100%', marginTop: '24px', padding: '14px', background: '#573cfa', color: '#ffffff', border: 'none', borderRadius: '12px',
+                width: '100%', marginTop: '24px', padding: '14px', background: '#282B4A', color: '#EEEBDA', border: 'none', borderRadius: '12px',
                 fontSize: '14px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                boxShadow: '0 4px 14px rgba(87, 60, 250, 0.3)', opacity: loading ? 0.7 : 1
+                boxShadow: '0 4px 14px rgba(40, 43, 74, 0.25)', opacity: loading ? 0.7 : 1
               }}
             >
               <UserPlus size={16} /> {loading ? 'Enrolling...' : 'Enroll Student'}
@@ -282,12 +282,12 @@ export default function AddStudent() {
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
             style={{
-              border: `2px dashed ${dragActive ? '#573cfa' : '#d4d4d8'}`,
+              border: `2px dashed ${dragActive ? '#282B4A' : '#d4d4d8'}`,
               borderRadius: '16px',
               padding: '40px 24px',
               textAlign: 'center',
               cursor: 'pointer',
-              background: dragActive ? '#f3f0ff' : '#fafafa',
+              background: dragActive ? 'rgba(40,43,74,0.06)' : '#fafafa',
               transition: 'all 0.2s',
               marginBottom: '20px'
             }}
@@ -300,7 +300,7 @@ export default function AddStudent() {
               style={{ display: 'none' }}
             />
 
-            <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: '#f3f0ff', color: '#573cfa', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+            <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'rgba(40,43,74,0.08)', color: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
               <FileSpreadsheet size={28} />
             </div>
 
@@ -333,9 +333,9 @@ export default function AddStudent() {
             onClick={handleBulkUpload}
             disabled={!bulkFile || bulkUploading}
             style={{
-              width: '100%', padding: '14px', background: bulkFile ? '#573cfa' : '#d4d4d8', color: '#ffffff', border: 'none', borderRadius: '12px',
+              width: '100%', padding: '14px', background: bulkFile ? '#282B4A' : '#d4d4d8', color: bulkFile ? '#EEEBDA' : '#ffffff', border: 'none', borderRadius: '12px',
               fontSize: '14px', fontWeight: 700, cursor: bulkFile ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-              boxShadow: bulkFile ? '0 4px 14px rgba(87, 60, 250, 0.3)' : 'none', opacity: bulkUploading ? 0.7 : 1,
+              boxShadow: bulkFile ? '0 4px 14px rgba(40, 43, 74, 0.25)' : 'none', opacity: bulkUploading ? 0.7 : 1,
               transition: 'all 0.2s'
             }}
           >
@@ -361,9 +361,9 @@ export default function AddStudent() {
                       <div style={{ fontSize: '28px', fontWeight: 800, color: bulkResult.error_count > 0 ? '#dc2626' : '#71717a' }}>{bulkResult.error_count}</div>
                       <div style={{ fontSize: '11px', fontWeight: 700, color: bulkResult.error_count > 0 ? '#991b1b' : '#71717a' }}>Errors / Skipped</div>
                     </div>
-                    <div style={{ background: '#f3f0ff', borderRadius: '12px', padding: '16px', border: '1px solid #ddd6fe', textAlign: 'center' }}>
-                      <div style={{ fontSize: '28px', fontWeight: 800, color: '#573cfa' }}>{bulkResult.total_rows}</div>
-                      <div style={{ fontSize: '11px', fontWeight: 700, color: '#4c1d95' }}>Total Rows in File</div>
+                    <div style={{ background: 'rgba(40,43,74,0.06)', borderRadius: '12px', padding: '16px', border: '1px solid rgba(40,43,74,0.12)', textAlign: 'center' }}>
+                      <div style={{ fontSize: '28px', fontWeight: 800, color: '#282B4A' }}>{bulkResult.total_rows}</div>
+                      <div style={{ fontSize: '11px', fontWeight: 700, color: '#282B4A' }}>Total Rows in File</div>
                     </div>
                   </div>
 
@@ -382,7 +382,7 @@ export default function AddStudent() {
                         {bulkResult.errors.map((err: any, i: number) => (
                           <div key={i} style={{ padding: '10px 16px', borderBottom: '1px solid #fef2f2', fontSize: '12px', display: 'flex', gap: '12px' }}>
                             <span style={{ fontWeight: 700, color: '#71717a', minWidth: '50px' }}>Row {err.row}</span>
-                            <span style={{ fontWeight: 700, color: '#573cfa', minWidth: '90px', fontFamily: 'monospace' }}>{err.enrollment}</span>
+                            <span style={{ fontWeight: 700, color: '#282B4A', minWidth: '90px', fontFamily: 'monospace' }}>{err.enrollment}</span>
                             <span style={{ color: '#dc2626', fontWeight: 600 }}>{err.error}</span>
                           </div>
                         ))}
