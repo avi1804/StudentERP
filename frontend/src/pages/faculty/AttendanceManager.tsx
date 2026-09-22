@@ -269,7 +269,7 @@ function QRModal({
 
   const pct = totalSeconds.current > 0 ? (timeRemaining / totalSeconds.current) * 100 : 100;
   const isExpired = timeRemaining <= 0 && expiresAt !== null;
-  const timerColor = timeRemaining > 60 ? '#3b82f6' : timeRemaining > 20 ? '#f59e0b' : '#ef4444';
+  const timerColor = timeRemaining > 60 ? '#282B4A' : timeRemaining > 20 ? '#f59e0b' : '#ef4444';
   const expiryMinutes = Math.ceil(expirySeconds / 60);
 
   return (
@@ -372,20 +372,22 @@ function QRModal({
               <button
                 onClick={onClose}
                 style={{
-                  flex: 1, padding: '13px', borderRadius: 14, background: '#f4f4f5',
-                  border: 'none', fontWeight: 700, cursor: 'pointer', color: '#374151',
+                  flex: 1, padding: '13px', borderRadius: 14, background: '#282B4A',
+                  color: '#EEEBDA', border: 'none', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                  boxShadow: '0 4px 14px rgba(40,43,74,0.25)',
                 }}
               >
-                Close
+                Done / Close
               </button>
               <button
                 onClick={onRegenerate}
                 disabled={loading || !isExpired}
                 style={{
-                  flex: 1, padding: '13px', borderRadius: 14, background: '#3b82f6',
-                  border: 'none', fontWeight: 700, cursor: loading || !isExpired ? 'not-allowed' : 'pointer',
-                  color: '#fff', opacity: !isExpired ? 0.5 : 1,
+                  flex: 1, padding: '13px', borderRadius: 14, background: '#282B4A',
+                  border: '1px solid rgba(238,235,218,0.2)', fontWeight: 700, cursor: loading || !isExpired ? 'not-allowed' : 'pointer',
+                  color: '#EEEBDA', opacity: !isExpired ? 0.5 : 1,
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                  boxShadow: '0 4px 14px rgba(40,43,74,0.25)',
                 }}
               >
                 <RefreshCw size={14} /> Regenerate
@@ -632,16 +634,17 @@ export const AttendanceManager: React.FC = () => {
           <h1 style={{ fontSize: 28, fontWeight: 800, color: '#111827', letterSpacing: '-0.6px', margin: 0, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
             <span>Attendance</span>
             <span style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#fff', padding: '4px 18px', borderRadius: 14,
-              boxShadow: '0 4px 20px rgba(99,102,241,0.3)',
+              background: '#282B4A',
+              color: '#EEEBDA', padding: '4px 18px', borderRadius: 14,
+              boxShadow: '0 4px 20px rgba(40,43,74,0.25)',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
               display: 'inline-flex', alignItems: 'center', lineHeight: 1.2,
             }}>
               <TextType
                 text={['Manager', 'Lecture-Wise', 'Evaluator']}
                 typingSpeed={60} deletingSpeed={35} pauseDuration={2200}
                 loop showCursor cursorCharacter="|"
-                style={{ color: '#fff' }}
+                style={{ color: '#EEEBDA' }}
               />
             </span>
           </h1>
@@ -658,8 +661,8 @@ export const AttendanceManager: React.FC = () => {
         style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: 18, marginBottom: 28 }}
       >
         {[
-          { icon: <BookOpen size={16} color="#6366f1" />, label: 'My Subjects', value: myAssignedSubjects.length, color: '#6366f1' },
-          { icon: <Users size={16} color="#3b82f6" />, label: 'Students Loaded', value: students.length, color: '#3b82f6' },
+          { icon: <BookOpen size={16} color="#282B4A" />, label: 'My Subjects', value: myAssignedSubjects.length, color: '#282B4A' },
+          { icon: <Users size={16} color="#282B4A" />, label: 'Students Loaded', value: students.length, color: '#282B4A' },
           { icon: <CheckCircle2 size={16} color="#22c55e" />, label: 'Present', value: presentCount, color: '#22c55e' },
           { icon: <Clock size={16} color="#ef4444" />, label: 'Absent', value: absentCount, color: '#ef4444' },
         ].map((card, i) => (
@@ -701,7 +704,7 @@ export const AttendanceManager: React.FC = () => {
       {/* ── Slot Selector ── */}
       <div style={{ background: '#fff', borderRadius: 24, padding: 26, border: '1.5px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)', marginBottom: 24 }}>
         <h3 style={{ fontSize: 16, fontWeight: 800, color: '#111827', marginBottom: 18, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Calendar size={18} color="#6366f1" /> Select Lecture Slot
+          <Calendar size={18} color="#282B4A" /> Select Lecture Slot
         </h3>
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '200px 1fr', gap: 16 }}>
           <div>
@@ -752,7 +755,7 @@ export const AttendanceManager: React.FC = () => {
             border: '1px solid #e2e8f0',
           }}>
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#282B4A', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>
                 {locked ? '🔒 Attendance Locked' : 'Active Slot'}
               </div>
               <div style={{ fontSize: 17, fontWeight: 800, color: '#111827' }}>{activeSlot.subjectName}</div>
@@ -767,9 +770,10 @@ export const AttendanceManager: React.FC = () => {
                 disabled={qrLoading || locked}
                 style={{
                   padding: '9px 18px', borderRadius: 11,
-                  background: locked ? '#f3f4f6' : '#3b82f6', color: locked ? '#9ca3af' : '#fff',
-                  border: 'none', fontWeight: 700, cursor: locked ? 'not-allowed' : 'pointer',
+                  background: locked ? '#f3f4f6' : '#282B4A', color: locked ? '#9ca3af' : '#EEEBDA',
+                  border: '1px solid rgba(40,43,74,0.15)', fontWeight: 700, cursor: locked ? 'not-allowed' : 'pointer',
                   display: 'flex', alignItems: 'center', gap: 6, fontSize: 13,
+                  boxShadow: '0 4px 14px rgba(40,43,74,0.15)'
                 }}
               >
                 <QrCode size={14} />
@@ -795,9 +799,9 @@ export const AttendanceManager: React.FC = () => {
                     disabled={saving || students.length === 0}
                     style={{
                       padding: '9px 18px', borderRadius: 11,
-                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                      color: '#fff', border: 'none', fontWeight: 700, cursor: saving || students.length === 0 ? 'not-allowed' : 'pointer',
-                      boxShadow: '0 4px 14px rgba(16,185,129,0.28)',
+                      background: '#282B4A',
+                      color: '#EEEBDA', border: '1px solid rgba(238, 235, 218, 0.2)', fontWeight: 700, cursor: saving || students.length === 0 ? 'not-allowed' : 'pointer',
+                      boxShadow: '0 4px 14px rgba(40,43,74,0.25)',
                       display: 'flex', alignItems: 'center', gap: 6, fontSize: 13,
                     }}
                   >
@@ -827,7 +831,7 @@ export const AttendanceManager: React.FC = () => {
           {/* Header row */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
             <h3 style={{ fontSize: 16, fontWeight: 800, color: '#111827', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Users size={18} color="#3b82f6" />
+              <Users size={18} color="#282B4A" />
               Student List
               {loadingStudents && <span style={{ fontSize: 12, fontWeight: 500, color: '#6b7280' }}> · Loading…</span>}
               {!loadingStudents && (

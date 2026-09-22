@@ -295,15 +295,15 @@ export function AssignmentManager() {
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span>Assignments</span>
             <span style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
+              background: '#282B4A',
+              color: '#EEEBDA',
               padding: '4px 18px',
               borderRadius: '14px',
-              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
               display: 'inline-flex',
               alignItems: 'center',
               lineHeight: 1.2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
             }}>
               <TextType
                 text={["Manager", "Evaluator", "Tracker"]}
@@ -313,7 +313,7 @@ export function AssignmentManager() {
                 loop={true}
                 showCursor={true}
                 cursorCharacter="|"
-                style={{ color: '#ffffff' }}
+                style={{ color: '#EEEBDA' }}
               />
             </span>
           </h1>
@@ -325,9 +325,9 @@ export function AssignmentManager() {
         <button
           onClick={() => { resetForm(); setShowCreateModal(true); }}
           style={{
-            background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-            color: '#ffffff',
-            border: 'none',
+            background: '#282B4A',
+            color: '#EEEBDA',
+            border: '1px solid rgba(238, 235, 218, 0.2)',
             padding: '12px 24px',
             borderRadius: '16px',
             fontSize: '14px',
@@ -336,7 +336,7 @@ export function AssignmentManager() {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            boxShadow: '0 4px 16px rgba(99, 102, 241, 0.35)',
+            boxShadow: '0 4px 16px rgba(40, 43, 74, 0.25)',
             transition: 'transform 0.2s ease',
           }}
           onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
@@ -373,7 +373,7 @@ export function AssignmentManager() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '13px', fontWeight: 600, color: '#52525b' }}>Total</span>
-            <ClipboardList size={18} color="#6366f1" />
+            <ClipboardList size={18} color="#282B4A" />
           </div>
           <div>
             <div style={{ fontSize: '36px', fontWeight: 800, color: '#09090b', lineHeight: 1.1 }}>{stats.total_assignments}</div>
@@ -388,11 +388,11 @@ export function AssignmentManager() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '13px', fontWeight: 600, color: '#52525b' }}>Active</span>
-            <Clock size={18} color="#3b82f6" />
+            <Clock size={18} color="#282B4A" />
           </div>
           <div>
             <div style={{ fontSize: '36px', fontWeight: 800, color: '#09090b', lineHeight: 1.1 }}>{stats.active_assignments}</div>
-            <div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: 600, marginTop: '4px' }}>Ongoing</div>
+            <div style={{ fontSize: '11px', color: '#282B4A', fontWeight: 600, marginTop: '4px' }}>Ongoing</div>
           </div>
         </motion.div>
 
@@ -448,11 +448,11 @@ export function AssignmentManager() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '13px', fontWeight: 600, color: '#52525b' }}>Sub. Rate</span>
-            <Award size={18} color="#8b5cf6" />
+            <Award size={18} color="#282B4A" />
           </div>
           <div>
             <div style={{ fontSize: '36px', fontWeight: 800, color: '#09090b', lineHeight: 1.1 }}>{stats.average_submission_rate}%</div>
-            <div style={{ fontSize: '11px', color: '#8b5cf6', fontWeight: 600, marginTop: '4px' }}>Overall Roster</div>
+            <div style={{ fontSize: '11px', color: '#282B4A', fontWeight: 600, marginTop: '4px' }}>Overall Roster</div>
           </div>
         </motion.div>
       </motion.div>
@@ -528,7 +528,7 @@ export function AssignmentManager() {
                 <tr key={a.id} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)', transition: 'background 0.15s ease' }}>
                   <td style={{ padding: '18px 24px' }}>
                     <div style={{ fontWeight: 700, fontSize: '15px', color: '#09090b' }}>{a.title}</div>
-                    <span style={{ fontSize: '11px', fontWeight: 600, color: '#6366f1', background: 'rgba(99,102,241,0.08)', padding: '2px 8px', borderRadius: '8px', display: 'inline-block', marginTop: '4px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 600, color: '#282B4A', background: 'rgba(40,43,74,0.08)', padding: '2px 8px', borderRadius: '8px', display: 'inline-block', marginTop: '4px' }}>
                       {a.assignment_type}
                     </span>
                   </td>
@@ -548,7 +548,7 @@ export function AssignmentManager() {
                   </td>
                   <td style={{ padding: '18px 20px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontWeight: 700, fontSize: '14px', color: '#6366f1' }}>{a.submission_count}</span>
+                      <span style={{ fontWeight: 700, fontSize: '14px', color: '#282B4A' }}>{a.submission_count}</span>
                       <span style={{ fontSize: '12px', color: '#71717a' }}>submitted</span>
                     </div>
                     {a.graded_count > 0 && (
@@ -571,7 +571,7 @@ export function AssignmentManager() {
                         onClick={() => handleOpenSubmissions(a)}
                         title="View Submissions & Grade"
                         style={{
-                          background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.2)',
+                          background: 'rgba(40,43,74,0.08)', color: '#282B4A', border: '1px solid rgba(40,43,74,0.2)',
                           padding: '8px 14px', borderRadius: '12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer',
                           display: 'flex', alignItems: 'center', gap: '6px'
                         }}
@@ -742,7 +742,7 @@ export function AssignmentManager() {
                     id="allowLate"
                     checked={formAllowLate}
                     onChange={e => setFormAllowLate(e.target.checked)}
-                    style={{ width: '18px', height: '18px', accentColor: '#6366f1' }}
+                    style={{ width: '18px', height: '18px', accentColor: '#282B4A' }}
                   />
                   <label htmlFor="allowLate" style={{ fontSize: '14px', fontWeight: 600, color: '#3f3f46', cursor: 'pointer' }}>
                     Allow Late Submissions after Due Date
@@ -753,7 +753,7 @@ export function AssignmentManager() {
                   <button type="button" onClick={() => setShowCreateModal(false)} style={{ background: '#f4f4f5', border: 'none', padding: '12px 20px', borderRadius: '14px', fontWeight: 600, color: '#52525b', cursor: 'pointer' }}>
                     Cancel
                   </button>
-                  <button type="submit" style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', border: 'none', padding: '12px 24px', borderRadius: '14px', fontWeight: 700, color: '#ffffff', cursor: 'pointer', boxShadow: '0 4px 16px rgba(99,102,241,0.3)' }}>
+                  <button type="submit" style={{ background: '#282B4A', border: '1px solid rgba(238, 235, 218, 0.2)', padding: '12px 24px', borderRadius: '14px', fontWeight: 700, color: '#EEEBDA', cursor: 'pointer', boxShadow: '0 4px 16px rgba(40,43,74,0.25)' }}>
                     {editingAssignment ? 'Save Changes' : 'Publish Assignment'}
                   </button>
                 </div>
@@ -834,15 +834,15 @@ export function AssignmentManager() {
                             <td style={{ padding: '12px 16px', color: '#64748b' }}>{s.enrollment_number}</td>
                             <td style={{ padding: '12px 16px', color: '#64748b' }}>{s.submitted_at}</td>
                             <td style={{ padding: '12px 16px' }}>
-                              <a href={s.submission_url} target="_blank" rel="noreferrer" style={{ color: '#6366f1', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}>
+                              <a href={s.submission_url} target="_blank" rel="noreferrer" style={{ color: '#282B4A', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}>
                                 <FileText size={14} /> Download
                               </a>
                             </td>
                             <td style={{ padding: '12px 16px' }}>
                               <span style={{
                                 padding: '2px 8px', borderRadius: '8px', fontSize: '11px', fontWeight: 700,
-                                background: s.submission_status === 'GRADED' ? 'rgba(59,130,246,0.1)' : s.submission_status === 'LATE' ? 'rgba(245,158,11,0.1)' : 'rgba(34,197,94,0.1)',
-                                color: s.submission_status === 'GRADED' ? '#3b82f6' : s.submission_status === 'LATE' ? '#f59e0b' : '#22c55e'
+                                background: s.submission_status === 'GRADED' ? 'rgba(40,43,74,0.1)' : s.submission_status === 'LATE' ? 'rgba(245,158,11,0.1)' : 'rgba(34,197,94,0.1)',
+                                color: s.submission_status === 'GRADED' ? '#282B4A' : s.submission_status === 'LATE' ? '#f59e0b' : '#22c55e'
                               }}>
                                 {s.submission_status}
                               </span>
@@ -853,7 +853,7 @@ export function AssignmentManager() {
                             <td style={{ padding: '12px 16px', textAlign: 'right' }}>
                               <button
                                 onClick={() => { setGradingSubmission(s); setGradeMarks(s.marks || 0); setGradeRemarks(s.remarks || ''); }}
-                                style={{ background: '#6366f1', color: '#ffffff', border: 'none', padding: '6px 14px', borderRadius: '10px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
+                                style={{ background: '#282B4A', color: '#EEEBDA', border: '1px solid rgba(238,235,218,0.2)', padding: '6px 14px', borderRadius: '10px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 8px rgba(40,43,74,0.2)' }}
                               >
                                 {s.submission_status === 'GRADED' ? 'Edit Grade' : 'Grade'}
                               </button>
@@ -962,7 +962,7 @@ export function AssignmentManager() {
                   <button type="button" onClick={() => setGradingSubmission(null)} style={{ background: '#f4f4f5', border: 'none', padding: '10px 18px', borderRadius: '12px', fontWeight: 600, color: '#52525b', cursor: 'pointer' }}>
                     Cancel
                   </button>
-                  <button type="submit" style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', border: 'none', padding: '10px 22px', borderRadius: '12px', fontWeight: 700, color: '#ffffff', cursor: 'pointer' }}>
+                  <button type="submit" style={{ background: '#282B4A', border: '1px solid rgba(238,235,218,0.2)', padding: '10px 22px', borderRadius: '12px', fontWeight: 700, color: '#EEEBDA', cursor: 'pointer', boxShadow: '0 4px 14px rgba(40,43,74,0.25)' }}>
                     Save Grade
                   </button>
                 </div>

@@ -17,7 +17,7 @@ interface Drive {
 interface Company { id: number; name: string; industry: string; }
 
 const STATUS_BUCKETS = ['Upcoming', 'Registration Open', 'Interview Running', 'Completed'];
-const BUCKET_COLORS = { 'Upcoming': '#3b82f6', 'Registration Open': '#f59e0b', 'Interview Running': '#8b5cf6', 'Completed': '#10b981' };
+const BUCKET_COLORS = { 'Upcoming': '#282B4A', 'Registration Open': '#f59e0b', 'Interview Running': '#8b5cf6', 'Completed': '#10b981' };
 
 function getDriveStatus(drive: Drive): string {
   const today = new Date();
@@ -69,7 +69,7 @@ function DriveModal({ drive, companies, onClose, onSaved }: { drive: Drive | nul
       <motion.div initial={{ opacity: 0, scale: 0.96, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }}
         style={{ position: 'relative', width: '100%', maxWidth: '560px', background: '#fff', borderRadius: '20px', padding: '28px', boxShadow: '0 20px 60px rgba(0,0,0,0.2)', zIndex: 10000, maxHeight: '90vh', overflowY: 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>{drive ? 'Edit Drive' : 'Create Drive'}</h2>
+          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#282B4A' }}>{drive ? 'Edit Drive' : 'Create Drive'}</h2>
           <button onClick={onClose} style={{ background: '#f1f5f9', border: 'none', borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16} /></button>
         </div>
         {error && <div style={{ marginBottom: '16px', padding: '10px 14px', borderRadius: '10px', background: 'rgba(239,68,68,0.08)', color: '#ef4444', fontSize: '13px', fontWeight: 600 }}>{error}</div>}
@@ -111,8 +111,8 @@ function DriveModal({ drive, companies, onClose, onSaved }: { drive: Drive | nul
             </div>
           </div>
           <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
-            <button type="button" onClick={onClose} style={{ flex: 1, padding: '11px', borderRadius: '12px', border: '1px solid #e2e8f0', background: '#fff', color: '#475569', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
-            <button type="submit" disabled={loading} style={{ flex: 1, padding: '11px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #3b82f6, #6366f1)', color: '#fff', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
+            <button type="button" onClick={onClose} style={{ flex: 1, padding: '11px', borderRadius: '12px', border: '1.5px solid rgba(40,43,74,0.12)', background: '#fff', color: '#282B4A', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
+            <button type="submit" disabled={loading} style={{ flex: 1, padding: '11px', borderRadius: '12px', border: '1px solid rgba(238, 235, 218, 0.2)', background: '#282B4A', color: '#EEEBDA', fontSize: '13px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 14px rgba(40,43,74,0.25)' }}>
               {loading ? 'Saving...' : drive ? 'Update Drive' : 'Create Drive'}
             </button>
           </div>
@@ -142,22 +142,22 @@ export function PlacementDrives() {
   const getCompanyName = (id: number) => companies.find(c => c.id === id)?.name || 'Unknown';
 
   return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1400px', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 800, color: '#0f172a' }}>Placement Drives</h1>
-          <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: '13px' }}>{drives.length} drives this placement season</p>
+          <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 800, color: '#282B4A' }}>Placement Drives</h1>
+          <p style={{ margin: '4px 0 0', color: '#71717a', fontSize: '13px' }}>{drives.length} drives this placement season</p>
         </div>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: '10px', padding: '3px' }}>
+          <div style={{ display: 'flex', background: 'rgba(40, 43, 74, 0.06)', borderRadius: '12px', padding: '3px', border: '1px solid rgba(40, 43, 74, 0.08)' }}>
             {[{ icon: Kanban, v: 'kanban' }, { icon: List, v: 'table' }].map(({ icon: Icon, v }) => (
               <button key={v} onClick={() => setView(v as any)}
-                style={{ padding: '7px 12px', borderRadius: '8px', border: 'none', background: view === v ? '#fff' : 'transparent', cursor: 'pointer', color: view === v ? '#3b82f6' : '#94a3b8', boxShadow: view === v ? '0 1px 4px rgba(0,0,0,0.08)' : 'none', transition: 'all 0.15s', display: 'flex', alignItems: 'center' }}>
+                style={{ padding: '7px 12px', borderRadius: '9px', border: 'none', background: view === v ? '#282B4A' : 'transparent', cursor: 'pointer', color: view === v ? '#EEEBDA' : 'rgba(40, 43, 74, 0.6)', boxShadow: view === v ? '0 2px 8px rgba(40,43,74,0.2)' : 'none', transition: 'all 0.15s', display: 'flex', alignItems: 'center' }}>
                 <Icon size={15} />
               </button>
             ))}
           </div>
-          <button onClick={() => setModal(null)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'linear-gradient(135deg, #3b82f6, #6366f1)', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 14px rgba(59,130,246,0.3)' }}>
+          <button onClick={() => setModal(null)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: '#282B4A', color: '#EEEBDA', border: '1px solid rgba(238, 235, 218, 0.2)', borderRadius: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 14px rgba(40,43,74,0.25)' }}>
             <Plus size={16} /> Create Drive
           </button>
         </div>

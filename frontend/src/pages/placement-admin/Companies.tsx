@@ -65,8 +65,8 @@ function CompanyModal({ company, onClose, onSaved }: { company: Company | null; 
             </div>
           ))}
           <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
-            <button type="button" onClick={onClose} style={{ flex: 1, padding: '11px', borderRadius: '12px', border: '1px solid #e2e8f0', background: '#fff', color: '#475569', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
-            <button type="submit" disabled={loading} style={{ flex: 1, padding: '11px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #3b82f6, #6366f1)', color: '#fff', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
+            <button type="button" onClick={onClose} style={{ flex: 1, padding: '11px', borderRadius: '12px', border: '1.5px solid rgba(40,43,74,0.12)', background: '#fff', color: '#282B4A', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
+            <button type="submit" disabled={loading} style={{ flex: 1, padding: '11px', borderRadius: '12px', border: '1px solid rgba(238, 235, 218, 0.2)', background: '#282B4A', color: '#EEEBDA', fontSize: '13px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 14px rgba(40,43,74,0.25)' }}>
               {loading ? 'Saving...' : company ? 'Update Company' : 'Add Company'}
             </button>
           </div>
@@ -100,21 +100,21 @@ export function Companies() {
   const filtered = companies.filter(c => c.name.toLowerCase().includes(search.toLowerCase()) || c.industry.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1200px', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 800, color: '#0f172a' }}>Companies</h1>
-          <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: '13px' }}>{companies.length} companies in the placement pool</p>
+          <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 800, color: '#282B4A' }}>Companies</h1>
+          <p style={{ margin: '4px 0 0', color: '#71717a', fontSize: '13px' }}>{companies.length} companies in the placement pool</p>
         </div>
         <button onClick={() => setModalCompany(null)}
-          style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'linear-gradient(135deg, #3b82f6, #6366f1)', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 14px rgba(59,130,246,0.3)' }}>
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: '#282B4A', color: '#EEEBDA', border: '1px solid rgba(238, 235, 218, 0.2)', borderRadius: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 14px rgba(40,43,74,0.25)' }}>
           <Plus size={16} /> Add Company
         </button>
       </div>
 
       {msg.text && <div style={{ marginBottom: '16px', padding: '12px 16px', borderRadius: '10px', background: msg.type === 'error' ? 'rgba(239,68,68,0.08)' : 'rgba(16,185,129,0.08)', color: msg.type === 'error' ? '#ef4444' : '#10b981', fontSize: '13px', fontWeight: 600 }}>{msg.text}</div>}
 
-      <div style={{ background: '#fff', border: '1px solid #f1f5f9', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+      <div style={{ background: '#fff', border: '1.5px solid rgba(40,43,74,0.08)', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(40,43,74,0.02)' }}>
         {/* Search */}
         <div style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9' }}>
           <div style={{ position: 'relative', maxWidth: '360px' }}>
@@ -147,18 +147,18 @@ export function Companies() {
                 >
                   <td style={{ padding: '14px 16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '13px', fontWeight: 800, flexShrink: 0 }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#EEEBDA', fontSize: '13px', fontWeight: 800, flexShrink: 0 }}>
                         {c.name.substring(0, 2).toUpperCase()}
                       </div>
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>{c.name}</span>
+                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#282B4A' }}>{c.name}</span>
                     </div>
                   </td>
                   <td style={{ padding: '14px 16px', fontSize: '13px', color: '#475569' }}>{c.industry}</td>
-                  <td style={{ padding: '14px 16px', fontSize: '12px', color: '#3b82f6' }}>{c.website || '—'}</td>
+                  <td style={{ padding: '14px 16px', fontSize: '12px', color: '#282B4A', fontWeight: 500, textDecoration: 'underline' }}>{c.website || '—'}</td>
                   <td style={{ padding: '14px 16px', fontSize: '12px', color: '#64748b' }}>{c.contact_email || '—'}</td>
                   <td style={{ padding: '14px 16px' }}>
                     <div style={{ display: 'flex', gap: '6px' }}>
-                      <button onClick={() => setModalCompany(c)} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#475569', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Edit3 size={13} /> Edit</button>
+                      <button onClick={() => setModalCompany(c)} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(40,43,74,0.15)', background: '#fff', color: '#282B4A', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Edit3 size={13} /> Edit</button>
                       <button onClick={() => handleDelete(c.id)} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.2)', background: 'rgba(239,68,68,0.06)', color: '#ef4444', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}><Trash2 size={13} /> Delete</button>
                     </div>
                   </td>

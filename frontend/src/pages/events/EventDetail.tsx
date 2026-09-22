@@ -82,7 +82,7 @@ export const EventDetail: React.FC = () => {
         )}
 
         <div style={{ padding: '40px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#e0e7ff', color: '#4f46e5', padding: '6px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: 700, marginBottom: '20px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(40, 43, 74, 0.08)', color: '#282B4A', padding: '6px 16px', borderRadius: '12px', fontSize: '13px', fontWeight: 700, marginBottom: '20px' }}>
             <Tag size={14} /> {event.category}
           </div>
           
@@ -92,8 +92,8 @@ export const EventDetail: React.FC = () => {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '32px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px', background: '#f8fafc', borderRadius: '16px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <CalendarDays size={20} color="#4f46e5" />
+              <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(40, 43, 74, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <CalendarDays size={20} color="#282B4A" />
               </div>
               <div>
                 <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Date</div>

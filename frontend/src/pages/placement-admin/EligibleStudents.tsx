@@ -22,13 +22,13 @@ export function EligibleStudents() {
   });
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1200px', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
       <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 800, color: '#0f172a' }}>Eligible Students</h1>
-        <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: '13px' }}>{filtered.length} students match criteria</p>
+        <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 800, color: '#282B4A' }}>Eligible Students</h1>
+        <p style={{ margin: '4px 0 0', color: '#71717a', fontSize: '13px' }}>{filtered.length} students match criteria</p>
       </div>
 
-      <div style={{ background: '#fff', border: '1px solid #f1f5f9', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+      <div style={{ background: '#fff', border: '1.5px solid rgba(40,43,74,0.08)', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(40,43,74,0.02)' }}>
         <div style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <div style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
             <Search size={14} color="#94a3b8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
@@ -64,10 +64,10 @@ export function EligibleStudents() {
                   onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                   <td style={{ padding: '13px 16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '12px', fontWeight: 800, flexShrink: 0 }}>
+                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#EEEBDA', fontSize: '12px', fontWeight: 800, flexShrink: 0 }}>
                         {(s.user?.full_name || 'ST').substring(0, 2).toUpperCase()}
                       </div>
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>{s.user?.full_name || 'Student'}</span>
+                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#282B4A' }}>{s.user?.full_name || 'Student'}</span>
                     </div>
                   </td>
                   <td style={{ padding: '13px 16px', fontSize: '12px', color: '#475569' }}>{s.enrollment_number}</td>

@@ -178,8 +178,8 @@ export function PlacementLayout() {
             <Menu size={22} />
           </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Briefcase size={20} color="#3b82f6" />
-            <span style={{ fontSize: '16px', fontWeight: 700, color: '#111827' }}>Placement ERP</span>
+            <Briefcase size={20} color="#282B4A" />
+            <span style={{ fontSize: '16px', fontWeight: 700, color: '#282B4A' }}>Placement ERP</span>
           </div>
         </header>
 

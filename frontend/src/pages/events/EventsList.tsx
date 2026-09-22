@@ -101,7 +101,7 @@ export const EventsList: React.FC = () => {
         
         <div style={{ display: 'grid', gap: '8px', marginTop: 'auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#71717a', fontSize: '13px', fontWeight: 500 }}>
-            <CalendarDays size={14} color="#6366f1" />
+            <CalendarDays size={14} color="#282B4A" />
             {new Date(event.start_date_time).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#71717a', fontSize: '13px', fontWeight: 500 }}>
@@ -124,11 +124,12 @@ export const EventsList: React.FC = () => {
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span>Campus</span>
             <span style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
+              background: '#282B4A',
+              color: '#EEEBDA',
               padding: '4px 18px',
               borderRadius: '14px',
-              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
               display: 'inline-flex',
               alignItems: 'center',
             }}>
@@ -172,7 +173,7 @@ export const EventsList: React.FC = () => {
           {upcomingEvents.length > 0 && (
             <div>
               <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#09090b', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Calendar size={20} color="#6366f1" />
+                <Calendar size={20} color="#282B4A" />
                 Upcoming Events
               </h2>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>

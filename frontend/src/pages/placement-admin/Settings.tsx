@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Settings as SettingsIcon, Save, User, Bell, Shield, Globe } from 'lucide-react';
 
 const Section = ({ title, icon: Icon, children }: { title: string; icon: any; children: React.ReactNode }) => (
-  <div style={{ background: '#fff', border: '1px solid #f1f5f9', borderRadius: '16px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', marginBottom: '20px' }}>
+  <div style={{ background: '#fff', border: '1.5px solid rgba(40,43,74,0.08)', borderRadius: '20px', padding: '24px', boxShadow: '0 4px 20px rgba(40,43,74,0.02)', marginBottom: '20px' }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid #f1f5f9' }}>
-      <Icon size={16} color="#3b82f6" />
-      <span style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a' }}>{title}</span>
+      <Icon size={16} color="#282B4A" />
+      <span style={{ fontSize: '15px', fontWeight: 800, color: '#282B4A' }}>{title}</span>
     </div>
     {children}
   </div>
@@ -26,7 +26,7 @@ const Toggle = ({ label, desc, value, onChange }: any) => (
       {desc && <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '2px' }}>{desc}</div>}
     </div>
     <button onClick={() => onChange(!value)}
-      style={{ width: '42px', height: '24px', borderRadius: '12px', border: 'none', background: value ? '#3b82f6' : '#e2e8f0', cursor: 'pointer', position: 'relative', transition: 'background 0.2s' }}>
+      style={{ width: '42px', height: '24px', borderRadius: '12px', border: 'none', background: value ? '#282B4A' : '#e2e8f0', cursor: 'pointer', position: 'relative', transition: 'background 0.2s' }}>
       <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: '#fff', position: 'absolute', top: '3px', left: value ? '20px' : '3px', transition: 'left 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
     </button>
   </div>
@@ -42,10 +42,10 @@ export function PlacementSettings() {
   const handleSave = () => { setSaved(true); setTimeout(() => setSaved(false), 2500); };
 
   return (
-    <div style={{ maxWidth: '720px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '720px', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
       <div style={{ marginBottom: '28px' }}>
-        <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 800, color: '#0f172a' }}>Settings</h1>
-        <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: '13px' }}>Manage your placement portal preferences</p>
+        <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 800, color: '#282B4A' }}>Settings</h1>
+        <p style={{ margin: '4px 0 0', color: '#71717a', fontSize: '13px' }}>Manage your placement portal preferences</p>
       </div>
 
       {saved && <div style={{ marginBottom: '16px', padding: '12px 16px', borderRadius: '10px', background: 'rgba(16,185,129,0.08)', color: '#10b981', fontSize: '13px', fontWeight: 600 }}>Settings saved successfully!</div>}
@@ -74,7 +74,7 @@ export function PlacementSettings() {
       </Section>
 
       <button onClick={handleSave}
-        style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 28px', background: 'linear-gradient(135deg, #3b82f6, #6366f1)', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 14px rgba(59,130,246,0.3)' }}>
+        style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 28px', background: '#282B4A', color: '#EEEBDA', border: '1px solid rgba(238, 235, 218, 0.2)', borderRadius: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 14px rgba(40,43,74,0.25)' }}>
         <Save size={15} /> Save Settings
       </button>
     </div>

@@ -21,39 +21,64 @@ const COMPANY_TREND = [
   { month: 'May', companies: 11 }, { month: 'Jun', companies: 9 }, { month: 'Jul', companies: 7 },
 ];
 const PKG_PIE = [
-  { name: '3–5 LPA', value: 18, color: '#94a3b8' }, { name: '5–8 LPA', value: 32, color: '#3b82f6' },
-  { name: '8–12 LPA', value: 24, color: '#8b5cf6' }, { name: '12–18 LPA', value: 12, color: '#f59e0b' },
-  { name: '18+ LPA', value: 7, color: '#10b981' },
+  { name: '3–5 LPA', value: 18, color: 'rgba(40, 43, 74, 0.25)' },
+  { name: '5–8 LPA', value: 32, color: 'rgba(40, 43, 74, 0.45)' },
+  { name: '8–12 LPA', value: 24, color: '#5B608F' },
+  { name: '12–18 LPA', value: 12, color: '#3F436C' },
+  { name: '18+ LPA', value: 7, color: '#282B4A' },
 ];
 
 const ChartCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <div style={{ background: '#fff', border: '1px solid #f1f5f9', borderRadius: '16px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-    <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a', marginBottom: '20px' }}>{title}</div>
+  <div style={{
+    background: '#ffffff',
+    border: '1.5px solid rgba(40, 43, 74, 0.08)',
+    borderRadius: '24px',
+    padding: '24px',
+    boxShadow: '0 4px 20px rgba(40, 43, 74, 0.02)'
+  }}>
+    <div style={{ fontSize: '15px', fontWeight: 700, color: '#282B4A', marginBottom: '20px' }}>{title}</div>
     {children}
   </div>
 );
 
-const CHART_TOOLTIP_STYLE = { borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '12px' };
+const CHART_TOOLTIP_STYLE = {
+  borderRadius: '12px',
+  border: '1px solid rgba(238, 235, 218, 0.25)',
+  fontSize: '12px',
+  background: '#282B4A',
+  color: '#EEEBDA',
+  boxShadow: '0 8px 24px rgba(40, 43, 74, 0.25)',
+};
 
 export function Analytics() {
   return (
-    <div style={{ maxWidth: '1300px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1300px', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
       <div style={{ marginBottom: '28px' }}>
-        <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 800, color: '#0f172a' }}>Analytics</h1>
-        <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: '13px' }}>Placement performance and trends across all years</p>
+        <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 800, color: '#282B4A' }}>Analytics</h1>
+        <p style={{ margin: '4px 0 0', color: '#71717a', fontSize: '13px' }}>Placement performance and trends across all years</p>
       </div>
 
       {/* KPI Row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
         {[
-          { label: 'Avg Package (2025)', value: '9.2 LPA', color: '#3b82f6' },
-          { label: 'Highest Package', value: '32 LPA', color: '#10b981' },
-          { label: 'Placement %', value: '78%', color: '#8b5cf6' },
-          { label: 'Companies Visited', value: '49', color: '#f59e0b' },
-        ].map(({ label, value, color }) => (
-          <div key={label} style={{ background: '#fff', border: '1px solid #f1f5f9', borderRadius: '14px', padding: '18px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-            <div style={{ fontSize: '26px', fontWeight: 800, color, letterSpacing: '-0.5px' }}>{value}</div>
-            <div style={{ fontSize: '12px', color: '#64748b', marginTop: '4px', fontWeight: 500 }}>{label}</div>
+          { label: 'Avg Package (2025)', value: '9.2 LPA', sub: '+8.2% vs last year' },
+          { label: 'Highest Package', value: '32 LPA', sub: 'Top Recruiter Offer' },
+          { label: 'Placement %', value: '78%', sub: '210 of 270 Placed' },
+          { label: 'Companies Visited', value: '49', sub: 'Campus recruitment' },
+        ].map(({ label, value, sub }) => (
+          <div
+            key={label}
+            style={{
+              background: '#ffffff',
+              border: '1.5px solid rgba(40, 43, 74, 0.08)',
+              borderRadius: '20px',
+              padding: '20px 22px',
+              boxShadow: '0 4px 18px rgba(40, 43, 74, 0.03)'
+            }}
+          >
+            <div style={{ fontSize: '28px', fontWeight: 800, color: '#282B4A', letterSpacing: '-0.8px' }}>{value}</div>
+            <div style={{ fontSize: '13px', color: '#282B4A', marginTop: '4px', fontWeight: 600 }}>{label}</div>
+            <div style={{ fontSize: '11px', color: '#71717a', marginTop: '2px', fontWeight: 500 }}>{sub}</div>
           </div>
         ))}
       </div>
@@ -62,12 +87,18 @@ export function Analytics() {
         <ChartCard title="Year-over-Year Placement Comparison">
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={YEAR_CMP} barGap={4}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-              <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
-              <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px' }} />
-              <Bar dataKey="placed" fill="#3b82f6" radius={[6, 6, 0, 0]} name="Students Placed" barSize={24} />
+              <defs>
+                <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#282B4A" />
+                  <stop offset="100%" stopColor="#3F436C" />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(40, 43, 74, 0.06)" vertical={false} />
+              <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#71717a' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: '#71717a' }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={CHART_TOOLTIP_STYLE} itemStyle={{ color: '#EEEBDA' }} />
+              <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px', color: '#282B4A', fontWeight: 600 }} />
+              <Bar dataKey="placed" fill="url(#barGrad)" radius={[6, 6, 0, 0]} name="Students Placed" barSize={26} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -77,21 +108,21 @@ export function Analytics() {
             <AreaChart data={YEAR_CMP}>
               <defs>
                 <linearGradient id="avgGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.15} />
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#282B4A" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#282B4A" stopOpacity={0.02} />
                 </linearGradient>
                 <linearGradient id="highGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.15} />
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#6B7094" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="#6B7094" stopOpacity={0.01} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-              <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
-              <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px' }} />
-              <Area type="monotone" dataKey="avg" stroke="#3b82f6" strokeWidth={2.5} fill="url(#avgGrad)" name="Avg Package" dot={{ r: 4, fill: '#3b82f6' }} />
-              <Area type="monotone" dataKey="high" stroke="#10b981" strokeWidth={2.5} fill="url(#highGrad)" name="Highest Package" dot={{ r: 4, fill: '#10b981' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(40, 43, 74, 0.06)" vertical={false} />
+              <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#71717a' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: '#71717a' }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={CHART_TOOLTIP_STYLE} itemStyle={{ color: '#EEEBDA' }} />
+              <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px', color: '#282B4A', fontWeight: 600 }} />
+              <Area type="monotone" dataKey="avg" stroke="#282B4A" strokeWidth={2.5} fill="url(#avgGrad)" name="Avg Package" dot={{ r: 4, fill: '#282B4A' }} />
+              <Area type="monotone" dataKey="high" stroke="#6B7094" strokeWidth={2.5} strokeDasharray="4 3" fill="url(#highGrad)" name="Highest Package" dot={{ r: 4, fill: '#6B7094' }} />
             </AreaChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -101,13 +132,13 @@ export function Analytics() {
         <ChartCard title="Branch-wise Placements">
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={DEPT} layout="vertical" barGap={4}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-              <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-              <YAxis type="category" dataKey="dept" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} width={40} />
-              <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
-              <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px' }} />
-              <Bar dataKey="placed" fill="#3b82f6" radius={[0, 6, 6, 0]} name="Placed" barSize={14} />
-              <Bar dataKey="total" fill="#e2e8f0" radius={[0, 6, 6, 0]} name="Total" barSize={14} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(40, 43, 74, 0.06)" horizontal={false} />
+              <XAxis type="number" tick={{ fontSize: 11, fill: '#71717a' }} axisLine={false} tickLine={false} />
+              <YAxis type="category" dataKey="dept" tick={{ fontSize: 11, fill: '#71717a' }} axisLine={false} tickLine={false} width={40} />
+              <Tooltip contentStyle={CHART_TOOLTIP_STYLE} itemStyle={{ color: '#EEEBDA' }} />
+              <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px', color: '#282B4A', fontWeight: 600 }} />
+              <Bar dataKey="placed" fill="#282B4A" radius={[0, 6, 6, 0]} name="Placed" barSize={14} />
+              <Bar dataKey="total" fill="rgba(40, 43, 74, 0.12)" radius={[0, 6, 6, 0]} name="Total" barSize={14} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -116,15 +147,16 @@ export function Analytics() {
           <ResponsiveContainer width="100%" height={200}>
             <PieChart>
               <Pie data={PKG_PIE} dataKey="value" cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3}>
-                {PKG_PIE.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                {PKG_PIE.map((entry, i) => <Cell key={i} fill={entry.color} stroke="#ffffff" strokeWidth={2} />)}
               </Pie>
-              <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
+              <Tooltip contentStyle={CHART_TOOLTIP_STYLE} itemStyle={{ color: '#EEEBDA' }} />
             </PieChart>
           </ResponsiveContainer>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '4px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '8px', justifyContent: 'center' }}>
             {PKG_PIE.map(d => (
-              <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: '#64748b' }}>
-                <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: d.color }} />{d.name}
+              <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: '#282B4A', fontWeight: 600 }}>
+                <div style={{ width: '9px', height: '9px', borderRadius: '3px', background: d.color }} />
+                <span>{d.name}</span>
               </div>
             ))}
           </div>

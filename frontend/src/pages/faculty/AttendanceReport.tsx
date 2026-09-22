@@ -104,15 +104,15 @@ export const AttendanceReport: React.FC = () => {
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span>Student</span>
             <span style={{
-              background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
-              color: '#ffffff',
+              background: '#282B4A',
+              color: '#EEEBDA',
               padding: '4px 18px',
               borderRadius: '14px',
-              boxShadow: '0 4px 20px rgba(139, 92, 246, 0.3)',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
               display: 'inline-flex',
               alignItems: 'center',
               lineHeight: 1.2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
             }}>
               Attendance
             </span>
@@ -196,7 +196,7 @@ export const AttendanceReport: React.FC = () => {
         <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ background: '#ffffff', borderRadius: '24px', border: '1.5px solid rgba(0,0,0,0.07)', padding: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
             <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#09090b', margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <UserCircle size={18} color="#8b5cf6" />
+              <UserCircle size={18} color="#282B4A" />
               Matching Students ({filteredStudents.length})
             </h3>
             
@@ -212,8 +212,8 @@ export const AttendanceReport: React.FC = () => {
                   style={{
                     padding: '16px',
                     borderRadius: '16px',
-                    background: selectedStudentId === s.id.toString() ? 'rgba(139, 92, 246, 0.08)' : '#f8fafc',
-                    border: selectedStudentId === s.id.toString() ? '1.5px solid #8b5cf6' : '1px solid rgba(0,0,0,0.04)',
+                    background: selectedStudentId === s.id.toString() ? 'rgba(40, 43, 74, 0.08)' : '#f8fafc',
+                    border: selectedStudentId === s.id.toString() ? '1.5px solid #282B4A' : '1px solid rgba(0,0,0,0.04)',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -221,14 +221,14 @@ export const AttendanceReport: React.FC = () => {
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#eedeff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <UserCircle size={20} color="#6d28d9" />
+                  <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(40, 43, 74, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <UserCircle size={20} color="#282B4A" />
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700, color: '#09090b', fontSize: '14px', marginBottom: '2px' }}>{s.name || s.user?.full_name || 'Unknown'}</div>
                     <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>{s.enrollment_number} • Sem {s.semester || 'N/A'}</div>
                   </div>
-                  <ChevronRight size={18} color={selectedStudentId === s.id.toString() ? '#8b5cf6' : '#d4d4d8'} />
+                  <ChevronRight size={18} color={selectedStudentId === s.id.toString() ? '#282B4A' : '#d4d4d8'} />
                 </motion.div>
               ))}
             </div>
@@ -238,9 +238,9 @@ export const AttendanceReport: React.FC = () => {
         {/* Right Column: Attendance Report View */}
         <div style={{ flex: '2', display: 'flex', flexDirection: 'column' }}>
           {!selectedStudentId ? (
-             <div style={{ background: '#ffffff', borderRadius: '24px', border: '1.5px solid rgba(0,0,0,0.07)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', minHeight: '400px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
-                <div style={{ width: '80px', height: '80px', borderRadius: '24px', background: '#f4f4f5', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
-                  <TrendingUp size={36} color="#a1a1aa" />
+             <div style={{ background: '#ffffff', borderRadius: '24px', border: '1.5px solid rgba(0,0,0,0.07)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', minHeight: '400px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', textAlign: 'center' }}>
+                <div style={{ width: '64px', height: '64px', borderRadius: '20px', background: 'rgba(40,43,74,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+                  <TrendingUp size={32} color="#282B4A" />
                 </div>
                 <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 700, color: '#09090b' }}>No Student Selected</h3>
                 <p style={{ margin: 0, fontSize: '14px', color: '#71717a', textAlign: 'center', maxWidth: '300px' }}>
@@ -249,7 +249,7 @@ export const AttendanceReport: React.FC = () => {
              </div>
           ) : reportLoading ? (
             <div style={{ background: '#ffffff', borderRadius: '24px', border: '1.5px solid rgba(0,0,0,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', minHeight: '400px' }}>
-              <div style={{ color: '#8b5cf6', fontWeight: 600 }}>Loading attendance report...</div>
+              <div style={{ color: '#282B4A', fontWeight: 600 }}>Loading attendance report...</div>
             </div>
           ) : reportData && selectedStudentObj && (
             <motion.div 
@@ -258,11 +258,11 @@ export const AttendanceReport: React.FC = () => {
               style={{ background: '#ffffff', borderRadius: '24px', border: '1.5px solid rgba(0,0,0,0.07)', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}
             >
               {/* Report Header */}
-              <div style={{ background: 'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)', padding: '32px', borderBottom: '1px solid rgba(139, 92, 246, 0.1)' }}>
+              <div style={{ background: 'linear-gradient(135deg, rgba(40,43,74,0.05) 0%, rgba(40,43,74,0.02) 100%)', padding: '32px', borderBottom: '1px solid rgba(40, 43, 74, 0.1)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                    <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(139, 92, 246, 0.15)' }}>
-                      <UserCircle size={40} color="#8b5cf6" />
+                    <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(40, 43, 74, 0.1)' }}>
+                      <UserCircle size={40} color="#282B4A" />
                     </div>
                     <div>
                       <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#09090b', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
@@ -270,13 +270,13 @@ export const AttendanceReport: React.FC = () => {
                       </h2>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', color: '#52525b', fontSize: '13px', fontWeight: 600 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <GraduationCap size={16} color="#8b5cf6" /> {selectedStudentObj.enrollment_number || 'N/A'}
+                          <GraduationCap size={16} color="#282B4A" /> {selectedStudentObj.enrollment_number || 'N/A'}
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <Building2 size={16} color="#8b5cf6" /> {selectedStudentObj.course_rel?.name || 'CSE (B.Tech)'}
+                          <Building2 size={16} color="#282B4A" /> {selectedStudentObj.course_rel?.name || 'CSE (B.Tech)'}
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <Library size={16} color="#8b5cf6" /> Sem {selectedStudentObj.semester || '7'}
+                          <Library size={16} color="#282B4A" /> Sem {selectedStudentObj.semester || '7'}
                         </div>
                       </div>
                     </div>

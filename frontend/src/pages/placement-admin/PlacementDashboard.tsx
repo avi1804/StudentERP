@@ -14,7 +14,7 @@ import {
 import TextType from '@/components/TextType';
 
 const STATUS_COLOR: Record<string, string> = {
-  APPLIED: '#3b82f6', SHORTLISTED: '#f59e0b', INTERVIEW: '#8b5cf6',
+  APPLIED: '#282B4A', SHORTLISTED: '#f59e0b', INTERVIEW: '#8b5cf6',
   SELECTED: '#10b981', REJECTED: '#ef4444',
 };
 
@@ -104,12 +104,12 @@ export function PlacementDashboard() {
   const KPIS = [
     { label: 'Total Students', value: kpis.total_students ?? '—', icon: Users, color: '#282B4A', sub: 'Enrolled across branches', highlight: 'Enrolled' },
     { label: 'Companies Visited', value: kpis.total_companies ?? '—', icon: Building2, color: '#282B4A', sub: 'This placement season', highlight: 'Recruiting' },
-    { label: 'Active Drives', value: kpis.total_drives ?? '—', icon: CalendarDays, color: '#f59e0b', sub: 'Campus drives', highlight: 'Live' },
-    { label: 'Students Placed', value: kpis.placed_students ?? '—', icon: CheckCircle2, color: '#10b981', sub: 'Successfully offered', highlight: 'Placed' },
-    { label: 'Avg Package', value: kpis.average_package ?? '—', icon: TrendingUp, color: '#06b6d4', sub: 'Across all offers', highlight: 'Average' },
-    { label: 'Highest Package', value: kpis.highest_package ?? '—', icon: Zap, color: '#f43f5e', sub: 'Best CTC this year', highlight: 'Highest' },
-    { label: 'Pending Apps', value: kpis.pending_applications ?? '—', icon: Clock, color: '#64748b', sub: 'Awaiting review', highlight: 'Reviewing' },
-    { label: 'Total Applications', value: kpis.total_applications ?? '—', icon: FileBarChart2, color: '#0ea5e9', sub: 'Across all drives', highlight: 'Submissions' },
+    { label: 'Active Drives', value: kpis.total_drives ?? '—', icon: CalendarDays, color: '#282B4A', sub: 'Campus drives', highlight: 'Live' },
+    { label: 'Students Placed', value: kpis.placed_students ?? '—', icon: CheckCircle2, color: '#282B4A', sub: 'Successfully offered', highlight: 'Placed' },
+    { label: 'Avg Package', value: kpis.average_package ?? '—', icon: TrendingUp, color: '#282B4A', sub: 'Across all offers', highlight: 'Average' },
+    { label: 'Highest Package', value: kpis.highest_package ?? '—', icon: Zap, color: '#282B4A', sub: 'Best CTC this year', highlight: 'Highest' },
+    { label: 'Pending Apps', value: kpis.pending_applications ?? '—', icon: Clock, color: '#282B4A', sub: 'Awaiting review', highlight: 'Reviewing' },
+    { label: 'Total Applications', value: kpis.total_applications ?? '—', icon: FileBarChart2, color: '#282B4A', sub: 'Across all drives', highlight: 'Submissions' },
   ];
 
   return (
@@ -151,23 +151,23 @@ export function PlacementDashboard() {
       {/* Quick Actions */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '32px', flexWrap: 'wrap' }}>
         {[
-          { label: 'Add Company', icon: Building2, path: '/placement-admin/companies', color: '#3b82f6' },
-          { label: 'Create Drive', icon: CalendarDays, path: '/placement-admin/drives', color: '#8b5cf6' },
-          { label: 'Upload Results', icon: UploadCloud, path: '/placement-admin/reports', color: '#f59e0b' },
-          { label: 'Send Notification', icon: Send, path: '/placement-admin/notifications', color: '#10b981' },
-          { label: 'Export Report', icon: FileBarChart2, path: '/placement-admin/reports', color: '#0ea5e9' },
-        ].map(({ label, icon: Icon, path, color }) => (
+          { label: 'Add Company', icon: Building2, path: '/placement-admin/companies' },
+          { label: 'Create Drive', icon: CalendarDays, path: '/placement-admin/drives' },
+          { label: 'Upload Results', icon: UploadCloud, path: '/placement-admin/reports' },
+          { label: 'Send Notification', icon: Send, path: '/placement-admin/notifications' },
+          { label: 'Export Report', icon: FileBarChart2, path: '/placement-admin/reports' },
+        ].map(({ label, icon: Icon, path }) => (
           <button
             key={label}
             onClick={() => navigate(path)}
             style={{
               display: 'flex', alignItems: 'center', gap: '7px', padding: '9px 18px',
-              background: '#ffffff', border: '1.5px solid #e4e4e7', borderRadius: '12px',
-              fontSize: '13px', fontWeight: 600, color: '#3f3f46', cursor: 'pointer',
+              background: '#ffffff', border: '1.5px solid rgba(40, 43, 74, 0.1)', borderRadius: '12px',
+              fontSize: '13px', fontWeight: 600, color: '#282B4A', cursor: 'pointer',
               boxShadow: '0 1px 3px rgba(0,0,0,0.02)', transition: 'all 0.15s ease',
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = `${color}08`; e.currentTarget.style.borderColor = `${color}50`; e.currentTarget.style.color = color; }}
-            onMouseLeave={e => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.borderColor = '#e4e4e7'; e.currentTarget.style.color = '#3f3f46'; }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(40, 43, 74, 0.06)'; e.currentTarget.style.borderColor = '#282B4A'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(40, 43, 74, 0.1)'; }}
           >
             <Icon size={15} /> {label}
           </button>
@@ -189,16 +189,16 @@ export function PlacementDashboard() {
         {/* Placement Trend */}
         <motion.div
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-          style={{ background: '#ffffff', border: '1.5px solid #f4f4f5', borderRadius: '24px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
+          style={{ background: '#ffffff', border: '1.5px solid rgba(40, 43, 74, 0.08)', borderRadius: '24px', padding: '24px', boxShadow: '0 4px 20px rgba(40, 43, 74, 0.02)' }}
         >
           <div style={{ fontSize: '15px', fontWeight: 700, color: '#282B4A', marginBottom: '20px' }}>Placement Hiring Trend</div>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={TREND_DATA}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f4f4f5" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(40, 43, 74, 0.06)" />
               <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#71717a' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: '#71717a' }} axisLine={false} tickLine={false} />
               <Tooltip
-                contentStyle={{ borderRadius: '12px', border: '1px solid rgba(40,43,74,0.12)', fontSize: '12px', background: '#282B4A', color: '#EEEBDA' }}
+                contentStyle={{ borderRadius: '12px', border: '1px solid rgba(238, 235, 218, 0.25)', fontSize: '12px', background: '#282B4A', color: '#EEEBDA', boxShadow: '0 8px 24px rgba(40, 43, 74, 0.25)' }}
                 itemStyle={{ color: '#EEEBDA' }}
               />
               <Line type="monotone" dataKey="placed" stroke="#282B4A" strokeWidth={2.5} dot={{ r: 4, fill: '#282B4A' }} name="Students Placed" />
@@ -210,19 +210,25 @@ export function PlacementDashboard() {
         {/* Package Distribution */}
         <motion.div
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-          style={{ background: '#ffffff', border: '1.5px solid #f4f4f5', borderRadius: '24px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
+          style={{ background: '#ffffff', border: '1.5px solid rgba(40, 43, 74, 0.08)', borderRadius: '24px', padding: '24px', boxShadow: '0 4px 20px rgba(40, 43, 74, 0.02)' }}
         >
           <div style={{ fontSize: '15px', fontWeight: 700, color: '#282B4A', marginBottom: '20px' }}>Package Distribution (LPA)</div>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={PKG_DATA} barSize={32}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f4f4f5" vertical={false} />
+              <defs>
+                <linearGradient id="pkgBarGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#282B4A" />
+                  <stop offset="100%" stopColor="#3F436C" />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(40, 43, 74, 0.06)" vertical={false} />
               <XAxis dataKey="range" tick={{ fontSize: 11, fill: '#71717a' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: '#71717a' }} axisLine={false} tickLine={false} />
               <Tooltip
-                contentStyle={{ borderRadius: '12px', border: '1px solid rgba(40,43,74,0.12)', fontSize: '12px', background: '#282B4A', color: '#EEEBDA' }}
+                contentStyle={{ borderRadius: '12px', border: '1px solid rgba(238, 235, 218, 0.25)', fontSize: '12px', background: '#282B4A', color: '#EEEBDA', boxShadow: '0 8px 24px rgba(40, 43, 74, 0.25)' }}
                 itemStyle={{ color: '#EEEBDA' }}
               />
-              <Bar dataKey="count" fill="#282B4A" radius={[8, 8, 0, 0]} name="Students" />
+              <Bar dataKey="count" fill="url(#pkgBarGrad)" radius={[8, 8, 0, 0]} name="Students" />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
@@ -233,7 +239,7 @@ export function PlacementDashboard() {
         {/* Upcoming Drives */}
         <motion.div
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
-          style={{ background: '#ffffff', border: '1.5px solid #f4f4f5', borderRadius: '24px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
+          style={{ background: '#ffffff', border: '1.5px solid rgba(40, 43, 74, 0.08)', borderRadius: '24px', padding: '24px', boxShadow: '0 4px 20px rgba(40, 43, 74, 0.02)' }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
             <div style={{ fontSize: '15px', fontWeight: 700, color: '#282B4A' }}>Upcoming Campus Drives</div>
@@ -269,7 +275,7 @@ export function PlacementDashboard() {
         {/* Recent Activity */}
         <motion.div
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-          style={{ background: '#ffffff', border: '1.5px solid #f4f4f5', borderRadius: '24px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
+          style={{ background: '#ffffff', border: '1.5px solid rgba(40, 43, 74, 0.08)', borderRadius: '24px', padding: '24px', boxShadow: '0 4px 20px rgba(40, 43, 74, 0.02)' }}
         >
           <div style={{ fontSize: '15px', fontWeight: 700, color: '#282B4A', marginBottom: '18px' }}>Recent Student Applications</div>
           {loading ? (

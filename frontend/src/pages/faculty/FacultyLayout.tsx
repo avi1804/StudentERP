@@ -1,7 +1,8 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { 
   LayoutGrid, CheckSquare, FileText, BookOpen, BarChart2,
-  Search, Bell, User, ChevronUp, ChevronDown, LogOut, GraduationCap, Shield, ClipboardList
+  Search, Bell, User, Users, BookMarked, UserCheck, Megaphone, Calendar,
+  ChevronUp, ChevronDown, LogOut, GraduationCap, Shield, ClipboardList
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useIsMobile } from "../../hooks/useIsMobile";
@@ -23,15 +24,33 @@ export function FacultySidebar() {
     navigate('/login');
   };
 
-  const navLinks = [
-    { to: "/faculty/dashboard", label: "Dashboard", icon: LayoutGrid, end: true },
-    { to: "/faculty/attendance", label: "Attendance", icon: CheckSquare },
-    { to: "/faculty/attendance-report", label: "Attendance Report", icon: FileText },
-    { to: "/faculty/assignments", label: "Assignments", icon: ClipboardList },
-    { to: "/faculty/marks", label: "Enter Marks", icon: BookOpen },
-    { to: "/faculty/results", label: "View Results", icon: BarChart2 },
-    { to: "/faculty/assign-substitute", label: "Assign Substitute", icon: User },
-    { to: "/faculty/events", label: "Events", icon: BookOpen },
+  const navSections = [
+    {
+      category: "ACADEMIC",
+      items: [
+        { to: "/faculty/dashboard", label: "Dashboard", icon: LayoutGrid, end: true },
+        { to: "/faculty/attendance", label: "Attendance", icon: CheckSquare },
+        { to: "/faculty/attendance-report", label: "Attendance Reports", icon: FileText },
+        { to: "/faculty/assignments", label: "Assignments", icon: ClipboardList },
+        { to: "/faculty/marks", label: "Enter Marks", icon: BookOpen },
+        { to: "/faculty/results", label: "View Results", icon: BarChart2 },
+      ]
+    },
+    {
+      category: "FACULTY",
+      items: [
+        { to: "/faculty/my-students", label: "My Students", icon: Users },
+        { to: "/faculty/my-subjects", label: "My Subjects", icon: BookMarked },
+        { to: "/faculty/assign-substitute", label: "Assign Substitute", icon: UserCheck },
+      ]
+    },
+    {
+      category: "COMMUNICATION",
+      items: [
+        { to: "/faculty/notices", label: "Notices", icon: Megaphone },
+        { to: "/faculty/events", label: "Events", icon: Calendar },
+      ]
+    }
   ];
 
   return (
@@ -43,9 +62,11 @@ export function FacultySidebar() {
         WebkitBackdropFilter: 'blur(18px)',
         border: '1px solid rgba(40, 43, 74, 0.12)',
         boxShadow: '0 10px 35px rgba(40, 43, 74, 0.1)',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
-      <div className="logo-area" style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '28px 24px 20px' }}>
+      <div className="logo-area" style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '28px 24px 20px', flexShrink: 0 }}>
         <div
           className="logo-icon"
           style={{
@@ -76,25 +97,36 @@ export function FacultySidebar() {
         </div>
       </div>
 
-      <div className="nav-links">
-        <div style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(40, 43, 74, 0.6)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '24px 0 8px 16px' }}>
-          Academic Controls
-        </div>
+      <div className="nav-links" style={{ overflowY: 'auto', flex: 1, paddingBottom: '32px' }}>
+        {navSections.map((sec, sIdx) => (
+          <div key={sec.category} style={{ marginBottom: sIdx === navSections.length - 1 ? '0' : '8px' }}>
+            <div style={{
+              fontSize: '10px',
+              fontWeight: 800,
+              color: 'rgba(40, 43, 74, 0.65)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              margin: sIdx === 0 ? '12px 0 6px 16px' : '20px 0 6px 16px'
+            }}>
+              {sec.category}
+            </div>
 
-        {navLinks.map((link) => {
-          const Icon = link.icon;
-          return (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              end={link.end}
-              className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")}
-            >
-              <span className="nav-icon"><Icon size={20} /></span>
-              <span className="nav-text">{link.label}</span>
-            </NavLink>
-          );
-        })}
+            {sec.items.map((link) => {
+              const Icon = link.icon;
+              return (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  end={link.end}
+                  className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")}
+                >
+                  <span className="nav-icon"><Icon size={19} /></span>
+                  <span className="nav-text">{link.label}</span>
+                </NavLink>
+              );
+            })}
+          </div>
+        ))}
       </div>
     </div>
   );

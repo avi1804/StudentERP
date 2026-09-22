@@ -159,15 +159,15 @@ export const AssignSubstitute: React.FC = () => {
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span>Substitute</span>
             <span style={{
-              background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
-              color: '#ffffff',
+              background: '#282B4A',
+              color: '#EEEBDA',
               padding: '4px 18px',
               borderRadius: '14px',
-              boxShadow: '0 4px 20px rgba(139, 92, 246, 0.3)',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
               display: 'inline-flex',
               alignItems: 'center',
               lineHeight: 1.2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
             }}>
               Assignment
             </span>
@@ -184,18 +184,18 @@ export const AssignSubstitute: React.FC = () => {
               setShowAssignModal(true);
             }}
             style={{
-              background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
-              color: '#ffffff',
+              background: '#282B4A',
+              color: '#EEEBDA',
               padding: '12px 22px',
               borderRadius: '16px',
-              border: 'none',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
               fontWeight: 700,
               fontSize: '14px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              boxShadow: '0 4px 20px rgba(139, 92, 246, 0.3)',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
               transition: 'all 0.2s ease'
             }}
           >
@@ -255,7 +255,7 @@ export const AssignSubstitute: React.FC = () => {
                 borderRadius: '12px',
                 border: 'none',
                 background: activeTab === 'incoming' ? '#ffffff' : 'transparent',
-                color: activeTab === 'incoming' ? '#6d28d9' : '#71717a',
+                color: activeTab === 'incoming' ? '#282B4A' : '#71717a',
                 fontWeight: 700,
                 fontSize: '13px',
                 cursor: 'pointer',
@@ -276,7 +276,7 @@ export const AssignSubstitute: React.FC = () => {
                 borderRadius: '12px',
                 border: 'none',
                 background: activeTab === 'outgoing' ? '#ffffff' : 'transparent',
-                color: activeTab === 'outgoing' ? '#6d28d9' : '#71717a',
+                color: activeTab === 'outgoing' ? '#282B4A' : '#71717a',
                 fontWeight: 700,
                 fontSize: '13px',
                 cursor: 'pointer',
@@ -317,7 +317,7 @@ export const AssignSubstitute: React.FC = () => {
         <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ background: '#ffffff', borderRadius: '24px', border: '1.5px solid rgba(0,0,0,0.07)', padding: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
             <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#09090b', margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <UserCircle size={18} color="#8b5cf6" />
+              <UserCircle size={18} color="#282B4A" />
               {activeTab === 'incoming' ? 'Incoming Requests' : 'Outgoing Requests'} ({filteredRequests.length})
             </h3>
             
@@ -335,8 +335,8 @@ export const AssignSubstitute: React.FC = () => {
                   style={{
                     padding: '16px',
                     borderRadius: '16px',
-                    background: selectedRequestId === r.id ? 'rgba(139, 92, 246, 0.08)' : '#f8fafc',
-                    border: selectedRequestId === r.id ? '1.5px solid #8b5cf6' : '1px solid rgba(0,0,0,0.04)',
+                    background: selectedRequestId === r.id ? 'rgba(40, 43, 74, 0.08)' : '#f8fafc',
+                    border: selectedRequestId === r.id ? '1.5px solid #282B4A' : '1px solid rgba(0,0,0,0.04)',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -344,8 +344,8 @@ export const AssignSubstitute: React.FC = () => {
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#eedeff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <UserCircle size={20} color="#6d28d9" />
+                  <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(40, 43, 74, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <UserCircle size={20} color="#282B4A" />
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700, color: '#09090b', fontSize: '14px', marginBottom: '2px' }}>
@@ -358,7 +358,7 @@ export const AssignSubstitute: React.FC = () => {
                       }}>{r.status}</span>
                     </div>
                   </div>
-                  <ChevronRight size={18} color={selectedRequestId === r.id ? '#8b5cf6' : '#d4d4d8'} />
+                  <ChevronRight size={18} color={selectedRequestId === r.id ? '#282B4A' : '#d4d4d8'} />
                 </motion.div>
               ))}
             </div>
@@ -384,11 +384,11 @@ export const AssignSubstitute: React.FC = () => {
               style={{ background: '#ffffff', borderRadius: '24px', border: '1.5px solid rgba(0,0,0,0.07)', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}
             >
               {/* Report/Request Header */}
-              <div style={{ background: 'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)', padding: '32px', borderBottom: '1px solid rgba(139, 92, 246, 0.1)' }}>
+              <div style={{ background: '#f8fafc', padding: '32px', borderBottom: '1px solid rgba(0, 0, 0, 0.06)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                    <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(139, 92, 246, 0.15)' }}>
-                      <UserCircle size={40} color="#8b5cf6" />
+                    <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)', border: '1px solid rgba(0,0,0,0.05)' }}>
+                      <UserCircle size={40} color="#282B4A" />
                     </div>
                     <div>
                       <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#09090b', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
@@ -396,10 +396,10 @@ export const AssignSubstitute: React.FC = () => {
                       </h2>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', color: '#52525b', fontSize: '13px', fontWeight: 600 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <Calendar size={16} color="#8b5cf6" /> {selectedRequestObj.start_date}
+                          <Calendar size={16} color="#282B4A" /> {selectedRequestObj.start_date}
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <BookOpen size={16} color="#8b5cf6" /> {selectedRequestObj.lecture_instance_id}
+                          <BookOpen size={16} color="#282B4A" /> {selectedRequestObj.lecture_instance_id}
                         </div>
                       </div>
                     </div>
@@ -446,7 +446,7 @@ export const AssignSubstitute: React.FC = () => {
                     <span style={{ fontSize: '15px', fontWeight: 700, color: '#09090b' }}>
                       {selectedRequestObj.lecture_instance_id}
                     </span>
-                    <span style={{ fontSize: '12px', fontWeight: 600, color: '#6d28d9', background: '#eedeff', padding: '4px 12px', borderRadius: '8px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 600, color: '#282B4A', background: 'rgba(40, 43, 74, 0.08)', padding: '4px 12px', borderRadius: '8px' }}>
                       {selectedRequestObj.start_date}
                     </span>
                   </div>
@@ -486,9 +486,9 @@ export const AssignSubstitute: React.FC = () => {
                         flex: 1,
                         padding: '14px',
                         borderRadius: '16px',
-                        border: 'none',
-                        background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
-                        color: '#ffffff',
+                        border: '1px solid rgba(238, 235, 218, 0.2)',
+                        background: '#282B4A',
+                        color: '#EEEBDA',
                         fontWeight: 700,
                         fontSize: '14px',
                         cursor: 'pointer',
@@ -496,7 +496,7 @@ export const AssignSubstitute: React.FC = () => {
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: '8px',
-                        boxShadow: '0 4px 20px rgba(139, 92, 246, 0.3)',
+                        boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
                         transition: 'all 0.2s ease'
                       }}
                     >
@@ -532,7 +532,7 @@ export const AssignSubstitute: React.FC = () => {
               {/* Header */}
               <div style={{ padding: '20px 24px', borderBottom: '1px solid rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc' }}>
                 <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#09090b', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <UserCheck size={20} color="#8b5cf6" />
+                  <UserCheck size={20} color="#282B4A" />
                   Request Substitute
                 </h3>
                 <button
@@ -626,9 +626,9 @@ export const AssignSubstitute: React.FC = () => {
                     disabled={loading || availableLectures.length === 0}
                     style={{
                       marginTop: '12px', padding: '14px', borderRadius: '16px',
-                      border: 'none', background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
-                      color: '#ffffff', fontWeight: 700, fontSize: '14px',
-                      cursor: 'pointer', boxShadow: '0 4px 20px rgba(139, 92, 246, 0.3)',
+                      border: '1px solid rgba(238, 235, 218, 0.2)', background: '#282B4A',
+                      color: '#EEEBDA', fontWeight: 700, fontSize: '14px',
+                      cursor: 'pointer', boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
                       opacity: (loading || availableLectures.length === 0) ? 0.6 : 1
                     }}
                   >

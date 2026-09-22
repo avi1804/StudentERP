@@ -10,7 +10,7 @@ const SAMPLE = [
 ];
 
 const TYPE_CONFIG: Record<string, { color: string; bg: string; icon: any }> = {
-  info:    { color: '#3b82f6', bg: 'rgba(59,130,246,0.08)', icon: Bell },
+  info:    { color: '#282B4A', bg: 'rgba(40,43,74,0.08)', icon: Bell },
   success: { color: '#10b981', bg: 'rgba(16,185,129,0.08)', icon: CheckCircle2 },
   warning: { color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', icon: AlertCircle },
 };
@@ -34,17 +34,17 @@ export function Notifications() {
   };
 
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '900px', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
       <div style={{ marginBottom: '28px' }}>
-        <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 800, color: '#0f172a' }}>Notifications</h1>
-        <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: '13px' }}>Send announcements to students and view activity</p>
+        <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 800, color: '#282B4A' }}>Notifications</h1>
+        <p style={{ margin: '4px 0 0', color: '#71717a', fontSize: '13px' }}>Send announcements to students and view activity</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: '20px', alignItems: 'start' }}>
         {/* Send Panel */}
-        <div style={{ background: '#fff', border: '1px solid #f1f5f9', borderRadius: '16px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-          <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Send size={16} color="#3b82f6" /> Send Notification
+        <div style={{ background: '#fff', border: '1.5px solid rgba(40,43,74,0.08)', borderRadius: '20px', padding: '24px', boxShadow: '0 4px 20px rgba(40,43,74,0.02)' }}>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: '#282B4A', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Send size={16} color="#282B4A" /> Send Notification
           </div>
           {sent && <div style={{ marginBottom: '12px', padding: '10px 14px', borderRadius: '10px', background: 'rgba(16,185,129,0.08)', color: '#10b981', fontSize: '13px', fontWeight: 600 }}>Notification sent successfully!</div>}
           <form onSubmit={handleSend} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -63,15 +63,21 @@ export function Notifications() {
               <span style={{ fontSize: '12px', color: '#64748b' }}>Notification will be sent to <strong>all eligible students</strong> in the system</span>
             </div>
             <button type="submit" disabled={sending || !title || !body}
-              style={{ padding: '12px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #3b82f6, #6366f1)', color: '#fff', fontSize: '13px', fontWeight: 700, cursor: sending ? 'not-allowed' : 'pointer', opacity: !title || !body ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              style={{
+                padding: '12px', borderRadius: '12px', border: '1px solid rgba(238, 235, 218, 0.2)',
+                background: '#282B4A', color: '#EEEBDA', fontSize: '13px', fontWeight: 700,
+                cursor: sending ? 'not-allowed' : 'pointer', opacity: !title || !body ? 0.6 : 1,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                boxShadow: '0 4px 14px rgba(40,43,74,0.25)', transition: 'all 0.15s ease'
+              }}>
               <Send size={14} /> {sending ? 'Sending...' : 'Send Notification'}
             </button>
           </form>
         </div>
 
         {/* Notification Feed */}
-        <div style={{ background: '#fff', border: '1px solid #f1f5f9', borderRadius: '16px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-          <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a', marginBottom: '16px' }}>Recent Notifications</div>
+        <div style={{ background: '#fff', border: '1.5px solid rgba(40,43,74,0.08)', borderRadius: '20px', padding: '24px', boxShadow: '0 4px 20px rgba(40,43,74,0.02)' }}>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: '#282B4A', marginBottom: '16px' }}>Recent Notifications</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {notices.map((n, i) => {
               const conf = TYPE_CONFIG[n.type] || TYPE_CONFIG.info;

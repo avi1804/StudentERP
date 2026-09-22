@@ -56,6 +56,9 @@ const AssignmentManager = React.lazy(() => import("./pages/faculty/AssignmentMan
 const MarksManager = React.lazy(() => import("./pages/faculty/MarksManager").then(m => ({ default: m.MarksManager })));
 const ResultCard = React.lazy(() => import("./pages/faculty/ResultCard").then(m => ({ default: m.ResultCard })));
 const AssignSubstitute = React.lazy(() => import("./pages/faculty/AssignSubstitute").then(m => ({ default: m.AssignSubstitute })));
+const MyStudents = React.lazy(() => import("./pages/faculty/MyStudents").then(m => ({ default: m.MyStudents })));
+const FacultySubjects = React.lazy(() => import("./pages/faculty/MySubjects").then(m => ({ default: m.MySubjects })));
+const FacultyNotices = React.lazy(() => import("./pages/faculty/FacultyNotices").then(m => ({ default: m.FacultyNotices })));
 
 // Lazy Loaded Placement Admin Pages
 const PlacementLayout = React.lazy(() => import("./pages/placement-admin/PlacementLayout").then(m => ({ default: m.PlacementLayout })));
@@ -159,6 +162,9 @@ function App() {
                 <Route path="events" element={<EventsList />} />
                 <Route path="events/detail/:id" element={<EventDetail />} />
                 <Route path="assign-substitute" element={<AssignSubstitute />} />
+                <Route path="my-students" element={<MyStudents />} />
+                <Route path="my-subjects" element={<FacultySubjects />} />
+                <Route path="notices" element={<FacultyNotices />} />
               </Route>
             </Route>
 

@@ -18,7 +18,7 @@ interface Application {
 }
 
 const STATUS_CONFIG: Record<string, { bg: string; color: string; label: string }> = {
-  APPLIED:     { bg: 'rgba(59,130,246,0.1)',  color: '#3b82f6', label: 'Applied' },
+  APPLIED:     { bg: 'rgba(40,43,74,0.08)',  color: '#282B4A', label: 'Applied' },
   SHORTLISTED: { bg: 'rgba(245,158,11,0.1)', color: '#f59e0b', label: 'Shortlisted' },
   INTERVIEW:   { bg: 'rgba(139,92,246,0.1)', color: '#8b5cf6', label: 'Interview' },
   SELECTED:    { bg: 'rgba(16,185,129,0.1)', color: '#10b981', label: 'Selected' },
@@ -67,10 +67,10 @@ export function StudentApplications() {
   const counts = Object.fromEntries(ALL_STATUSES.slice(1).map(s => [s, apps.filter(a => a.status === s).length]));
 
   return (
-    <div style={{ maxWidth: '1300px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1300px', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
       <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 800, color: '#0f172a' }}>Student Applications</h1>
-        <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: '13px' }}>Track and manage all placement applications</p>
+        <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 800, color: '#282B4A' }}>Student Applications</h1>
+        <p style={{ margin: '4px 0 0', color: '#71717a', fontSize: '13px' }}>Track and manage all placement applications</p>
       </div>
 
       {/* Status Tabs */}
@@ -78,16 +78,36 @@ export function StudentApplications() {
         {ALL_STATUSES.map(s => {
           const isActive = statusFilter === s;
           const conf = s !== 'All' ? STATUS_CONFIG[s] : null;
+          const isAll = s === 'All';
+          
+          let tabBg = '#fff';
+          let tabColor = '#64748b';
+          let tabBorder = '#e2e8f0';
+
+          if (isActive) {
+            if (isAll) {
+              tabBg = '#282B4A';
+              tabColor = '#EEEBDA';
+              tabBorder = '#282B4A';
+            } else {
+              tabBg = conf?.bg || 'rgba(40,43,74,0.08)';
+              tabColor = conf?.color || '#282B4A';
+              tabBorder = conf?.color || '#282B4A';
+            }
+          }
+
           return (
             <button key={s} onClick={() => setStatusFilter(s)}
               style={{
-                padding: '7px 16px', borderRadius: '10px', border: `1.5px solid ${isActive ? (conf?.color || '#3b82f6') : '#e2e8f0'}`,
-                background: isActive ? (conf?.bg || 'rgba(59,130,246,0.1)') : '#fff',
-                color: isActive ? (conf?.color || '#3b82f6') : '#64748b',
+                padding: '7px 16px', borderRadius: '10px', border: `1.5px solid ${tabBorder}`,
+                background: tabBg,
+                color: tabColor,
                 fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
+                boxShadow: isActive && isAll ? '0 2px 10px rgba(40,43,74,0.2)' : 'none',
+                transition: 'all 0.15s ease'
               }}>
               {s === 'All' ? 'All' : STATUS_CONFIG[s]?.label}
-              {s !== 'All' && <span style={{ background: isActive ? (conf?.color || '#3b82f6') : '#e2e8f0', color: isActive ? '#fff' : '#64748b', borderRadius: '20px', padding: '0 6px', fontSize: '10px', fontWeight: 800 }}>{counts[s] || 0}</span>}
+              {s !== 'All' && <span style={{ background: isActive ? conf?.color : '#e2e8f0', color: isActive ? '#fff' : '#64748b', borderRadius: '20px', padding: '0 6px', fontSize: '10px', fontWeight: 800 }}>{counts[s] || 0}</span>}
             </button>
           );
         })}
@@ -96,7 +116,7 @@ export function StudentApplications() {
       {msg && <div style={{ marginBottom: '12px', padding: '10px 16px', borderRadius: '10px', background: 'rgba(16,185,129,0.08)', color: '#10b981', fontSize: '13px', fontWeight: 600 }}>{msg}</div>}
 
       {/* Search */}
-      <div style={{ background: '#fff', border: '1px solid #f1f5f9', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+      <div style={{ background: '#fff', border: '1.5px solid rgba(40,43,74,0.08)', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(40,43,74,0.02)' }}>
         <div style={{ padding: '14px 20px', borderBottom: '1px solid #f1f5f9' }}>
           <div style={{ position: 'relative', maxWidth: '380px' }}>
             <Search size={14} color="#94a3b8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
@@ -129,11 +149,11 @@ export function StudentApplications() {
                   >
                     <td style={{ padding: '14px 16px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '12px', fontWeight: 800, flexShrink: 0 }}>
+                        <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#EEEBDA', fontSize: '12px', fontWeight: 800, flexShrink: 0 }}>
                           {a.student_name.substring(0, 2).toUpperCase()}
                         </div>
                         <div>
-                          <div style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>{a.student_name}</div>
+                          <div style={{ fontSize: '13px', fontWeight: 700, color: '#282B4A' }}>{a.student_name}</div>
                           <div style={{ fontSize: '11px', color: '#94a3b8' }}>{a.enrollment_number || a.student_email}</div>
                         </div>
                       </div>
