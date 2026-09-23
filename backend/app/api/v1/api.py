@@ -4,12 +4,13 @@ from app.api.v1 import (
     subjects, timetable, fees,
     assignments, events, notices, complaints, placements, dashboard,
     student_dashboard, faculty_dashboard, qr_attendance, substitutes,
-    chatbot, ai_attendance
+    chatbot, ai_attendance, notifications
 )
 
 api_router = APIRouter()
 api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 api_router.include_router(users.router, prefix="/users", tags=["users"])
+api_router.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
 api_router.include_router(student_dashboard.router, prefix="/student-dash", tags=["student-dashboard"])
 api_router.include_router(faculty_dashboard.router, prefix="/faculty-dash", tags=["faculty-dashboard"])
 api_router.include_router(students.router, prefix="/students", tags=["students"])

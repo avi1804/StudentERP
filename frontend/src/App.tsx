@@ -171,9 +171,10 @@ function App() {
             </Route>
 
             {/* Placement Admin Routes */}
-            <Route element={<ProtectedRoute allowedRoles={['placement_admin']} />}>
+            <Route element={<ProtectedRoute allowedRoles={['placement_admin', 'placement' as any]} />}>
               <Route path="/placement-admin" element={<PlacementLayout />}>
                 <Route index element={<PlacementDashboard />} />
+                <Route path="dashboard" element={<PlacementDashboard />} />
                 <Route path="companies" element={<Companies />} />
                 <Route path="drives" element={<PlacementDrives />} />
                 <Route path="applications" element={<StudentApplications />} />

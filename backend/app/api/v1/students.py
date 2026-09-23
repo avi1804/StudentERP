@@ -54,7 +54,7 @@ async def read_students(
     skip: int = 0,
     limit: int = 100,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(RequireRole(["admin", "faculty"]))
+    current_user: User = Depends(RequireRole(["admin", "faculty", "placement_admin", "placement"]))
 ) -> Any:
     """
     Retrieve all students (Admin/Faculty).

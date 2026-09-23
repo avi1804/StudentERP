@@ -254,10 +254,10 @@ export function PlacementDashboard() {
               {(data?.upcoming_drives || []).map((drive) => (
                 <div key={drive.id} style={{ display: 'flex', gap: '12px', alignItems: 'center', padding: '12px', background: '#f4f4f5', borderRadius: '14px' }}>
                   <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#EEEBDA', fontSize: '13px', fontWeight: 700, flexShrink: 0 }}>
-                    {drive.company_name.substring(0, 2).toUpperCase()}
+                    {(drive.company_name || 'CO').substring(0, 2).toUpperCase()}
                   </div>
                   <div style={{ minWidth: 0, flex: 1 }}>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#09090b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{drive.company_name}</div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#09090b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{drive.company_name || 'Company'}</div>
                     <div style={{ fontSize: '11px', color: '#71717a' }}>{drive.drive_date} · {drive.package_offered || 'Package TBD'}</div>
                   </div>
                   <button

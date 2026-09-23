@@ -37,14 +37,19 @@ class Notification(Base):
     __tablename__ = "notifications"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=True, index=True)
     title: Mapped[str] = mapped_column(String(255))
     message: Mapped[str] = mapped_column(Text)
+    category: Mapped[Optional[str]] = mapped_column(String(50), default="GENERAL", nullable=True)
+    sender_role: Mapped[Optional[str]] = mapped_column(String(50), default="admin", nullable=True)
+    sender_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    target_role: Mapped[Optional[str]] = mapped_column(String(50), default="all", nullable=True)
+    link: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     is_read: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     # Relationships
-    user: Mapped["User"] = relationship("User")
+    user: Mapped[Optional["User"]] = relationship("User")
 
 
 class ComplaintStatus(str, enum.Enum):

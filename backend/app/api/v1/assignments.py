@@ -250,6 +250,26 @@ async def create_assignment(
     )
 
     db.add(assignment)
+
+    # Cross-role notification to students and admin
+    try:
+        from app.models.communication import Notification
+        fac_name = current_user.full_name or "Faculty"
+        sub_name = subject.name if subject else "Course"
+        notif = Notification(
+            title=f"New Assignment: {assignment.title}",
+            message=f"Prof. {fac_name} posted an assignment for {sub_name}. Due on {due_d}.",
+            category="ASSIGNMENT",
+            sender_role="faculty",
+            sender_name=f"Prof. {fac_name}",
+            target_role="student",
+            link="/dashboard/assignments",
+            created_at=datetime.utcnow()
+        )
+        db.add(notif)
+    except Exception as e:
+        print("Failed to dispatch assignment notification:", e)
+
     await db.commit()
     await db.refresh(assignment)
 
@@ -525,12 +545,17 @@ async def get_student_assignments(
         res.append({
             "id": a.id,
             "title": a.title,
+            "subject_id": a.subject_id,
             "subject_code": subject.code if subject else "CS01",
             "subject_name": subject.name if subject else "General Subject",
             "assignment_type": a.assignment_type,
             "faculty_name": fac_name,
+            "faculty_id": a.faculty_id,
+            "semester": a.semester,
+            "section": a.section,
             "assigned_on": a.assigned_at.strftime("%d %b %Y") if a.assigned_at else "",
             "due_date": a.due_date.strftime("%d %b %Y") if a.due_date else "",
+            "due_date_raw": a.due_date.isoformat(),
             "due_time": a.due_time or "23:59",
             "max_marks": a.max_marks,
             "description": a.description or "",
@@ -588,6 +613,25 @@ async def submit_student_assignment(
             submission_status=status_str
         )
         db.add(new_sub)
+
+    # Cross-role notification to faculty
+    try:
+        from app.models.communication import Notification
+        fac = await db.scalar(select(Faculty).where(Faculty.id == assignment.faculty_id))
+        notif = Notification(
+            user_id=fac.user_id if fac else None,
+            title=f"Assignment Submitted: {assignment.title}",
+            message=f"{current_user.full_name or 'Student'} submitted solution for {assignment.title}.",
+            category="SUBMISSION",
+            sender_role="student",
+            sender_name=current_user.full_name or "Student",
+            target_role="faculty",
+            link="/faculty/assignments",
+            created_at=datetime.utcnow()
+        )
+        db.add(notif)
+    except Exception as e:
+        print("Failed to dispatch submission notification:", e)
 
     await db.commit()
     return {"message": "Assignment submitted successfully!", "status": status_str}

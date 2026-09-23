@@ -27,9 +27,14 @@ class NoticeResponse(NoticeBase):
 
 
 class NotificationBase(BaseModel):
-    user_id: int
+    user_id: Optional[int] = None
     title: str
     message: str
+    category: Optional[str] = "GENERAL"
+    sender_role: Optional[str] = "admin"
+    sender_name: Optional[str] = None
+    target_role: Optional[str] = "all"
+    link: Optional[str] = None
 
 class NotificationCreate(NotificationBase):
     pass

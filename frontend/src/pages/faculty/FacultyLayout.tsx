@@ -159,11 +159,42 @@ export function FacultyLayout() {
     }).catch(console.error);
   }, [user, setUser]);
 
-  const notificationsList = [
-    { id: 1, type: 'Academic', badge: 'MARKS', title: 'Mid-Sem Marks Submission Deadline', subtitle: 'Submit 7th Sem marks before Friday 5 PM', time: '30m ago' },
-    { id: 2, type: 'Notice', badge: 'ATTENDANCE', title: 'Low Attendance Alert Sent', subtitle: 'Notified 12 students in Machine Learning', time: '2h ago' },
-    { id: 3, type: 'System', badge: 'CURRICULUM', title: 'New Course Syllabus Updated', subtitle: 'Cloud Computing syllabus revision uploaded', time: 'Yesterday' },
-  ];
+  const [notificationsList, setNotificationsList] = useState<any[]>([
+    { id: 'default', type: 'System', badge: 'LIVE', title: 'Faculty Portal Active', subtitle: 'Checking student submissions & campus circulars...', time: 'Just now', link: '/faculty/dashboard' }
+  ]);
+
+  const getBadgeTheme = (badge: string) => {
+    switch (badge?.toUpperCase()) {
+      case 'STUDENT':
+        return { bg: '#059669', text: '#ffffff', glow: 'rgba(5,150,105,0.25)' };
+      case 'ADMIN':
+        return { bg: '#282B4A', text: '#EEEBDA', glow: 'rgba(40,43,74,0.25)' };
+      case 'PLACEMENT':
+        return { bg: '#d97706', text: '#ffffff', glow: 'rgba(217,119,6,0.25)' };
+      case 'DRIVE':
+        return { bg: '#7c3aed', text: '#ffffff', glow: 'rgba(124,58,237,0.25)' };
+      case 'FACULTY':
+        return { bg: '#2563eb', text: '#ffffff', glow: 'rgba(37,99,235,0.25)' };
+      default:
+        return { bg: '#282B4A', text: '#EEEBDA', glow: 'rgba(40,43,74,0.2)' };
+    }
+  };
+
+  const fetchNotifications = () => {
+    api.get('/notifications/my-notifications')
+      .then(res => {
+        if (res.data && Array.isArray(res.data) && res.data.length > 0) {
+          setNotificationsList(res.data);
+        }
+      })
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 20000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     document.body.classList.add('light-theme');
@@ -377,73 +408,101 @@ export function FacultyLayout() {
                 )}
 
                 {/* ─── NOTIFICATION EXPANDED ─── */}
-                {activeState === 'notifications' && (
-                  <motion.div
-                    key="notification-expanded"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                    style={{
-                      display: 'flex', alignItems: 'center',
-                      width: 450, height: 60,
-                      padding: '0 16px', gap: 12,
-                    }}
-                  >
-                    <button
+                {activeState === 'notifications' && (() => {
+                  const currentNotif = notificationsList[notifIndex] || notificationsList[0] || {
+                    id: 'fallback', badge: 'NOTICE', title: 'No notifications', subtitle: 'You are all caught up!', time: 'Now'
+                  };
+                  const theme = getBadgeTheme(currentNotif.badge);
+
+                  return (
+                    <motion.div
+                      key="notification-expanded"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.15 }}
                       style={{
-                        display: 'flex', alignItems: 'center', gap: 6,
-                        background: '#282B4A', color: '#EEEBDA',
-                        padding: '7px 13px', borderRadius: 9999, border: 'none',
-                        fontSize: 12, fontWeight: 700, letterSpacing: '0.04em',
-                        boxShadow: '0 4px 14px rgba(40, 43, 74, 0.25)',
-                        flexShrink: 0, cursor: 'pointer',
+                        display: 'flex', alignItems: 'center',
+                        width: 450, height: 60,
+                        padding: '0 16px', gap: 12,
                       }}
                     >
-                      <Bell size={13} color="#EEEBDA" strokeWidth={2.5} />
-                      <span>{notificationsList[notifIndex].badge}</span>
-                    </button>
-
-                    <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#282B4A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {notificationsList[notifIndex].title}
-                      </div>
-                      <div style={{ fontSize: 11, color: '#525677', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {notificationsList[notifIndex].subtitle} · <span style={{ color: '#7E82A4', fontWeight: 500 }}>{notificationsList[notifIndex].time}</span>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, background: 'rgba(40, 43, 74, 0.08)', borderRadius: 999, padding: '3px 6px' }}>
                       <button
-                        onClick={() => setNotifIndex(prev => (prev > 0 ? prev - 1 : notificationsList.length - 1))}
-                        title="Previous Notification"
-                        style={{
-                          width: 24, height: 24, borderRadius: '50%', border: 'none',
-                          background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          cursor: 'pointer', color: '#282B4A',
+                        onClick={() => {
+                          if (currentNotif.link) {
+                            navigate(currentNotif.link);
+                            setActiveState('idle');
+                          } else {
+                            navigate('/faculty/notices');
+                          }
                         }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 6,
+                          background: theme.bg, color: theme.text,
+                          padding: '7px 12px', borderRadius: 9999, border: 'none',
+                          fontSize: 11, fontWeight: 800, letterSpacing: '0.04em',
+                          boxShadow: `0 4px 12px ${theme.glow}`,
+                          flexShrink: 0, cursor: 'pointer',
+                          transition: 'transform 0.15s',
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.05)')}
+                        onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+                        title={`Open ${currentNotif.type || 'Notification'}`}
                       >
-                        <ChevronUp size={14} strokeWidth={2.5} />
+                        <Bell size={13} color={theme.text} strokeWidth={2.5} />
+                        <span>{currentNotif.badge}</span>
                       </button>
 
-                      <span style={{ fontSize: 11, fontWeight: 700, color: '#282B4A', padding: '0 2px', userSelect: 'none' }}>
-                        {notifIndex + 1}/{notificationsList.length}
-                      </span>
-
-                      <button
-                        onClick={() => setNotifIndex(prev => (prev < notificationsList.length - 1 ? prev + 1 : 0))}
-                        title="Next Notification"
-                        style={{
-                          width: 24, height: 24, borderRadius: '50%', border: 'none',
-                          background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          cursor: 'pointer', color: '#282B4A',
+                      <div 
+                        onClick={() => {
+                          if (currentNotif.link) {
+                            navigate(currentNotif.link);
+                            setActiveState('idle');
+                          }
                         }}
+                        style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', cursor: currentNotif.link ? 'pointer' : 'default' }}
+                        title={currentNotif.link ? "Click to view details" : undefined}
                       >
-                        <ChevronDown size={14} strokeWidth={2.5} />
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
+                        <div style={{ fontSize: 13, fontWeight: 600, color: '#282B4A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {currentNotif.title}
+                        </div>
+                        <div style={{ fontSize: 11, color: '#525677', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {currentNotif.subtitle} · <span style={{ color: '#7E82A4', fontWeight: 500 }}>{currentNotif.time}</span>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, background: 'rgba(40, 43, 74, 0.08)', borderRadius: 999, padding: '3px 6px' }}>
+                        <button
+                          onClick={() => setNotifIndex(prev => (prev > 0 ? prev - 1 : notificationsList.length - 1))}
+                          title="Previous Notification"
+                          style={{
+                            width: 24, height: 24, borderRadius: '50%', border: 'none',
+                            background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            cursor: 'pointer', color: '#282B4A',
+                          }}
+                        >
+                          <ChevronUp size={14} strokeWidth={2.5} />
+                        </button>
+
+                        <span style={{ fontSize: 11, fontWeight: 700, color: '#282B4A', padding: '0 2px', userSelect: 'none' }}>
+                          {notifIndex + 1}/{notificationsList.length}
+                        </span>
+
+                        <button
+                          onClick={() => setNotifIndex(prev => (prev < notificationsList.length - 1 ? prev + 1 : 0))}
+                          title="Next Notification"
+                          style={{
+                            width: 24, height: 24, borderRadius: '50%', border: 'none',
+                            background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            cursor: 'pointer', color: '#282B4A',
+                          }}
+                        >
+                          <ChevronDown size={14} strokeWidth={2.5} />
+                        </button>
+                      </div>
+                    </motion.div>
+                  );
+                })()}
 
                 {/* ─── PROFILE EXPANDED ─── */}
                 {activeState === 'profile' && (

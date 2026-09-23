@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useAuthStore } from "../../store/authStore";
 import { apiClient as api } from "../../api/axios";
 import { useNavigate } from "react-router-dom";
@@ -6,16 +6,40 @@ import {
   Check, TrendingUp, Play, MonitorPlay, 
   User, IdCard, CheckCircle2, Calendar, 
   BarChart2, Book, Megaphone, Layers, Briefcase, ArrowUpRight,
-  CheckCircle, FileText, Activity, ChevronLeft, ChevronRight, Clock, Monitor, Database, Network, Brain, Code2, Utensils, BookOpen
+  CheckCircle, FileText, Activity, ChevronLeft, ChevronRight, Clock, Monitor, Database, Network, Brain, Code2, Utensils, BookOpen, AlertCircle, RefreshCw
 } from "lucide-react";
 import { motion } from "framer-motion";
 import TextType from "../../components/TextType";
 import { TimetableAttendanceService } from "../../services/timetableAttendanceService";
 
 /* ── Interactive Real-Time Calendar Component with Circular Badges & Surprising UX ── */
+/* ── Interactive Real-Time Calendar Component with Live Database Assignments ── */
+interface CalendarAssignment {
+  id: number;
+  title: string;
+  subject_id: number;
+  subject_code: string;
+  subject_name: string;
+  assignment_type: string;
+  faculty_name: string;
+  faculty_id?: number;
+  semester?: number;
+  assigned_on: string;
+  due_date: string;
+  due_date_raw: string; // "YYYY-MM-DD"
+  due_time: string;
+  max_marks: number;
+  description: string;
+  status: 'PENDING' | 'SUBMITTED' | 'OVERDUE' | 'GRADED' | string;
+}
+
 function InteractiveCalendar() {
+  const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedDay, setSelectedDay] = useState<number | null>(new Date().getDate());
+  const [assignments, setAssignments] = useState<CalendarAssignment[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -27,14 +51,31 @@ function InteractiveCalendar() {
 
   const daysOfWeek = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
-  // Mock events mapping for surprising UX
-  const eventsMap: Record<number, { title: string; type: 'class' | 'deadline' | 'quiz' }> = {
-    10: { title: "DBMS Assignment Submission", type: "deadline" },
-    12: { title: "Operating Systems Quiz", type: "quiz" },
-    15: { title: "CN Lab Record Submission", type: "deadline" },
-    20: { title: "Software Engineering Project", type: "class" },
-    30: { title: "3 Active Classes Today (OS, CN, SE)", type: "class" },
-  };
+  const fetchAssignments = useCallback(async (isManual = false) => {
+    if (isManual) setRefreshing(true);
+    try {
+      const res = await api.get('/assignments/student');
+      setAssignments(res.data || []);
+    } catch (err) {
+      console.error('Failed to load real-time assignments for schedule:', err);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAssignments();
+
+    // Auto-refresh when tab gains focus or on a 25-second poll
+    const onFocus = () => fetchAssignments();
+    window.addEventListener('focus', onFocus);
+    const interval = setInterval(() => fetchAssignments(), 25000);
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      clearInterval(interval);
+    };
+  }, [fetchAssignments]);
 
   const prevMonth = () => {
     setCurrentDate(new Date(year, month - 1, 1));
@@ -71,6 +112,7 @@ function InteractiveCalendar() {
       isCurrentMonth: false,
       isToday: false,
       isSelected: false,
+      assignments: [] as CalendarAssignment[],
     });
   }
 
@@ -78,12 +120,16 @@ function InteractiveCalendar() {
   for (let d = 1; d <= daysInMonth; d++) {
     const itIsToday = isCurrentMonthToday && today.getDate() === d;
     const itIsSelected = selectedDay === d;
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const dayAsgs = assignments.filter(a => a.due_date_raw === dateStr);
+
     calendarCells.push({
       day: d,
       isCurrentMonth: true,
       isToday: itIsToday,
       isSelected: itIsSelected,
-      event: eventsMap[d],
+      dateStr,
+      assignments: dayAsgs,
     });
   }
 
@@ -96,22 +142,46 @@ function InteractiveCalendar() {
       isCurrentMonth: false,
       isToday: false,
       isSelected: false,
+      assignments: [] as CalendarAssignment[],
     });
   }
 
-  const selectedEvent = selectedDay ? eventsMap[selectedDay] : null;
+  // Selected date matching
+  const selectedDateStr = selectedDay
+    ? `${year}-${String(month + 1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`
+    : '';
+  const selectedDayAssignments = selectedDay
+    ? assignments.filter(a => a.due_date_raw === selectedDateStr)
+    : [];
+
+  // Next upcoming pending assignments across the database
+  const upcomingAssignments = assignments
+    .filter(a => a.status === 'PENDING' || a.status === 'OVERDUE')
+    .sort((a, b) => a.due_date_raw.localeCompare(b.due_date_raw));
 
   return (
     <div className="calendar-widget" style={{ width: '100%' }}>
       {/* Dynamic Header with Live Month/Year & Controls */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <h4 style={{ fontSize: 18, fontWeight: 700, color: '#09090b', letterSpacing: '-0.3px', margin: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <h4 style={{ fontSize: 17, fontWeight: 700, color: '#09090b', letterSpacing: '-0.3px', margin: 0 }}>
             {monthNames[month]} {year}
           </h4>
-          <span style={{ fontSize: 11, fontWeight: 600, color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', padding: '2px 8px', borderRadius: 12 }}>
-            🔥 Live
+          <span style={{ fontSize: 10, fontWeight: 700, color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', padding: '2px 7px', borderRadius: 10, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981' }} />
+            Live DB
           </span>
+          <button
+            onClick={() => fetchAssignments(true)}
+            disabled={refreshing}
+            title="Refresh database deadlines"
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer', padding: 2,
+              color: '#71717a', display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}
+          >
+            <RefreshCw size={12} className={refreshing ? 'animate-spin' : ''} />
+          </button>
           {(!isCurrentMonthToday || selectedDay !== today.getDate()) && (
             <button
               onClick={jumpToToday}
@@ -132,33 +202,33 @@ function InteractiveCalendar() {
             onClick={prevMonth}
             title="Previous Month"
             style={{
-              width: 32, height: 32, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.08)',
+              width: 30, height: 30, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.08)',
               background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer', color: '#18181b', transition: 'all 0.15s', boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
             }}
             onMouseEnter={e => (e.currentTarget.style.background = '#f4f4f5')}
             onMouseLeave={e => (e.currentTarget.style.background = '#ffffff')}
           >
-            <ChevronLeft size={16} />
+            <ChevronLeft size={15} />
           </button>
           <button
             onClick={nextMonth}
             title="Next Month"
             style={{
-              width: 32, height: 32, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.08)',
+              width: 30, height: 30, borderRadius: '50%', border: '1px solid rgba(0,0,0,0.08)',
               background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer', color: '#18181b', transition: 'all 0.15s', boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
             }}
             onMouseEnter={e => (e.currentTarget.style.background = '#f4f4f5')}
             onMouseLeave={e => (e.currentTarget.style.background = '#ffffff')}
           >
-            <ChevronRight size={16} />
+            <ChevronRight size={15} />
           </button>
         </div>
       </div>
 
       {/* Calendar Circular Day Grid */}
-      <div className="cal-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 8, textAlign: 'center' }}>
+      <div className="cal-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6, textAlign: 'center' }}>
         {daysOfWeek.map(day => (
           <div key={day} style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', paddingBottom: 6 }}>
             {day}
@@ -170,6 +240,10 @@ function InteractiveCalendar() {
           let fontWeight: number | string = 500;
           let border = 'none';
           let boxShadow = 'none';
+
+          const hasAssignments = cell.assignments && cell.assignments.length > 0;
+          const hasPending = hasAssignments && cell.assignments.some(a => a.status === 'PENDING' || a.status === 'OVERDUE');
+          const isAllDone = hasAssignments && !hasPending;
 
           if (cell.isToday) {
             bg = 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)';
@@ -191,7 +265,7 @@ function InteractiveCalendar() {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: 44,
+                height: 42,
               }}
             >
               <motion.div
@@ -203,9 +277,9 @@ function InteractiveCalendar() {
                   }
                 }}
                 style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: '50%', // 🌟 PERFECT CIRCULAR BADGE!
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -221,18 +295,38 @@ function InteractiveCalendar() {
                 }}
               >
                 {cell.day}
-                {/* Event Dot Indicator */}
-                {cell.event && cell.isCurrentMonth && !cell.isToday && (
+                {/* Real-Time Database Event Dot Indicator */}
+                {hasAssignments && cell.isCurrentMonth && !cell.isToday && (
                   <div
                     style={{
                       position: 'absolute',
                       bottom: 3,
-                      width: 4,
-                      height: 4,
-                      borderRadius: '50%',
-                      background: cell.event.type === 'deadline' ? '#ef4444' : cell.event.type === 'quiz' ? '#f59e0b' : '#10b981',
+                      display: 'flex',
+                      gap: 2,
+                      alignItems: 'center',
+                      justifyContent: 'center'
                     }}
-                  />
+                  >
+                    <div
+                      style={{
+                        width: 5,
+                        height: 5,
+                        borderRadius: '50%',
+                        background: hasPending ? '#ef4444' : '#10b981',
+                        boxShadow: hasPending ? '0 0 4px rgba(239, 68, 68, 0.6)' : 'none'
+                      }}
+                    />
+                    {cell.assignments.length > 1 && (
+                      <div
+                        style={{
+                          width: 4,
+                          height: 4,
+                          borderRadius: '50%',
+                          background: '#f59e0b'
+                        }}
+                      />
+                    )}
+                  </div>
                 )}
               </motion.div>
             </div>
@@ -240,56 +334,159 @@ function InteractiveCalendar() {
         })}
       </div>
 
-      {/* 🌟 SURPRISE UI/UX: Floating Selected Day Event Pill */}
+      {/* ── Real-Time Database Deadline Display Section ── */}
       {selectedDay && (
-        <motion.div
-          initial={{ opacity: 0, y: 10, scale: 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          style={{
-            marginTop: 18,
-            padding: '12px 16px',
-            borderRadius: 18,
-            background: selectedEvent ? 'rgba(87, 60, 250, 0.06)' : '#f4f4f5',
-            border: selectedEvent ? '1px solid rgba(87, 60, 250, 0.15)' : '1px solid rgba(0,0,0,0.06)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div
-              style={{
-                width: 32, height: 32, borderRadius: '50%',
-                background: selectedEvent ? '#282B4A' : '#e4e4e7',
-                color: selectedEvent ? '#EEEBDA' : '#71717a',
-                fontSize: 12, fontWeight: 700,
-                display: 'flex', alignItems: 'center', justifyContent: 'center'
-              }}
-            >
-              {selectedDay}
-            </div>
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#18181b' }}>
-                {selectedEvent ? selectedEvent.title : `${monthNames[month]} ${selectedDay}, ${year}`}
+        <div style={{ marginTop: 16 }}>
+          {selectedDayAssignments.length > 0 ? (
+            /* Specific Deadlines Due on Selected Date */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span>Deadlines on {monthNames[month]} {selectedDay}, {year}:</span>
+                <span style={{ fontSize: 11, color: '#ef4444', fontWeight: 700 }}>
+                  {selectedDayAssignments.length} assignment{selectedDayAssignments.length > 1 ? 's' : ''}
+                </span>
               </div>
-              <div style={{ fontSize: 11, color: '#71717a' }}>
-                {selectedEvent ? (
-                  selectedEvent.type === 'deadline' ? '⚠️ High Priority Deadline' :
-                  selectedEvent.type === 'quiz' ? '✏️ Scheduled Exam Quiz' : '📚 Live Classes Scheduled'
-                ) : (
-                  '✨ No pending deadlines — All caught up!'
-                )}
-              </div>
+              {selectedDayAssignments.map(asg => {
+                const isPending = asg.status === 'PENDING';
+                const isSubmitted = asg.status === 'SUBMITTED' || asg.status === 'GRADED';
+                const isOverdue = asg.status === 'OVERDUE';
+
+                return (
+                  <motion.div
+                    key={asg.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{
+                      padding: '12px 14px',
+                      borderRadius: 14,
+                      background: isPending ? 'rgba(239, 68, 68, 0.04)' : isSubmitted ? 'rgba(16, 185, 129, 0.05)' : 'rgba(40, 43, 74, 0.05)',
+                      border: isPending ? '1.5px solid rgba(239, 68, 68, 0.2)' : isSubmitted ? '1.5px solid rgba(16, 185, 129, 0.2)' : '1px solid rgba(0,0,0,0.08)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 8,
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                          <span style={{ fontSize: 10, fontWeight: 700, color: '#282B4A', background: 'rgba(40, 43, 74, 0.1)', padding: '2px 8px', borderRadius: 8 }}>
+                            {asg.subject_name} ({asg.subject_code})
+                          </span>
+                          <span
+                            style={{
+                              fontSize: 10, fontWeight: 700,
+                              color: isPending ? '#dc2626' : isSubmitted ? '#059669' : '#d97706',
+                              background: isPending ? '#fee2e2' : isSubmitted ? '#ecfdf5' : '#fef3c7',
+                              padding: '2px 8px', borderRadius: 8
+                            }}
+                          >
+                            {isPending ? '⚠️ Pending Due' : isSubmitted ? '✅ Submitted' : '⏰ Overdue'}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#18181b', lineHeight: 1.3 }}>
+                          {asg.title}
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => navigate('/dashboard/assignments')}
+                        style={{
+                          fontSize: 11, fontWeight: 700, color: '#282B4A', background: '#ffffff',
+                          border: '1px solid rgba(40,43,74,0.15)', padding: '5px 10px', borderRadius: 10,
+                          cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                          display: 'flex', alignItems: 'center', gap: 4
+                        }}
+                      >
+                        <span>{isSubmitted ? 'View' : 'Submit'}</span>
+                        <ArrowUpRight size={12} />
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 11, color: '#71717a', flexWrap: 'wrap' }}>
+                      <span style={{ fontWeight: 600, color: '#3f3f46' }}>
+                        👩‍🏫 {asg.faculty_name}
+                      </span>
+                      <span>⏰ Due {asg.due_time || '23:59'}</span>
+                      <span>🎯 {asg.max_marks} Marks</span>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
-          </div>
-          {selectedEvent && (
-            <span style={{ fontSize: 11, fontWeight: 600, color: '#282B4A', background: '#ffffff', padding: '4px 10px', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-              Details
-            </span>
+          ) : (
+            /* No Deadlines on Selected Date - Show Date Status + Real Upcoming Deadlines */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div
+                style={{
+                  padding: '10px 14px',
+                  borderRadius: 14,
+                  background: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                }}
+              >
+                <div
+                  style={{
+                    width: 28, height: 28, borderRadius: '50%',
+                    background: '#e2e8f0', color: '#475569',
+                    fontSize: 12, fontWeight: 700,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0
+                  }}
+                >
+                  {selectedDay}
+                </div>
+                <div style={{ fontSize: 12, color: '#64748b' }}>
+                  <span style={{ fontWeight: 600, color: '#1e293b' }}>{monthNames[month]} {selectedDay}, {year}</span>
+                  <div>No deadlines due on this day</div>
+                </div>
+              </div>
+
+              {/* Real Upcoming Deadlines Feed */}
+              {upcomingAssignments.length > 0 ? (
+                <div
+                  style={{
+                    padding: '12px 14px',
+                    borderRadius: 14,
+                    background: 'rgba(40, 43, 74, 0.04)',
+                    border: '1px dashed rgba(40, 43, 74, 0.18)',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#282B4A', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
+                      📌 Next Upcoming Deadline
+                    </span>
+                    <button
+                      onClick={() => navigate('/dashboard/assignments')}
+                      style={{ fontSize: 11, fontWeight: 700, color: '#282B4A', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 2 }}
+                    >
+                      <span>All</span>
+                      <ArrowUpRight size={11} />
+                    </button>
+                  </div>
+
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#18181b', marginBottom: 3 }}>
+                    {upcomingAssignments[0].title}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#64748b', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <span style={{ fontWeight: 600, color: '#282B4A' }}>{upcomingAssignments[0].subject_name}</span>
+                    <span>•</span>
+                    <span style={{ color: '#ef4444', fontWeight: 600 }}>Due: {upcomingAssignments[0].due_date} ({upcomingAssignments[0].due_time || '23:59'})</span>
+                  </div>
+                  <div style={{ fontSize: 11, color: '#71717a', marginTop: 4 }}>
+                    Uploaded by: {upcomingAssignments[0].faculty_name}
+                  </div>
+                </div>
+              ) : (
+                <div style={{ textAlign: 'center', padding: '12px', fontSize: 12, color: '#10b981', fontWeight: 600 }}>
+                  ✨ No pending deadlines — All caught up!
+                </div>
+              )}
+            </div>
           )}
-        </motion.div>
+        </div>
       )}
     </div>
   );

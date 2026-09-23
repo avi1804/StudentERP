@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy import select, func
+from sqlalchemy import select, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any, Optional
 from datetime import datetime, date
@@ -16,6 +16,7 @@ from app.models.subject import Subject
 from app.models.subject_assignment import SubjectAssignment
 from app.models.attendance import Attendance
 from app.models.marks import Marks
+from app.models.assignment import Assignment, AssignmentSubmission
 
 router = APIRouter()
 
@@ -88,6 +89,26 @@ async def get_dashboard(
             "room": rooms[idx % len(rooms)]
         })
             
+    # Calculate real-time assignments
+    all_asg = (await db.scalars(
+        select(Assignment).where(or_(Assignment.semester == student.semester, Assignment.semester == 7))
+    )).all()
+    if not all_asg:
+        all_asg = (await db.scalars(select(Assignment))).all()
+
+    asg_ids = [a.id for a in all_asg]
+    submitted_asg_count = 0
+    if asg_ids:
+        submitted_asg_count = await db.scalar(
+            select(func.count(AssignmentSubmission.id)).where(
+                AssignmentSubmission.assignment_id.in_(asg_ids),
+                AssignmentSubmission.student_id == student.id,
+                AssignmentSubmission.submission_status.in_(["SUBMITTED", "GRADED", "LATE"])
+            )
+        ) or 0
+
+    pending_asg_count = max(0, len(all_asg) - submitted_asg_count)
+
     return {
         "student_id": student.id,
         "name": current_user.full_name or "Student",
@@ -97,8 +118,8 @@ async def get_dashboard(
         "present_classes": present_classes,
         "cgpa": cgpa,
         "total_subjects": len(subjects_7th),
-        "assignments_done": 12,
-        "pending_assignments": 3,
+        "assignments_done": submitted_asg_count,
+        "pending_assignments": pending_asg_count,
         "todays_classes": todays_classes
     }
 
