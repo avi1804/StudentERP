@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react';
+ximport React, { useEffect, useState, useCallback } from 'react';
 import { useAuthStore } from "../../store/authStore";
 import { apiClient as api } from "../../api/axios";
 import { useNavigate } from "react-router-dom";
-import { 
-  Check, TrendingUp, Play, MonitorPlay, 
-  User, IdCard, CheckCircle2, Calendar, 
+import {
+  Check, TrendingUp, Play, MonitorPlay,
+  User, IdCard, CheckCircle2, Calendar,
   BarChart2, Book, Megaphone, Layers, Briefcase, ArrowUpRight,
   CheckCircle, FileText, Activity, ChevronLeft, ChevronRight, Clock, Monitor, Database, Network, Brain, Code2, Utensils, BookOpen, AlertCircle, RefreshCw
 } from "lucide-react";
@@ -195,7 +195,7 @@ function InteractiveCalendar() {
             </button>
           )}
         </div>
-        
+
         {/* Month Prev / Next buttons */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <button
@@ -778,7 +778,7 @@ export function StudentHome() {
             }
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     }
 
     // Fetch real-time KPI data from backend APIs
@@ -808,13 +808,13 @@ export function StudentHome() {
       .then(res => {
         if (res.data) setComplaintStats(res.data);
       })
-      .catch(() => {});
+      .catch(() => { });
 
     api.get('/complaints/my')
       .then(res => {
         if (res.data) setRecentComplaints(res.data.slice(0, 4));
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [user, setUser]);
 
   const displayName = userName || user?.full_name || 'Student';
