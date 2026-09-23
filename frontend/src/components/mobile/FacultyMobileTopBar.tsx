@@ -5,6 +5,7 @@ import { LogOut, Menu } from 'lucide-react';
 const pageTitles: Record<string, string> = {
   '/faculty/dashboard': 'Faculty Dashboard',
   '/faculty/attendance': 'Attendance',
+  '/faculty/attendance/ai': 'AI Attendance',
   '/faculty/attendance-report': 'Attendance Report',
   '/faculty/assignments': 'Assignments',
   '/faculty/marks': 'Enter Marks',

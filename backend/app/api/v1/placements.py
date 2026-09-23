@@ -153,6 +153,57 @@ async def ensure_placement_seed_data(db: AsyncSession):
     
     await db.commit()
 
+    # Seed placement applications across students if missing
+    app_count = await db.scalar(select(func.count(PlacementApplication.id))) or 0
+    if app_count < 10:
+        students = (await db.scalars(select(Student))).all()
+        drives = (await db.scalars(select(PlacementDrive))).all()
+        student_map = {s.id: s for s in students}
+        drive_map = {d.id: d for d in drives}
+
+        apps_to_create = [
+            (5, 1, ApplicationStatus.SELECTED),
+            (6, 1, ApplicationStatus.SHORTLISTED),
+            (8, 1, ApplicationStatus.REJECTED),
+            (7, 2, ApplicationStatus.SELECTED),
+            (10, 2, ApplicationStatus.SHORTLISTED),
+            (12, 2, ApplicationStatus.REJECTED),
+            (8, 3, ApplicationStatus.SELECTED),
+            (9, 3, ApplicationStatus.SELECTED),
+            (14, 3, ApplicationStatus.REJECTED),
+            (11, 4, ApplicationStatus.SELECTED),
+            (12, 4, ApplicationStatus.SELECTED),
+            (15, 4, ApplicationStatus.SELECTED),
+            (13, 5, ApplicationStatus.SELECTED),
+            (14, 5, ApplicationStatus.SELECTED),
+            (16, 5, ApplicationStatus.SELECTED),
+            (17, 6, ApplicationStatus.SELECTED),
+            (18, 6, ApplicationStatus.SELECTED),
+            (6, 6, ApplicationStatus.SELECTED),
+            (2, 7, ApplicationStatus.APPLIED),
+            (3, 7, ApplicationStatus.SHORTLISTED),
+            (2, 8, ApplicationStatus.APPLIED),
+            (5, 8, ApplicationStatus.APPLIED)
+        ]
+
+        for s_id, d_id, stat in apps_to_create:
+            if s_id in student_map and d_id in drive_map:
+                existing = await db.scalar(
+                    select(PlacementApplication).where(
+                        PlacementApplication.student_id == s_id,
+                        PlacementApplication.drive_id == d_id
+                    )
+                )
+                if not existing:
+                    app_obj = PlacementApplication(
+                        student_id=s_id,
+                        drive_id=d_id,
+                        status=stat,
+                        applied_on=datetime.utcnow() - timedelta(days=5)
+                    )
+                    db.add(app_obj)
+        await db.commit()
+
 
 # ─────────── STUDENT PLACEMENT DASHBOARD ───────────
 @router.get("/student-dashboard")
@@ -221,7 +272,16 @@ async def get_student_placement_dashboard(
         ind = company.industry if company else "Software & Cloud"
         role_counts[ind] = role_counts.get(ind, 0) + 1
 
-    color_palette = ["#8b5cf6", "#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#ec4899"]
+    color_palette = [
+        "#282B4A",  # Midnight Indigo
+        "#3D426E",  # Slate Indigo
+        "#5A6096",  # Muted Indigo
+        "#7B82BE",  # Soft Iris
+        "#BCA882",  # Warm Sand
+        "#9D987B",  # Muted Olive
+        "#2E5077",  # Deep Steel
+        "#4A6B5B",  # Sage Slate
+    ]
     role_distribution = []
     for idx, (ind, cnt) in enumerate(role_counts.items()):
         role_distribution.append({
@@ -240,11 +300,11 @@ async def get_student_placement_dashboard(
     }
 
     tier_colors = {
-        "20 LPA +": "#8b5cf6",
-        "10 - 20 LPA": "#3b82f6",
-        "5 - 10 LPA": "#10b981",
-        "3 - 5 LPA": "#f59e0b",
-        "Below 3 LPA": "#ef4444"
+        "20 LPA +": "#282B4A",
+        "10 - 20 LPA": "#3D426E",
+        "5 - 10 LPA": "#5A6096",
+        "3 - 5 LPA": "#7B82BE",
+        "Below 3 LPA": "#BCA882"
     }
 
     for p in packages:
@@ -307,9 +367,9 @@ async def get_student_placement_dashboard(
         "kpis": {
             "dream_offers": dream_offers_count,
             "active_drives": len(active_drives),
-            "placed_students": placed_count if placed_count > 0 else 12,
-            "highest_package": f"{highest_package_val} LPA" if highest_package_val else "32.0 LPA",
-            "average_package": f"{avg_package_val} LPA" if avg_package_val else "14.5 LPA",
+            "placed_students": placed_count,
+            "highest_package": f"{highest_package_val} LPA" if highest_package_val > 0 else "0.0 LPA",
+            "average_package": f"{avg_package_val} LPA" if avg_package_val > 0 else "0.0 LPA",
             "total_applications": len(all_applications),
             "my_applications_count": len(student_applications)
         },
@@ -414,8 +474,8 @@ async def get_placement_dashboard(
     # Calculate real highest and average package
     all_drives = (await db.scalars(select(PlacementDrive))).all()
     packages = [parse_package_lpa(d.package_offered) for d in all_drives if parse_package_lpa(d.package_offered) > 0]
-    highest_pkg = max(packages) if packages else 24.0
-    avg_pkg = round(sum(packages) / len(packages), 1) if packages else 8.5
+    highest_pkg = max(packages) if packages else 0.0
+    avg_pkg = round(sum(packages) / len(packages), 1) if packages else 0.0
 
     # Recent companies
     recent_companies = (await db.scalars(

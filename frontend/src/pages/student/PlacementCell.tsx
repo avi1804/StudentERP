@@ -242,7 +242,7 @@ export function PlacementCell() {
           variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
           style={{
             background: '#f4f4f5',
-            border: '1.5px solid rgba(0,0,0,0.07)',
+            border: '1.5px solid rgba(40, 43, 74, 0.08)',
             borderRadius: '24px',
             padding: '22px 20px',
             display: 'flex',
@@ -257,14 +257,14 @@ export function PlacementCell() {
               <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(40,43,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(40,43,74,0.08)' }}>
                 <BarChart2 size={18} color="#282B4A" strokeWidth={2} />
               </div>
-              <span style={{ fontSize: '13px', fontWeight: 500, color: '#52525b' }}>Dream Offers</span>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: '#282B4A' }}>Dream Offers</span>
             </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <ArrowUpRight size={15} color="#18181b" />
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', border: '1px solid rgba(40,43,74,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <ArrowUpRight size={15} color="#282B4A" />
             </div>
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '42px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+            <div style={{ fontSize: '42px', fontWeight: 700, color: '#282B4A', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
               {kpis.dream_offers}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
@@ -278,7 +278,7 @@ export function PlacementCell() {
           variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
           style={{
             background: '#f4f4f5',
-            border: '1.5px solid rgba(0,0,0,0.07)',
+            border: '1.5px solid rgba(40, 43, 74, 0.08)',
             borderRadius: '24px',
             padding: '22px 20px',
             display: 'flex',
@@ -290,21 +290,21 @@ export function PlacementCell() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(34,197,94,0.08)' }}>
-                <Briefcase size={18} color="#22c55e" strokeWidth={2} />
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(40,43,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(40,43,74,0.08)' }}>
+                <Briefcase size={18} color="#282B4A" strokeWidth={2} />
               </div>
-              <span style={{ fontSize: '13px', fontWeight: 500, color: '#52525b' }}>Active Drives</span>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: '#282B4A' }}>Active Drives</span>
             </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <ArrowUpRight size={15} color="#18181b" />
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', border: '1px solid rgba(40,43,74,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <ArrowUpRight size={15} color="#282B4A" />
             </div>
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '42px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+            <div style={{ fontSize: '42px', fontWeight: 700, color: '#282B4A', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
               {kpis.active_drives}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#22c55e', fontWeight: 600 }}>Active</span> · Open Registrations
+              <span style={{ color: '#282B4A', fontWeight: 600 }}>Active</span> · Open Registrations
             </div>
           </div>
         </motion.div>
@@ -314,7 +314,7 @@ export function PlacementCell() {
           variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
           style={{
             background: '#f4f4f5',
-            border: '1.5px solid rgba(0,0,0,0.07)',
+            border: '1.5px solid rgba(40, 43, 74, 0.08)',
             borderRadius: '24px',
             padding: '22px 20px',
             display: 'flex',
@@ -326,21 +326,21 @@ export function PlacementCell() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(59,130,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(59,130,246,0.08)' }}>
-                <Users size={18} color="#3b82f6" strokeWidth={2} />
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(40,43,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(40,43,74,0.08)' }}>
+                <Users size={18} color="#282B4A" strokeWidth={2} />
               </div>
-              <span style={{ fontSize: '13px', fontWeight: 500, color: '#52525b' }}>Students Placed</span>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: '#282B4A' }}>Students Placed</span>
             </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <ArrowUpRight size={15} color="#18181b" />
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', border: '1px solid rgba(40,43,74,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <ArrowUpRight size={15} color="#282B4A" />
             </div>
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '42px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+            <div style={{ fontSize: '42px', fontWeight: 700, color: '#282B4A', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
               {kpis.placed_students}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#3b82f6', fontWeight: 600 }}>Secured</span> · Selected Candidates
+              <span style={{ color: '#282B4A', fontWeight: 600 }}>Secured</span> · Selected Candidates
             </div>
           </div>
         </motion.div>
@@ -350,7 +350,7 @@ export function PlacementCell() {
           variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
           style={{
             background: '#f4f4f5',
-            border: '1.5px solid rgba(0,0,0,0.07)',
+            border: '1.5px solid rgba(40, 43, 74, 0.08)',
             borderRadius: '24px',
             padding: '22px 20px',
             display: 'flex',
@@ -362,21 +362,21 @@ export function PlacementCell() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(245,158,11,0.08)' }}>
-                <Target size={18} color="#f59e0b" strokeWidth={2} />
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(40,43,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(40,43,74,0.08)' }}>
+                <Target size={18} color="#282B4A" strokeWidth={2} />
               </div>
-              <span style={{ fontSize: '13px', fontWeight: 500, color: '#52525b' }}>Highest Package</span>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: '#282B4A' }}>Highest Package</span>
             </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <ArrowUpRight size={15} color="#18181b" />
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', border: '1px solid rgba(40,43,74,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <ArrowUpRight size={15} color="#282B4A" />
             </div>
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '32px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+            <div style={{ fontSize: '32px', fontWeight: 700, color: '#282B4A', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
               {kpis.highest_package}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#f59e0b', fontWeight: 600 }}>Record</span> · Maximum CTC
+              <span style={{ color: '#282B4A', fontWeight: 600 }}>Record</span> · Maximum CTC
             </div>
           </div>
         </motion.div>
@@ -386,7 +386,7 @@ export function PlacementCell() {
           variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } } }}
           style={{
             background: '#f4f4f5',
-            border: '1.5px solid rgba(0,0,0,0.07)',
+            border: '1.5px solid rgba(40, 43, 74, 0.08)',
             borderRadius: '24px',
             padding: '22px 20px',
             display: 'flex',
@@ -398,21 +398,21 @@ export function PlacementCell() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(236,72,153,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(236,72,153,0.08)' }}>
-                <Award size={18} color="#ec4899" strokeWidth={2} />
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(40,43,74,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(40,43,74,0.08)' }}>
+                <Award size={18} color="#282B4A" strokeWidth={2} />
               </div>
-              <span style={{ fontSize: '13px', fontWeight: 500, color: '#52525b' }}>Avg Package</span>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: '#282B4A' }}>Avg Package</span>
             </div>
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <ArrowUpRight size={15} color="#18181b" />
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffffff', border: '1px solid rgba(40,43,74,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <ArrowUpRight size={15} color="#282B4A" />
             </div>
           </div>
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-            <div style={{ fontSize: '32px', fontWeight: 700, color: '#09090b', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
+            <div style={{ fontSize: '32px', fontWeight: 700, color: '#282B4A', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '6px' }}>
               {kpis.average_package}
             </div>
             <div style={{ fontSize: '12px', color: '#71717a', fontWeight: 500 }}>
-              <span style={{ color: '#ec4899', fontWeight: 600 }}>Average</span> · Campus CTC
+              <span style={{ color: '#282B4A', fontWeight: 600 }}>Average</span> · Campus CTC
             </div>
           </div>
         </motion.div>
@@ -547,108 +547,135 @@ export function PlacementCell() {
           </div>
         </div>
 
-        {/* Right Column: Dynamic Statistics & Preparation */}
+        {/* Right Column: Dynamic Placement Statistics (Real Database Live Aggregation) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           {/* Placement Statistics (Pie & Bar Chart fed with real backend analytics) */}
-          <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #f3f4f6', padding: '24px' }}>
+          <div style={{ 
+            background: 'white', 
+            borderRadius: '20px', 
+            border: '1.5px solid rgba(40, 43, 74, 0.08)', 
+            padding: '24px',
+            boxShadow: '0 2px 10px rgba(40, 43, 74, 0.03)'
+          }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: 0 }}>Placement Statistics</h3>
-              <span style={{ fontSize: '11px', color: '#6b7280', fontWeight: 600 }}>Live DB Aggregation</span>
+              <div>
+                <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#282B4A', margin: 0 }}>Placement Statistics</h3>
+                <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '2px' }}>Real-time database analytics across active placement drives</div>
+              </div>
+              <span style={{ 
+                fontSize: '11px', 
+                color: '#282B4A', 
+                fontWeight: 600, 
+                background: 'rgba(40, 43, 74, 0.08)', 
+                padding: '4px 10px', 
+                borderRadius: '8px',
+                border: '1px solid rgba(40, 43, 74, 0.12)'
+              }}>
+                Live DB Aggregation
+              </span>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.1fr', gap: '20px' }}>
-              {/* Pie Chart */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.15fr', gap: '22px', marginBottom: '22px' }}>
+              {/* Pie / Donut Chart */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ width: '110px', height: '110px', position: 'relative', flexShrink: 0 }}>
+                <div style={{ width: '115px', height: '115px', position: 'relative', flexShrink: 0 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={pieData} innerRadius={35} outerRadius={52} paddingAngle={3} dataKey="value" stroke="none">
+                      <Pie data={pieData} innerRadius={36} outerRadius={54} paddingAngle={3} dataKey="value" stroke="none">
                         {pieData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
                     </PieChart>
                   </ResponsiveContainer>
-                  <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                    <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#111827' }}>{totalPiePlaced}</div>
-                    <div style={{ fontSize: '9px', color: '#6b7280' }}>Industries</div>
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+                    <div style={{ fontSize: '18px', fontWeight: 800, color: '#282B4A', lineHeight: 1 }}>{dashboardData?.statistics?.total_drives_analyzed || totalPiePlaced}</div>
+                    <div style={{ fontSize: '10px', color: '#6b7280', fontWeight: 600, marginTop: '2px' }}>Drives</div>
                   </div>
                 </div>
                 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', flex: 1 }}>
                   {pieData.map((d, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#4b5563' }}>
-                        <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: d.color }}></div>
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '80px' }}>{d.name}</span>
+                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: d.color, flexShrink: 0 }}></div>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '85px', fontWeight: 500 }}>{d.name}</span>
                       </div>
-                      <div style={{ color: '#111827', fontWeight: 600 }}>{d.value}</div>
+                      <div style={{ color: '#282B4A', fontWeight: 700 }}>{d.value}</div>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Package Distribution Bar Charts */}
-              <div style={{ borderLeft: '1px solid #f3f4f6', paddingLeft: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#111827', marginBottom: '12px' }}>CTC Range Breakdown</div>
+              <div style={{ borderLeft: '1px solid rgba(40, 43, 74, 0.08)', paddingLeft: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: '#282B4A', marginBottom: '12px' }}>CTC Range Breakdown</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {packageDistribution.map((item, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{ width: '64px', fontSize: '10px', color: '#4b5563', fontWeight: 500 }}>{item.label}</div>
-                      <div style={{ flex: 1, height: '6px', background: '#f3f4f6', borderRadius: '3px', overflow: 'hidden' }}>
-                        <div style={{ width: `${item.percent}%`, height: '100%', background: item.color, borderRadius: '3px' }}></div>
+                      <div style={{ width: '68px', fontSize: '10px', color: '#52525b', fontWeight: 500 }}>{item.label}</div>
+                      <div style={{ flex: 1, height: '7px', background: 'rgba(40, 43, 74, 0.06)', borderRadius: '4px', overflow: 'hidden' }}>
+                        <div style={{ width: `${item.percent}%`, height: '100%', background: item.color, borderRadius: '4px', transition: 'width 0.4s ease' }}></div>
                       </div>
-                      <div style={{ width: '26px', fontSize: '10px', fontWeight: 700, color: '#111827', textAlign: 'right' }}>{item.percent}%</div>
+                      <div style={{ width: '30px', fontSize: '10px', fontWeight: 700, color: '#282B4A', textAlign: 'right' }}>{item.percent}%</div>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Preparation Progress */}
-          <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #f3f4f6', padding: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: 0 }}>Preparation Progress</h3>
-              <span style={{ fontSize: '12px', color: '#282B4A', fontWeight: 600 }}>82% Average Score</span>
+            {/* Real-Time Database Summary Metrics Strip */}
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(3, 1fr)', 
+              gap: '12px', 
+              paddingTop: '18px', 
+              borderTop: '1px solid rgba(40, 43, 74, 0.08)' 
+            }}>
+              <div style={{ 
+                background: 'rgba(40, 43, 74, 0.03)', 
+                border: '1px solid rgba(40, 43, 74, 0.08)', 
+                borderRadius: '14px', 
+                padding: '12px 14px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2px'
+              }}>
+                <div style={{ fontSize: '11px', color: '#6b7280', fontWeight: 500 }}>Students Placed</div>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: '#282B4A', letterSpacing: '-0.5px' }}>{kpis.placed_students}</div>
+                <div style={{ fontSize: '10px', color: '#71717a' }}>Verified selections in DB</div>
+              </div>
+
+              <div style={{ 
+                background: 'rgba(40, 43, 74, 0.03)', 
+                border: '1px solid rgba(40, 43, 74, 0.08)', 
+                borderRadius: '14px', 
+                padding: '12px 14px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2px'
+              }}>
+                <div style={{ fontSize: '11px', color: '#6b7280', fontWeight: 500 }}>Dream Offers</div>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: '#282B4A', letterSpacing: '-0.5px' }}>{kpis.dream_offers}</div>
+                <div style={{ fontSize: '10px', color: '#71717a' }}>Offers ≥ 10 LPA</div>
+              </div>
+
+              <div style={{ 
+                background: 'rgba(40, 43, 74, 0.03)', 
+                border: '1px solid rgba(40, 43, 74, 0.08)', 
+                borderRadius: '14px', 
+                padding: '12px 14px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2px'
+              }}>
+                <div style={{ fontSize: '11px', color: '#6b7280', fontWeight: 500 }}>Total Applications</div>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: '#282B4A', letterSpacing: '-0.5px' }}>{kpis.total_applications}</div>
+                <div style={{ fontSize: '10px', color: '#71717a' }}>Active student pool</div>
+              </div>
             </div>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
-              
-              <div style={{ padding: '14px', border: '1px solid #f3f4f6', borderRadius: '12px', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: '#f3f0ff', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Brain size={14} /></div>
-                  <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827' }}>85%</div>
-                </div>
-                <div style={{ fontSize: '11px', fontWeight: 600, color: '#4b5563' }}>Aptitude</div>
-              </div>
 
-              <div style={{ padding: '14px', border: '1px solid #f3f4f6', borderRadius: '12px', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><MonitorPlay size={14} /></div>
-                  <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827' }}>78%</div>
-                </div>
-                <div style={{ fontSize: '11px', fontWeight: 600, color: '#4b5563' }}>DSA</div>
-              </div>
-
-              <div style={{ padding: '14px', border: '1px solid #f3f4f6', borderRadius: '12px', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: '#e8f5e9', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Users size={14} /></div>
-                  <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827' }}>90%</div>
-                </div>
-                <div style={{ fontSize: '11px', fontWeight: 600, color: '#4b5563' }}>HR Prep</div>
-              </div>
-
-              <div style={{ padding: '14px', border: '1px solid #f3f4f6', borderRadius: '12px', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: '#fffbeb', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><FileText size={14} /></div>
-                  <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#111827' }}>88%</div>
-                </div>
-                <div style={{ fontSize: '11px', fontWeight: 600, color: '#4b5563' }}>Resume</div>
-              </div>
-
-            </div>
           </div>
         </div>
 
@@ -659,51 +686,122 @@ export function PlacementCell() {
         
         {/* Placement Resources */}
         <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #f3f4f6', padding: '24px' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: '0 0 20px 0' }}>Placement Resources</h3>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', margin: 0 }}>Placement Resources</h3>
+            <span style={{ fontSize: '11px', color: '#6b7280', fontWeight: 500 }}>AI & Prep Tools</span>
+          </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px', border: '1px solid #f3f4f6', borderRadius: '12px', cursor: 'pointer' }}>
+            {/* Resume Builder */}
+            <div 
+              onClick={() => window.open('https://resume.io/', '_blank', 'noopener,noreferrer')}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px', border: '1px solid #f3f4f6', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.18s ease' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#282B4A';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(40, 43, 74, 0.08)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = '#f3f4f6';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+              title="Open Resume Builder (resume.io)"
+            >
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(40, 43, 74, 0.08)', color: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><FileText size={18} /></div>
+                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(40, 43, 74, 0.08)', color: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <FileText size={18} />
+                </div>
                 <div>
                   <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827', marginBottom: '2px' }}>Resume Builder</div>
                   <div style={{ fontSize: '11px', color: '#6b7280' }}>Create & optimize ATS resume</div>
                 </div>
               </div>
-              <ChevronRight size={16} color="#9ca3af" />
+              <ArrowUpRight size={16} color="#282B4A" />
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px', border: '1px solid #f3f4f6', borderRadius: '12px', cursor: 'pointer' }}>
+            {/* Mock Interviews */}
+            <div 
+              onClick={() => window.open('https://aiapply.co/ai-job-interview', '_blank', 'noopener,noreferrer')}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px', border: '1px solid #f3f4f6', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.18s ease' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#282B4A';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(40, 43, 74, 0.08)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = '#f3f4f6';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+              title="Practice Mock Interview (aiapply.co)"
+            >
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(40, 43, 74, 0.08)', color: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><MonitorPlay size={18} /></div>
+                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(40, 43, 74, 0.08)', color: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <MonitorPlay size={18} />
+                </div>
                 <div>
                   <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827', marginBottom: '2px' }}>Mock Interviews</div>
                   <div style={{ fontSize: '11px', color: '#6b7280' }}>Practice AI tech & HR interviews</div>
                 </div>
               </div>
-              <ChevronRight size={16} color="#9ca3af" />
+              <ArrowUpRight size={16} color="#282B4A" />
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px', border: '1px solid #f3f4f6', borderRadius: '12px', cursor: 'pointer' }}>
+            {/* Aptitude Tests */}
+            <div 
+              onClick={() => window.open('https://www.tryapt.ai/ai-aptitude-test', '_blank', 'noopener,noreferrer')}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px', border: '1px solid #f3f4f6', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.18s ease' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#282B4A';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(40, 43, 74, 0.08)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = '#f3f4f6';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+              title="Practice Aptitude Tests (tryapt.ai)"
+            >
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(40, 43, 74, 0.08)', color: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Brain size={18} /></div>
+                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(40, 43, 74, 0.08)', color: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Brain size={18} />
+                </div>
                 <div>
                   <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827', marginBottom: '2px' }}>Aptitude Tests</div>
                   <div style={{ fontSize: '11px', color: '#6b7280' }}>Quant, Reasoning & Verbal</div>
                 </div>
               </div>
-              <ChevronRight size={16} color="#9ca3af" />
+              <ArrowUpRight size={16} color="#282B4A" />
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px', border: '1px solid #f3f4f6', borderRadius: '12px', cursor: 'pointer' }}>
+            {/* Company Insights */}
+            <div 
+              onClick={() => window.open('https://lightcast.io/resources/blog/company-insights', '_blank', 'noopener,noreferrer')}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px', border: '1px solid #f3f4f6', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.18s ease' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#282B4A';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(40, 43, 74, 0.08)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = '#f3f4f6';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+              title="Read Company Insights (lightcast.io)"
+            >
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(40, 43, 74, 0.08)', color: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Building2 size={18} /></div>
+                <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(40, 43, 74, 0.08)', color: '#282B4A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Building2 size={18} />
+                </div>
                 <div>
                   <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827', marginBottom: '2px' }}>Company Insights</div>
                   <div style={{ fontSize: '11px', color: '#6b7280' }}>Explore tech stacks & packages</div>
                 </div>
               </div>
-              <ChevronRight size={16} color="#9ca3af" />
+              <ArrowUpRight size={16} color="#282B4A" />
             </div>
 
           </div>
@@ -895,9 +993,9 @@ export function PlacementCell() {
                 }}
                 onMouseEnter={e => {
                   if (company.website) {
-                    e.currentTarget.style.borderColor = '#c7d2fe';
+                    e.currentTarget.style.borderColor = '#282B4A';
                     e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.05)';
+                    e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(40, 43, 74, 0.08)';
                   }
                 }}
                 onMouseLeave={e => {
@@ -912,13 +1010,13 @@ export function PlacementCell() {
                   width: '46px', 
                   height: '46px', 
                   borderRadius: '12px', 
-                  background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)', 
+                  background: 'linear-gradient(135deg, #282B4A 0%, #3D426E 100%)', 
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'center', 
                   fontSize: '18px', 
                   fontWeight: 700, 
-                  color: '#4f46e5',
+                  color: '#EEEBDA',
                   flexShrink: 0
                 }}>
                   {company.name.charAt(0)}

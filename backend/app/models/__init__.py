@@ -16,6 +16,7 @@ from app.models.assignment import Assignment, AssignmentSubmission
 from app.models.fee import FeeStructure, StudentFee, Scholarship, Discount, FineRule, Payment, Receipt, PaymentHistory
 from app.models.qr_attendance import QRSession, QRScanLog
 from app.models.event import Event
+from app.models.ai_attendance import AIAttendanceSession, AIAttendanceMatch
 
 # Export all models for Alembic and convenient imports
 __all__ = [
@@ -31,5 +32,6 @@ __all__ = [
     "AuditLog", "DashboardStat", "SystemSetting", "ImportExportHistory", "SubstituteFacultyAssignment",
     "Assignment", "AssignmentSubmission",
     "FeeStructure", "StudentFee", "Scholarship", "Discount", "FineRule", "Payment", "Receipt", "PaymentHistory",
-    "QRSession", "QRScanLog", "Event"
+    "QRSession", "QRScanLog", "Event",
+    "AIAttendanceSession", "AIAttendanceMatch"
 ]

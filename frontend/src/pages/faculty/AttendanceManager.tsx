@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { apiClient as api } from '../../api/axios';
 import {
   BookOpen, Calendar, CheckCircle2, Clock, Users, Check, XCircle,
   Search, Filter, QrCode, Save, RefreshCw, AlertTriangle, Lock,
-  User as UserIcon, ChevronDown,
+  User as UserIcon, ChevronDown, Sparkles
 } from 'lucide-react';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -402,6 +403,7 @@ function QRModal({
 
 /* ─── Main Component ─────────────────────────────────────────── */
 export const AttendanceManager: React.FC = () => {
+  const navigate = useNavigate();
   const { isMobile } = useIsMobile();
   const { user } = useAuthStore();
 
@@ -652,6 +654,28 @@ export const AttendanceManager: React.FC = () => {
             Mark class attendance per lecture slot • All students default to Absent
           </div>
         </div>
+
+        <button
+          onClick={() => navigate('/faculty/attendance/ai')}
+          style={{
+            background: '#282B4A',
+            color: '#EEEBDA',
+            padding: '10px 20px',
+            borderRadius: '14px',
+            fontSize: '13px',
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            border: 'none',
+            cursor: 'pointer',
+            boxShadow: '0 4px 14px rgba(40, 43, 74, 0.25)',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          <Sparkles size={16} color="#EEEBDA" />
+          AI Attendance from Sheet/Image
+        </button>
       </div>
 
       {/* ── KPI Row ── */}

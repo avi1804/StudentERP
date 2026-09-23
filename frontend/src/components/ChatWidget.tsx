@@ -10,78 +10,96 @@ import { API_BASE_URL } from '../config';
 import { useAuthStore } from '../store/authStore';
 import AttendanceWidget from './AttendanceWidget';
 
-export const RobotIcon: React.FC<{ className?: string; size?: number }> = ({ className = "w-full h-full", size }) => (
-  <svg
-    viewBox="0 0 100 100"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className={className}
-    style={size ? { width: size, height: size } : undefined}
-  >
-    <defs>
-      {/* Head & Body Gradient */}
-      <linearGradient id="robotBodyGrad" x1="50" y1="12" x2="50" y2="88" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stopColor="#38BDF8" />
-        <stop offset="100%" stopColor="#0284C7" />
-      </linearGradient>
-      {/* Antenna Ball Gradient */}
-      <radialGradient id="robotBallGrad" cx="38%" cy="32%" r="68%">
-        <stop offset="0%" stopColor="#BAE6FD" />
-        <stop offset="55%" stopColor="#0EA5E9" />
-        <stop offset="100%" stopColor="#0369A1" />
-      </radialGradient>
-      {/* Ear Left Gradient */}
-      <linearGradient id="robotEarLeftGrad" x1="10" y1="42" x2="19" y2="68" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stopColor="#38BDF8" />
-        <stop offset="100%" stopColor="#0369A1" />
-      </linearGradient>
-      {/* Ear Right Gradient */}
-      <linearGradient id="robotEarRightGrad" x1="81" y1="42" x2="90" y2="68" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stopColor="#38BDF8" />
-        <stop offset="100%" stopColor="#0369A1" />
-      </linearGradient>
-      {/* Face Screen Gradient */}
-      <linearGradient id="robotScreenGrad" x1="50" y1="33" x2="50" y2="75" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stopColor="#252F3F" />
-        <stop offset="100%" stopColor="#111827" />
-      </linearGradient>
-    </defs>
+export const RobotIcon: React.FC<{ className?: string; size?: number; theme?: 'cream' | 'indigo' }> = ({
+  className = "w-full h-full",
+  size,
+  theme = "cream"
+}) => {
+  const isCream = theme === 'cream';
 
-    {/* Antenna Stem */}
-    <rect x="47" y="19" width="6" height="9" rx="3" fill="#0284C7" />
-    
-    {/* Antenna Ball */}
-    <circle cx="50" cy="14.5" r="7.5" fill="url(#robotBallGrad)" />
-
-    {/* Left Ear */}
-    <rect x="10" y="42" width="9" height="26" rx="4.5" fill="url(#robotEarLeftGrad)" />
-    
-    {/* Right Ear */}
-    <rect x="81" y="42" width="9" height="26" rx="4.5" fill="url(#robotEarRightGrad)" />
-
-    {/* Main Head Body */}
-    <rect x="16" y="24" width="68" height="60" rx="22" fill="url(#robotBodyGrad)" />
-    
-    {/* Head Top Subtle Highlight */}
-    <path d="M 28 27 Q 50 24 72 27" stroke="#BAE6FD" strokeWidth="2.2" strokeLinecap="round" opacity="0.65" />
-
-    {/* Dark Inner Screen */}
-    <rect x="23.5" y="33" width="53" height="42" rx="14" fill="url(#robotScreenGrad)" />
-
-    {/* Eyes */}
-    <ellipse cx="38" cy="50" rx="4.5" ry="5.5" fill="#FFFFFF" />
-    <ellipse cx="62" cy="50" rx="4.5" ry="5.5" fill="#FFFFFF" />
-
-    {/* Smile */}
-    <path
-      d="M 43 61.5 Q 50 67.5 57 61.5"
-      stroke="#FFFFFF"
-      strokeWidth="3.2"
-      strokeLinecap="round"
+  return (
+    <svg
+      viewBox="0 0 100 100"
       fill="none"
-    />
-  </svg>
-);
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      style={size ? { width: size, height: size } : undefined}
+    >
+      <defs>
+        {/* Head & Body Gradient */}
+        <linearGradient id={`robotBodyGrad_${theme}`} x1="50" y1="12" x2="50" y2="88" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor={isCream ? "#FAF8F5" : "#3D426E"} />
+          <stop offset="100%" stopColor={isCream ? "#EEEBDA" : "#282B4A"} />
+        </linearGradient>
+
+        {/* Antenna Ball Gradient */}
+        <radialGradient id={`robotBallGrad_${theme}`} cx="38%" cy="32%" r="68%">
+          <stop offset="0%" stopColor={isCream ? "#FFFFFF" : "#4E548B"} />
+          <stop offset="60%" stopColor={isCream ? "#EEEBDA" : "#282B4A"} />
+          <stop offset="100%" stopColor={isCream ? "#DCD7C2" : "#1B1D33"} />
+        </radialGradient>
+
+        {/* Ear Left Gradient */}
+        <linearGradient id={`robotEarLeftGrad_${theme}`} x1="10" y1="42" x2="19" y2="68" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor={isCream ? "#FAF8F5" : "#3D426E"} />
+          <stop offset="100%" stopColor={isCream ? "#DDD8C4" : "#1B1D33"} />
+        </linearGradient>
+
+        {/* Ear Right Gradient */}
+        <linearGradient id={`robotEarRightGrad_${theme}`} x1="81" y1="42" x2="90" y2="68" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor={isCream ? "#FAF8F5" : "#3D426E"} />
+          <stop offset="100%" stopColor={isCream ? "#DDD8C4" : "#1B1D33"} />
+        </linearGradient>
+
+        {/* Face Screen Gradient */}
+        <linearGradient id={`robotScreenGrad_${theme}`} x1="50" y1="33" x2="50" y2="75" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor={isCream ? "#282B4A" : "#151726"} />
+          <stop offset="100%" stopColor={isCream ? "#181A2D" : "#0E0F1A"} />
+        </linearGradient>
+      </defs>
+
+      {/* Antenna Stem */}
+      <rect x="47" y="19" width="6" height="9" rx="3" fill={isCream ? "#DDD8C4" : "#282B4A"} />
+
+      {/* Antenna Ball */}
+      <circle cx="50" cy="14.5" r="7.5" fill={`url(#robotBallGrad_${theme})`} />
+
+      {/* Left Ear */}
+      <rect x="10" y="42" width="9" height="26" rx="4.5" fill={`url(#robotEarLeftGrad_${theme})`} />
+
+      {/* Right Ear */}
+      <rect x="81" y="42" width="9" height="26" rx="4.5" fill={`url(#robotEarRightGrad_${theme})`} />
+
+      {/* Main Head Body */}
+      <rect x="16" y="24" width="68" height="60" rx="22" fill={`url(#robotBodyGrad_${theme})`} />
+
+      {/* Head Top Subtle Highlight */}
+      <path
+        d="M 28 27 Q 50 24 72 27"
+        stroke={isCream ? "#FFFFFF" : "rgba(238, 235, 218, 0.4)"}
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        opacity="0.8"
+      />
+
+      {/* Inner Screen */}
+      <rect x="23.5" y="33" width="53" height="42" rx="14" fill={`url(#robotScreenGrad_${theme})`} />
+
+      {/* Eyes */}
+      <ellipse cx="38" cy="50" rx="4.5" ry="5.5" fill={isCream ? "#EEEBDA" : "#FFFFFF"} />
+      <ellipse cx="62" cy="50" rx="4.5" ry="5.5" fill={isCream ? "#EEEBDA" : "#FFFFFF"} />
+
+      {/* Smile */}
+      <path
+        d="M 43 61.5 Q 50 67.5 57 61.5"
+        stroke={isCream ? "#EEEBDA" : "#FFFFFF"}
+        strokeWidth="3.2"
+        strokeLinecap="round"
+        fill="none"
+      />
+    </svg>
+  );
+};
 
 interface Message {
   id: string;
@@ -413,9 +431,9 @@ const ChatWidget: React.FC = () => {
               height: isMaximized ? 'calc(100vh - 48px)' : '700px',
               maxHeight: isMaximized ? 'calc(100vh - 48px)' : '85vh',
               borderRadius: isMaximized ? '20px' : '28px',
-              background: 'linear-gradient(180deg, #EDE9FE 0%, #F5F3FF 40%, #FFFFFF 100%)',
-              boxShadow: '0 30px 70px rgba(88, 28, 235, 0.18), 0 10px 28px rgba(0, 0, 0, 0.08)',
-              border: '1px solid rgba(139, 92, 246, 0.12)'
+              background: 'linear-gradient(180deg, #F4F1E6 0%, #FAF8F2 35%, #FFFFFF 100%)',
+              boxShadow: '0 24px 70px rgba(40, 43, 74, 0.22), 0 8px 24px rgba(0, 0, 0, 0.08)',
+              border: '1.5px solid rgba(40, 43, 74, 0.14)'
             }}
           >
             {/* ========== HEADER ========== */}
@@ -424,10 +442,10 @@ const ChatWidget: React.FC = () => {
               style={{
                 height: '84px',
                 padding: '0 20px',
-                background: 'rgba(255, 255, 255, 0.55)',
+                background: 'rgba(255, 255, 255, 0.75)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
-                borderBottom: '1px solid rgba(139, 92, 246, 0.12)'
+                borderBottom: '1px solid rgba(40, 43, 74, 0.10)'
               }}
             >
               <div className="flex items-center gap-3">
@@ -438,11 +456,12 @@ const ChatWidget: React.FC = () => {
                       width: '52px',
                       height: '52px',
                       borderRadius: '18px',
-                      background: 'linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)',
-                      boxShadow: '0 6px 16px rgba(2, 132, 199, 0.35)'
+                      background: 'linear-gradient(135deg, #282B4A 0%, #1B1D33 100%)',
+                      border: '1.5px solid rgba(238, 235, 218, 0.35)',
+                      boxShadow: '0 6px 16px rgba(40, 43, 74, 0.28)'
                     }}
                   >
-                    <RobotIcon className="w-full h-full" />
+                    <RobotIcon theme="cream" className="w-full h-full" />
                   </div>
                   <div
                     className="absolute"
@@ -452,7 +471,7 @@ const ChatWidget: React.FC = () => {
                       width: '14px',
                       height: '14px',
                       backgroundColor: '#22c55e',
-                      border: '3px solid #F5F3FF',
+                      border: '3px solid #F4F1E6',
                       borderRadius: '50%'
                     }}
                   />
@@ -460,7 +479,7 @@ const ChatWidget: React.FC = () => {
                 <div>
                   <div className="flex items-center gap-2">
                     <h3
-                      className="font-extrabold text-slate-900"
+                      className="font-extrabold text-[#282B4A]"
                       style={{
                         fontSize: '18px',
                         lineHeight: '1.2',
@@ -473,8 +492,8 @@ const ChatWidget: React.FC = () => {
                       className="font-bold px-2 py-0.5 rounded-full"
                       style={{
                         fontSize: '10px',
-                        backgroundColor: 'rgba(40,43,74,0.08)',
-                        color: '#282B4A',
+                        backgroundColor: '#282B4A',
+                        color: '#EEEBDA',
                         letterSpacing: '0.02em'
                       }}
                     >
@@ -496,7 +515,7 @@ const ChatWidget: React.FC = () => {
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={handleClearHistory}
-                  className="flex items-center justify-center text-slate-500 hover:text-purple-700 hover:bg-white/70 transition-all rounded-full"
+                  className="flex items-center justify-center text-slate-500 hover:text-[#282B4A] hover:bg-[rgba(40,43,74,0.06)] transition-all rounded-full"
                   style={{ width: '38px', height: '38px' }}
                   title="History"
                 >
@@ -504,7 +523,7 @@ const ChatWidget: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setIsMaximized(!isMaximized)}
-                  className="flex items-center justify-center text-slate-500 hover:text-purple-700 hover:bg-white/70 transition-all rounded-full"
+                  className="flex items-center justify-center text-slate-500 hover:text-[#282B4A] hover:bg-[rgba(40,43,74,0.06)] transition-all rounded-full"
                   style={{ width: '38px', height: '38px' }}
                   title={isMaximized ? "Minimize" : "Maximize"}
                 >
@@ -512,7 +531,7 @@ const ChatWidget: React.FC = () => {
                 </button>
                 <button
                   onClick={() => alert("Settings coming soon!")}
-                  className="flex items-center justify-center text-slate-500 hover:text-purple-700 hover:bg-white/70 transition-all rounded-full"
+                  className="flex items-center justify-center text-slate-500 hover:text-[#282B4A] hover:bg-[rgba(40,43,74,0.06)] transition-all rounded-full"
                   style={{ width: '38px', height: '38px' }}
                   title="Settings"
                 >
@@ -520,7 +539,7 @@ const ChatWidget: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center text-slate-500 hover:text-red-500 hover:bg-white/70 transition-all rounded-full ml-0.5"
+                  className="flex items-center justify-center text-slate-500 hover:text-red-500 hover:bg-[rgba(40,43,74,0.06)] transition-all rounded-full ml-0.5"
                   style={{ width: '38px', height: '38px' }}
                   title="Close"
                 >
@@ -537,7 +556,7 @@ const ChatWidget: React.FC = () => {
               {hasMessages && (
                 <div className="flex justify-center mb-5">
                   <span
-                    className="px-4 py-1.5 bg-white/80 backdrop-blur-sm rounded-full text-slate-500 font-semibold border border-purple-100"
+                    className="px-4 py-1.5 bg-white/90 backdrop-blur-sm rounded-full text-[#52556E] font-semibold border border-[rgba(40,43,74,0.1)] shadow-sm"
                     style={{ fontSize: '11.5px' }}
                   >
                     Today
@@ -568,11 +587,12 @@ const ChatWidget: React.FC = () => {
                                 width: '38px',
                                 height: '38px',
                                 borderRadius: '13px',
-                                background: 'linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)',
-                                boxShadow: '0 3px 10px rgba(2, 132, 199, 0.3)'
+                                background: 'linear-gradient(135deg, #282B4A 0%, #1B1D33 100%)',
+                                border: '1px solid rgba(238, 235, 218, 0.3)',
+                                boxShadow: '0 3px 10px rgba(40, 43, 74, 0.25)'
                               }}
                             >
-                              <RobotIcon className="w-full h-full" />
+                              <RobotIcon theme="cream" className="w-full h-full" />
                             </div>
                             <div
                               className="absolute"
@@ -582,7 +602,7 @@ const ChatWidget: React.FC = () => {
                                 width: '10px',
                                 height: '10px',
                                 backgroundColor: '#22c55e',
-                                border: '2px solid #F5F3FF',
+                                border: '2px solid #FAF8F2',
                                 borderRadius: '50%'
                               }}
                             />
@@ -606,15 +626,15 @@ const ChatWidget: React.FC = () => {
                                   : 'linear-gradient(135deg, #282B4A 0%, #1B1D33 100%)',
                                 color: msg.isBot ? undefined : '#EEEBDA',
                                 boxShadow: msg.isBot
-                                  ? '0 2px 10px rgba(40, 43, 74, 0.08)'
+                                  ? '0 2px 10px rgba(40, 43, 74, 0.06)'
                                   : '0 4px 14px rgba(40, 43, 74, 0.25)',
-                                border: msg.isBot ? '1px solid rgba(40, 43, 74, 0.08)' : 'none',
+                                border: msg.isBot ? '1px solid rgba(40, 43, 74, 0.09)' : '1px solid rgba(238, 235, 218, 0.15)',
                                 wordBreak: 'break-word'
                               }}
                             >
                               {msg.isBot ? renderStructuredMessage(msg.text) : msg.text}
                               <div
-                                className={`flex items-center gap-1 mt-1.5 ${msg.isBot ? 'text-slate-400' : 'text-purple-200 justify-end'
+                                className={`flex items-center gap-1 mt-1.5 ${msg.isBot ? 'text-slate-400' : 'text-[#EEEBDA]/75 justify-end'
                                   }`}
                                 style={{
                                   fontSize: '10.5px',
@@ -646,12 +666,12 @@ const ChatWidget: React.FC = () => {
                           {msg.isBot && (
                             <div className="flex items-center gap-1 pl-1">
                               <div
-                                className="flex items-center gap-0.5 bg-white/90 backdrop-blur-sm rounded-lg border border-purple-100 p-0.5"
-                                style={{ boxShadow: '0 2px 6px rgba(88, 28, 135, 0.06)' }}
+                                className="flex items-center gap-0.5 bg-white/95 backdrop-blur-sm rounded-lg border border-[rgba(40,43,74,0.12)] p-0.5"
+                                style={{ boxShadow: '0 2px 6px rgba(40, 43, 74, 0.05)' }}
                               >
                                 <button
                                   onClick={() => handleCopyMessage(msg.id, msg.text)}
-                                  className="flex items-center justify-center text-slate-500 hover:text-purple-700 hover:bg-purple-50 transition-all rounded-md"
+                                  className="flex items-center justify-center text-slate-500 hover:text-[#282B4A] hover:bg-[rgba(40,43,74,0.06)] transition-all rounded-md"
                                   style={{ width: '26px', height: '26px' }}
                                   title="Copy"
                                 >
@@ -663,7 +683,7 @@ const ChatWidget: React.FC = () => {
                                 </button>
                                 <button
                                   onClick={() => handleRegenerateMessage(msg.id)}
-                                  className="flex items-center justify-center text-slate-500 hover:text-purple-700 hover:bg-purple-50 transition-all rounded-md"
+                                  className="flex items-center justify-center text-slate-500 hover:text-[#282B4A] hover:bg-[rgba(40,43,74,0.06)] transition-all rounded-md"
                                   style={{ width: '26px', height: '26px' }}
                                   title="Regenerate"
                                 >
@@ -712,11 +732,12 @@ const ChatWidget: React.FC = () => {
                           width: '38px',
                           height: '38px',
                           borderRadius: '13px',
-                          background: 'linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)',
-                          boxShadow: '0 3px 10px rgba(2, 132, 199, 0.3)'
+                          background: 'linear-gradient(135deg, #282B4A 0%, #1B1D33 100%)',
+                          border: '1px solid rgba(238, 235, 218, 0.3)',
+                          boxShadow: '0 3px 10px rgba(40, 43, 74, 0.25)'
                         }}
                       >
-                        <RobotIcon className="w-full h-full" />
+                        <RobotIcon theme="cream" className="w-full h-full" />
                       </div>
                       <div
                         className="absolute"
@@ -726,7 +747,7 @@ const ChatWidget: React.FC = () => {
                           width: '10px',
                           height: '10px',
                           backgroundColor: '#22c55e',
-                          border: '2px solid #F5F3FF',
+                          border: '2px solid #FAF8F2',
                           borderRadius: '50%'
                         }}
                       />
@@ -736,21 +757,21 @@ const ChatWidget: React.FC = () => {
                       style={{
                         padding: '14px 20px',
                         borderRadius: '18px 18px 18px 4px',
-                        boxShadow: '0 2px 10px rgba(88, 28, 135, 0.08)',
-                        border: '1px solid rgba(139, 92, 246, 0.08)'
+                        boxShadow: '0 2px 10px rgba(40, 43, 74, 0.06)',
+                        border: '1px solid rgba(40, 43, 74, 0.09)'
                       }}
                     >
                       <div className="flex gap-1.5">
                         <div
-                          className="w-2 h-2 rounded-full bg-purple-400 animate-bounce"
+                          className="w-2 h-2 rounded-full bg-[#282B4A] animate-bounce"
                           style={{ animationDelay: '0ms', animationDuration: '1s' }}
                         />
                         <div
-                          className="w-2 h-2 rounded-full bg-purple-400 animate-bounce"
+                          className="w-2 h-2 rounded-full bg-[#282B4A] animate-bounce"
                           style={{ animationDelay: '150ms', animationDuration: '1s' }}
                         />
                         <div
-                          className="w-2 h-2 rounded-full bg-purple-400 animate-bounce"
+                          className="w-2 h-2 rounded-full bg-[#282B4A] animate-bounce"
                           style={{ animationDelay: '300ms', animationDuration: '1s' }}
                         />
                       </div>
@@ -766,19 +787,19 @@ const ChatWidget: React.FC = () => {
               className="flex-shrink-0"
               style={{
                 padding: '14px 20px 0 20px',
-                borderTop: '1px solid rgba(139, 92, 246, 0.10)'
+                borderTop: '1px solid rgba(40, 43, 74, 0.09)'
               }}
             >
               <div className="flex items-center justify-between mb-2.5">
                 <span
-                  className="font-bold text-slate-700"
+                  className="font-bold text-[#282B4A]"
                   style={{ fontSize: '12.5px' }}
                 >
                   Suggested for you
                 </span>
                 <button
                   onClick={() => setMessages(prev => [...prev])}
-                  className="flex items-center gap-1 text-purple-600 hover:text-purple-800 font-semibold transition-colors"
+                  className="flex items-center gap-1 text-[#282B4A] hover:opacity-75 font-semibold transition-colors"
                   style={{ fontSize: '12px' }}
                   title="Refresh suggestions"
                 >
@@ -792,12 +813,12 @@ const ChatWidget: React.FC = () => {
                     key={idx}
                     onClick={() => handleSend(prompt)}
                     disabled={isLoading}
-                    className="bg-white hover:bg-purple-50 text-slate-700 hover:text-purple-800 font-semibold border border-purple-100 hover:border-purple-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-white hover:bg-[#FAF8F5] text-[#282B4A] font-semibold border border-[rgba(40,43,74,0.12)] hover:border-[#282B4A] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
                       fontSize: '12.5px',
                       padding: '9px 14px',
                       borderRadius: '999px',
-                      boxShadow: '0 1px 4px rgba(88, 28, 135, 0.05)'
+                      boxShadow: '0 1px 4px rgba(40, 43, 74, 0.04)'
                     }}
                   >
                     {prompt}
@@ -815,10 +836,10 @@ const ChatWidget: React.FC = () => {
               }}
             >
               <div
-                className="relative bg-white border border-purple-100 focus-within:border-purple-300 transition-all"
+                className="relative bg-white border border-[rgba(40,43,74,0.16)] focus-within:border-[#282B4A] focus-within:ring-2 focus-within:ring-[rgba(40,43,74,0.08)] transition-all"
                 style={{
                   borderRadius: '22px',
-                  boxShadow: '0 4px 16px rgba(88, 28, 135, 0.08)'
+                  boxShadow: '0 4px 16px rgba(40, 43, 74, 0.06)'
                 }}
               >
                 <textarea
@@ -852,7 +873,7 @@ const ChatWidget: React.FC = () => {
                     />
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="flex items-center justify-center text-slate-400 hover:text-purple-700 hover:bg-purple-50 transition-all rounded-full"
+                      className="flex items-center justify-center text-slate-400 hover:text-[#282B4A] hover:bg-[rgba(40,43,74,0.06)] transition-all rounded-full"
                       style={{ width: '34px', height: '34px' }}
                       title="Attach file"
                     >
@@ -860,14 +881,14 @@ const ChatWidget: React.FC = () => {
                     </button>
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="flex items-center justify-center text-slate-400 hover:text-purple-700 hover:bg-purple-50 transition-all rounded-full"
+                      className="flex items-center justify-center text-slate-400 hover:text-[#282B4A] hover:bg-[rgba(40,43,74,0.06)] transition-all rounded-full"
                       style={{ width: '34px', height: '34px' }}
                       title="Paperclip"
                     >
                       <Paperclip size={16} strokeWidth={2} />
                     </button>
                     <button
-                      className="flex items-center justify-center text-purple-500 hover:text-purple-700 bg-purple-50 hover:bg-purple-100 transition-all rounded-full"
+                      className="flex items-center justify-center text-[#282B4A] hover:text-[#1B1D33] bg-[rgba(40,43,74,0.08)] hover:bg-[rgba(40,43,74,0.14)] border border-[rgba(40,43,74,0.15)] transition-all rounded-full"
                       style={{ width: '34px', height: '34px' }}
                       title="AI features"
                     >
@@ -877,7 +898,7 @@ const ChatWidget: React.FC = () => {
                   <div className="flex items-center gap-1.5">
                     <button
                       onClick={handleMicClick}
-                      className={`flex items-center justify-center border transition-all rounded-full ${isRecording ? 'text-red-500 bg-red-50 border-red-200 animate-pulse' : 'text-slate-500 border-slate-200 hover:text-purple-700 hover:bg-purple-50'}`}
+                      className={`flex items-center justify-center border transition-all rounded-full ${isRecording ? 'text-red-500 bg-red-50 border-red-200 animate-pulse' : 'text-slate-500 border-slate-200 hover:text-[#282B4A] hover:bg-[rgba(40,43,74,0.06)]'}`}
                       style={{ width: '38px', height: '38px' }}
                       title="Voice input"
                     >
@@ -886,14 +907,15 @@ const ChatWidget: React.FC = () => {
                     <button
                       onClick={() => handleSend()}
                       disabled={!inputValue.trim() || isLoading}
-                      className="flex items-center justify-center text-white transition-all rounded-full disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="flex items-center justify-center transition-all rounded-full disabled:opacity-40 disabled:cursor-not-allowed"
                       style={{
                         width: '42px',
                         height: '42px',
                         background: 'linear-gradient(135deg, #282B4A 0%, #1B1D33 100%)',
                         color: '#EEEBDA',
+                        border: '1px solid rgba(238, 235, 218, 0.25)',
                         boxShadow: inputValue.trim() && !isLoading
-                          ? '0 4px 14px rgba(40, 43, 74, 0.25)'
+                          ? '0 4px 14px rgba(40, 43, 74, 0.35)'
                           : 'none'
                       }}
                       title="Send message"
@@ -912,7 +934,7 @@ const ChatWidget: React.FC = () => {
                 style={{ fontSize: '10.5px' }}
               >
                 <div className="flex items-center gap-1.5">
-                  <Sparkles size={11} className="text-purple-500" fill="currentColor" />
+                  <Sparkles size={11} className="text-[#282B4A]" fill="currentColor" />
                   <span className="text-slate-500">Powered by Puter AI</span>
                 </div>
                 <span>AI can make mistakes. Verify important information.</span>
@@ -931,17 +953,18 @@ const ChatWidget: React.FC = () => {
           style={{
             width: '64px',
             height: '64px',
-            background: 'linear-gradient(135deg, #38BDF8 0%, #0284C7 60%, #0369A1 100%)',
-            boxShadow: '0 10px 25px -3px rgba(2, 132, 199, 0.45), 0 4px 10px -2px rgba(0, 0, 0, 0.1)',
-            border: '2.5px solid rgba(255, 255, 255, 0.9)',
+            background: 'linear-gradient(135deg, #282B4A 0%, #1E2138 60%, #121424 100%)',
+            boxShadow: '0 12px 28px -3px rgba(40, 43, 74, 0.45), 0 4px 12px -2px rgba(0, 0, 0, 0.15)',
+            border: '2.5px solid #EEEBDA',
             padding: '8px'
           }}
           title="ERP AI Assistant"
         >
-          <RobotIcon className="w-full h-full drop-shadow-sm select-none pointer-events-none" />
+          <RobotIcon theme="cream" className="w-full h-full drop-shadow-sm select-none pointer-events-none" />
           <span
-            className="absolute top-0 right-0 w-3.5 h-3.5 bg-emerald-400 border-2 border-white rounded-full"
+            className="absolute top-0 right-0 w-3.5 h-3.5 bg-emerald-400 rounded-full"
             style={{
+              border: '2px solid #282B4A',
               boxShadow: '0 0 6px rgba(34, 197, 94, 0.6)'
             }}
           />

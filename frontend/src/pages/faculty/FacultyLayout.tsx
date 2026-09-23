@@ -2,7 +2,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { 
   LayoutGrid, CheckSquare, FileText, BookOpen, BarChart2,
   Search, Bell, User, Users, BookMarked, UserCheck, Megaphone, Calendar,
-  ChevronUp, ChevronDown, LogOut, GraduationCap, Shield, ClipboardList
+  ChevronUp, ChevronDown, LogOut, GraduationCap, Shield, ClipboardList, Sparkles
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useIsMobile } from "../../hooks/useIsMobile";
@@ -30,6 +30,7 @@ export function FacultySidebar() {
       items: [
         { to: "/faculty/dashboard", label: "Dashboard", icon: LayoutGrid, end: true },
         { to: "/faculty/attendance", label: "Attendance", icon: CheckSquare },
+        { to: "/faculty/attendance/ai", label: "AI Attendance", icon: Sparkles },
         { to: "/faculty/attendance-report", label: "Attendance Reports", icon: FileText },
         { to: "/faculty/assignments", label: "Assignments", icon: ClipboardList },
         { to: "/faculty/marks", label: "Enter Marks", icon: BookOpen },

@@ -1,22 +1,22 @@
 from typing import Optional
 from sqlalchemy import select
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.crud.base import CRUDBase
-from app.models.user import User
+from app.models.user import User, Role
 from app.schemas.user import UserCreate, UserUpdate
 from app.core.security import get_password_hash
 
 class UserRepository(CRUDBase[User, UserCreate, UserUpdate]):
     async def get(self, db: AsyncSession, id: int) -> Optional[User]:
         result = await db.execute(
-            select(User).options(joinedload(User.role)).where(User.id == id)
+            select(User).options(joinedload(User.role).selectinload(Role.permissions)).where(User.id == id)
         )
         return result.scalars().first()
 
     async def get_by_email(self, db: AsyncSession, *, email: str) -> Optional[User]:
         result = await db.execute(
-            select(User).options(joinedload(User.role)).where(User.email == email)
+            select(User).options(joinedload(User.role).selectinload(Role.permissions)).where(User.email == email)
         )
         return result.scalars().first()
 

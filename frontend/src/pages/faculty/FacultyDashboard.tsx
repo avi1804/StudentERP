@@ -3,7 +3,7 @@ import { apiClient as api } from '../../api/axios';
 import { 
   BookOpen, Users, ClipboardCheck, FileCheck, ArrowUpRight, GraduationCap,
   CheckSquare, Edit3, ClipboardList, BarChart2, Clock, MapPin, CheckCircle2,
-  AlertCircle, ArrowRight, X, Calendar, Activity, Megaphone, Bell
+  AlertCircle, ArrowRight, X, Calendar, Activity, Megaphone, Bell, Sparkles
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import TextType from "../../components/TextType";
@@ -145,6 +145,28 @@ export const FacultyDashboard: React.FC = () => {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            onClick={() => navigate('/faculty/attendance/ai')}
+            style={{
+              background: '#282B4A',
+              color: '#EEEBDA',
+              padding: '8px 18px',
+              borderRadius: '14px',
+              fontSize: '13px',
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 14px rgba(40, 43, 74, 0.25)',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <Sparkles size={16} color="#EEEBDA" />
+            AI Attendance
+          </button>
+
           <div style={{
             background: 'rgba(40, 43, 74, 0.08)',
             color: '#282B4A',

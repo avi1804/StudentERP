@@ -730,10 +730,43 @@ async def is_attendance_submitted(
     current_user: User = Depends(RequireRole(["faculty", "admin"]))
 ) -> Any:
     """Check if attendance for this lecture has already been submitted/locked."""
+    # Primary check: exact lecture_id match
     existing = await db.scalar(
         select(Attendance).where(Attendance.lecture_id == lecture_id)
     )
-    return {"submitted": existing is not None}
+    if existing:
+        return {"submitted": True}
+
+    # Fallback: parse inst_{date}_{entry_id} format and check date + subject
+    import re as _re
+    m = _re.match(r"^inst_(\d{4}-\d{2}-\d{2})_(.+)$", lecture_id)
+    if m:
+        slot_date_str = m.group(1)
+        entry_id = m.group(2)
+        # Resolve subject_id from the timetable entry_id
+        ENTRY_TO_SUBJECT = {
+            "tt_mon_1": 1, "tt_mon_2": 2, "tt_mon_3": 3, "tt_mon_4": 4, "tt_mon_5": 5, "tt_mon_6": 1,
+            "tt_tue_1": 2, "tt_tue_2": 3, "tt_tue_3": 5, "tt_tue_4": 1, "tt_tue_5": 4, "tt_tue_6": 2,
+            "tt_wed_1": 4, "tt_wed_2": 5, "tt_wed_3": 1, "tt_wed_4": 2, "tt_wed_5": 3, "tt_wed_6": 3,
+            "tt_thu_1": 3, "tt_thu_2": 1, "tt_thu_3": 2, "tt_thu_4": 5, "tt_thu_5": 4, "tt_thu_6": 4,
+            "tt_fri_1": 5, "tt_fri_2": 4, "tt_fri_3": 1, "tt_fri_4": 3, "tt_fri_5": 2, "tt_fri_6": 5,
+        }
+        subject_id = ENTRY_TO_SUBJECT.get(entry_id)
+        if subject_id:
+            try:
+                slot_date = datetime.strptime(slot_date_str, "%Y-%m-%d").date()
+                fallback = await db.scalar(
+                    select(Attendance).where(
+                        Attendance.subject_id == subject_id,
+                        Attendance.date == slot_date
+                    )
+                )
+                if fallback:
+                    return {"submitted": True}
+            except (ValueError, Exception):
+                pass
+
+    return {"submitted": False}
 
 
 @router.get("/attendance/lecture/{lecture_id}")
@@ -743,9 +776,37 @@ async def get_lecture_attendance(
     current_user: User = Depends(RequireRole(["faculty", "admin"]))
 ) -> Any:
     """Fetch attendance records for a specific locked lecture."""
-    records = await db.scalars(
+    records = (await db.scalars(
         select(Attendance).where(Attendance.lecture_id == lecture_id)
-    )
+    )).all()
+
+    # Fallback: if no records for this exact lecture_id, try date+subject
+    if not records:
+        import re as _re
+        m = _re.match(r"^inst_(\d{4}-\d{2}-\d{2})_(.+)$", lecture_id)
+        if m:
+            slot_date_str = m.group(1)
+            entry_id = m.group(2)
+            ENTRY_TO_SUBJECT = {
+                "tt_mon_1": 1, "tt_mon_2": 2, "tt_mon_3": 3, "tt_mon_4": 4, "tt_mon_5": 5, "tt_mon_6": 1,
+                "tt_tue_1": 2, "tt_tue_2": 3, "tt_tue_3": 5, "tt_tue_4": 1, "tt_tue_5": 4, "tt_tue_6": 2,
+                "tt_wed_1": 4, "tt_wed_2": 5, "tt_wed_3": 1, "tt_wed_4": 2, "tt_wed_5": 3, "tt_wed_6": 3,
+                "tt_thu_1": 3, "tt_thu_2": 1, "tt_thu_3": 2, "tt_thu_4": 5, "tt_thu_5": 4, "tt_thu_6": 4,
+                "tt_fri_1": 5, "tt_fri_2": 4, "tt_fri_3": 1, "tt_fri_4": 3, "tt_fri_5": 2, "tt_fri_6": 5,
+            }
+            subject_id = ENTRY_TO_SUBJECT.get(entry_id)
+            if subject_id:
+                try:
+                    slot_date = datetime.strptime(slot_date_str, "%Y-%m-%d").date()
+                    records = (await db.scalars(
+                        select(Attendance).where(
+                            Attendance.subject_id == subject_id,
+                            Attendance.date == slot_date
+                        )
+                    )).all()
+                except (ValueError, Exception):
+                    pass
+
     return [
         {
             "student_id": r.student_id,

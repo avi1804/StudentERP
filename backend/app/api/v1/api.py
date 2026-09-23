@@ -4,7 +4,7 @@ from app.api.v1 import (
     subjects, timetable, fees,
     assignments, events, notices, complaints, placements, dashboard,
     student_dashboard, faculty_dashboard, qr_attendance, substitutes,
-    chatbot
+    chatbot, ai_attendance
 )
 
 api_router = APIRouter()
@@ -27,3 +27,5 @@ api_router.include_router(fees.router, prefix="/fees", tags=["fees"])
 api_router.include_router(qr_attendance.router, prefix="/qr", tags=["qr_attendance"])
 api_router.include_router(substitutes.router, prefix="/substitutes", tags=["substitutes"])
 api_router.include_router(chatbot.router, prefix="/chatbot", tags=["chatbot"])
+api_router.include_router(ai_attendance.router, prefix="/attendance/ai", tags=["ai_attendance"])
+api_router.include_router(ai_attendance.router, prefix="/faculty/attendance/ai", tags=["ai_attendance"])
