@@ -93,14 +93,48 @@ const ChatWidgetWrapper = () => {
   return <ChatWidget />;
 };
 
+// ErrorBoundary to prevent blank screens
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error: any }> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error: any, errorInfo: any) {
+    console.error("ErrorBoundary caught:", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '32px 20px', textAlign: 'center', background: '#f8fafc', minHeight: '100vh', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box' }}>
+          <div style={{ background: '#ffffff', borderRadius: '20px', padding: '24px', maxWidth: '400px', width: '100%', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0', boxSizing: 'border-box' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#09090b', margin: '0 0 8px 0' }}>Something went wrong</h2>
+            <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 16px 0' }}>{this.state.error?.message || 'An unexpected error occurred.'}</p>
+            <button
+              onClick={() => { this.setState({ hasError: false }); window.location.reload(); }}
+              style={{ padding: '10px 20px', background: '#282B4A', color: '#ffffff', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function App() {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID_HERE";
 
   return (
     <GoogleOAuthProvider clientId={googleClientId}>
       <BrowserRouter>
-        <Suspense fallback={<LoadingSpinner />}>
-          <Routes>
+        <ErrorBoundary>
+          <Suspense fallback={<LoadingSpinner />}>
+            <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Login />} />
             <Route path="/login" element={<Navigate to="/" replace />} />
@@ -190,8 +224,9 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
-        <ChatWidgetWrapper />
-      </BrowserRouter>
+      </ErrorBoundary>
+      <ChatWidgetWrapper />
+    </BrowserRouter>
     </GoogleOAuthProvider>
   );
 }

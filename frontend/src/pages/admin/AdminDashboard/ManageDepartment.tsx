@@ -138,15 +138,15 @@ export function ManageDepartment() {
           <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <span>Manage</span>
             <span style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              color: '#ffffff',
+              background: '#282B4A',
+              color: '#EEEBDA',
               padding: '4px 18px',
               borderRadius: '14px',
-              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
               display: 'inline-flex',
               alignItems: 'center',
               lineHeight: 1.2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
             }}>
               <TextType
                 text={["Departments", "Faculties", "Branches"]}
@@ -156,7 +156,7 @@ export function ManageDepartment() {
                 loop={true}
                 showCursor={true}
                 cursorCharacter="|"
-                style={{ color: '#ffffff' }}
+                style={{ color: '#EEEBDA' }}
               />
             </span>
           </h1>
@@ -166,9 +166,9 @@ export function ManageDepartment() {
         <button
           onClick={handleOpenAdd}
           style={{
-            background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-            color: '#ffffff',
-            border: 'none',
+            background: '#282B4A',
+            color: '#EEEBDA',
+            border: '1px solid rgba(238, 235, 218, 0.2)',
             padding: '12px 22px',
             borderRadius: '16px',
             fontSize: '14px',
@@ -177,10 +177,13 @@ export function ManageDepartment() {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            boxShadow: '0 4px 16px rgba(99,102,241,0.3)',
+            boxShadow: '0 4px 14px rgba(40, 43, 74, 0.25)',
+            transition: 'all 0.2s ease',
           }}
+          onMouseEnter={e => (e.currentTarget.style.background = '#373a61')}
+          onMouseLeave={e => (e.currentTarget.style.background = '#282B4A')}
         >
-          <Plus size={18} /> Add Department
+          <Plus size={18} color="#EEEBDA" /> Add Department
         </button>
       </div>
 
@@ -245,10 +248,10 @@ export function ManageDepartment() {
               >
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-                    <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Building2 size={22} color="#6366f1" />
+                    <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: 'rgba(40, 43, 74, 0.08)', border: '1px solid rgba(40, 43, 74, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Building2 size={22} color="#282B4A" />
                     </div>
-                    <span style={{ fontSize: '12px', fontWeight: 800, color: '#6366f1', background: 'rgba(99,102,241,0.1)', padding: '4px 12px', borderRadius: '10px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 800, color: '#282B4A', background: 'rgba(40, 43, 74, 0.08)', border: '1px solid rgba(40, 43, 74, 0.12)', padding: '4px 12px', borderRadius: '10px' }}>
                       {dept.code || `ID: ${dept.id}`}
                     </span>
                   </div>
@@ -453,10 +456,14 @@ export function ManageDepartment() {
                     type="submit"
                     style={{
                       flex: 1, padding: '12px', borderRadius: '14px',
-                      border: 'none', background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-                      color: '#ffffff', fontSize: '14px', fontWeight: 700, cursor: 'pointer',
-                      boxShadow: '0 4px 14px rgba(99,102,241,0.3)'
+                      border: '1px solid rgba(238, 235, 218, 0.2)',
+                      background: '#282B4A',
+                      color: '#EEEBDA', fontSize: '14px', fontWeight: 700, cursor: 'pointer',
+                      boxShadow: '0 4px 14px rgba(40, 43, 74, 0.25)',
+                      transition: 'all 0.2s ease',
                     }}
+                    onMouseEnter={e => (e.currentTarget.style.background = '#373a61')}
+                    onMouseLeave={e => (e.currentTarget.style.background = '#282B4A')}
                   >
                     {editingDepartment ? 'Update Department' : 'Create Department'}
                   </button>

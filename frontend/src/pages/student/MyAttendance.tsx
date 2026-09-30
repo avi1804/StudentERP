@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   CheckCircle2, XCircle, ChevronDown, ChevronLeft, ChevronRight,
-  Calendar, Book, ArrowUpRight, QrCode, AlertCircle, RefreshCw
+  Calendar, Book, ArrowUpRight, QrCode, AlertCircle, RefreshCw,
+  ArrowLeft, Cloud, Cpu, FileText, Binary, Wifi
 } from 'lucide-react';
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,122 +20,465 @@ import { qrAttendanceService } from "../../services/qrAttendanceService";
 import { studentAttendanceService } from "../../services/studentAttendanceService";
 import { Html5QrcodeScanner } from 'html5-qrcode';
 
-// ── Mobile Progress Ring ──
-function ProgressRing({ percentage, size = 80, strokeWidth = 6 }: { percentage: number; size?: number; strokeWidth?: number }) {
+// Helper to get subject icon and color
+function getSubjectTheme(name: string) {
+  const lower = name.toLowerCase();
+  if (lower.includes('cloud')) return { icon: Cloud, bg: '#eff6ff', color: '#2563eb' };
+  if (lower.includes('machine') || lower.includes('ml')) return { icon: Cpu, bg: '#fff7ed', color: '#ea580c' };
+  if (lower.includes('nlp') || lower.includes('natural')) return { icon: FileText, bg: '#faf5ff', color: '#9333ea' };
+  if (lower.includes('flat') || lower.includes('automata')) return { icon: Binary, bg: '#fefce8', color: '#ca8a04' };
+  if (lower.includes('network')) return { icon: Wifi, bg: '#ecfeff', color: '#0891b2' };
+  return { icon: Book, bg: '#f1f5f9', color: '#475569' };
+}
+
+// ── Mobile Progress Ring (Screen 3 Reference) ──
+function MobileAttendanceRing({ percentage, attended, total }: { percentage: number; attended: number; total: number }) {
+  const size = 132;
+  const strokeWidth = 11;
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (percentage / 100) * circumference;
-  const color = percentage >= 75 ? '#22c55e' : percentage >= 60 ? '#f59e0b' : '#ef4444';
+  const color = '#22c55e'; // Green as in reference
 
   return (
-    <div style={{ position: 'relative', width: size, height: size }}>
-      <svg className="m-progress-ring" width={size} height={size}>
-        <circle className="m-progress-ring-track" cx={size / 2} cy={size / 2} r={radius} strokeWidth={strokeWidth} />
+    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
+      <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
         <circle
-          className="m-progress-ring-fill"
           cx={size / 2}
           cy={size / 2}
           r={radius}
+          stroke="#f1f5f9"
           strokeWidth={strokeWidth}
+          fill="none"
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
           stroke={color}
+          strokeWidth={strokeWidth}
+          fill="none"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
+          strokeLinecap="round"
+          style={{ transition: 'stroke-dashoffset 0.8s ease' }}
         />
       </svg>
-      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ fontSize: '18px', fontWeight: 700, color, letterSpacing: '-0.02em' }}>{percentage}%</span>
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
+      }}>
+        <span style={{ fontSize: '24px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.5px', lineHeight: 1.1 }}>
+          {percentage}%
+        </span>
+        <span style={{ fontSize: '11px', fontWeight: 500, color: '#64748b', marginTop: '2px' }}>
+          {attended}/{total} Classes
+        </span>
       </div>
     </div>
   );
 }
 
-// ── Mobile Attendance View ──
-function MobileAttendance({ stats, onRefresh }: {
+// ── Mobile Attendance View (Reference Screen 3) ──
+function MobileAttendance({ stats, onRefresh, onOpenScanner }: {
   stats: OverallAttendanceStats;
   onRefresh: () => void;
+  onOpenScanner?: () => void;
 }) {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'overview' | 'subjects'>('overview');
   const [expandedSubject, setExpandedSubject] = useState<number | null>(null);
 
-  const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.06 } } };
-  const itemVariants = { hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0, transition: { duration: 0.3 } } };
-
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="visible">
-      {/* Summary Card */}
-      <motion.div variants={itemVariants} className="m-card" style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '16px' }}>
-        <ProgressRing percentage={stats.overallPercentage} />
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: '16px', fontWeight: 600, color: '#fff', marginBottom: '4px' }}>
-            Overall Attendance
-          </div>
-          <div style={{ fontSize: '12px', color: '#7a80a1', lineHeight: 1.5 }}>
-            {stats.totalAttended} of {stats.totalDelivered} lectures attended
-          </div>
+    <div style={{ padding: '0 4px', maxWidth: '500px', margin: '0 auto' }}>
+      {/* Top Bar / Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '8px 0 16px 0',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button
+            onClick={() => navigate(-1)}
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '12px',
+              border: 'none',
+              background: '#f1f5f9',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: '#09090b',
+            }}
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#09090b', margin: 0, letterSpacing: '-0.3px' }}>
+            Attendance
+          </h1>
         </div>
-      </motion.div>
 
-      {/* Compact Stats Row */}
-      <motion.div variants={itemVariants} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '20px' }}>
-        <div className="m-stat-card" style={{ padding: '12px', alignItems: 'center', textAlign: 'center' }}>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#fff' }}>{stats.totalDelivered}</div>
-          <div style={{ fontSize: '10px', color: '#7a80a1', fontWeight: 500 }}>Total</div>
-        </div>
-        <div className="m-stat-card" style={{ padding: '12px', alignItems: 'center', textAlign: 'center', borderBottom: '2px solid #22c55e' }}>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#22c55e' }}>{stats.totalAttended}</div>
-          <div style={{ fontSize: '10px', color: '#7a80a1', fontWeight: 500 }}>Present</div>
-        </div>
-        <div className="m-stat-card" style={{ padding: '12px', alignItems: 'center', textAlign: 'center', borderBottom: '2px solid #ef4444' }}>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#ef4444' }}>{stats.totalMissed}</div>
-          <div style={{ fontSize: '10px', color: '#7a80a1', fontWeight: 500 }}>Absent</div>
-        </div>
-      </motion.div>
+        {onOpenScanner && (
+          <button
+            onClick={onOpenScanner}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: '12px',
+              background: 'rgba(40,43,74,0.06)',
+              border: '1px solid rgba(40,43,74,0.12)',
+              color: '#282B4A',
+              fontSize: '12px',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            <QrCode size={15} />
+            <span>Scan QR</span>
+          </button>
+        )}
+      </div>
 
-      {/* Subject Cards — expandable on mobile too */}
-      <motion.div variants={containerVariants} initial="hidden" animate="visible" style={{ marginTop: '24px' }}>
-        <div className="m-section-label">Subject Breakdown</div>
-        {stats.subjectWise.map((r, i) => {
-          const pctColor = r.percentage >= 75 ? '#22c55e' : r.percentage >= 60 ? '#f59e0b' : '#ef4444';
-          const isExpanded = expandedSubject === r.subjectId;
+      {/* Segmented Pill Navigation: [ Overview ] [ Subjects ] */}
+      <div style={{
+        display: 'flex',
+        background: '#f1f5f9',
+        borderRadius: '16px',
+        padding: '4px',
+        marginBottom: '20px',
+      }}>
+        <button
+          onClick={() => setActiveTab('overview')}
+          style={{
+            flex: 1,
+            padding: '10px 0',
+            borderRadius: '12px',
+            border: 'none',
+            fontSize: '13px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            background: activeTab === 'overview' ? '#ede9fe' : 'transparent',
+            color: activeTab === 'overview' ? '#4f46e5' : '#64748b',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          Overview
+        </button>
+        <button
+          onClick={() => setActiveTab('subjects')}
+          style={{
+            flex: 1,
+            padding: '10px 0',
+            borderRadius: '12px',
+            border: 'none',
+            fontSize: '13px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            background: activeTab === 'subjects' ? '#ede9fe' : 'transparent',
+            color: activeTab === 'subjects' ? '#4f46e5' : '#64748b',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          Subjects
+        </button>
+      </div>
 
-          return (
-            <motion.div key={i} variants={itemVariants}>
-              <div
-                className="m-subject-card"
-                onClick={() => setExpandedSubject(isExpanded ? null : r.subjectId)}
-                style={{ cursor: 'pointer', marginBottom: isExpanded ? 0 : undefined, borderRadius: isExpanded ? '16px 16px 0 0' : undefined }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#fff', flex: 1 }}>
-                    {r.subjectName} ({r.subjectCode})
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '16px', fontWeight: 700, color: pctColor }}>{r.percentage}%</span>
-                    <ChevronDown size={16} color="#7a80a1" style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }} />
-                  </div>
+      {activeTab === 'overview' && (
+        <>
+          {/* Main Attendance Card with Ring & Legend */}
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '24px',
+            padding: '24px 20px',
+            border: '1px solid rgba(0,0,0,0.06)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '16px',
+            marginBottom: '24px',
+          }}>
+            <MobileAttendanceRing
+              percentage={stats.overallPercentage}
+              attended={stats.totalAttended}
+              total={stats.totalDelivered}
+            />
+
+            {/* Legend Column */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', flex: 1, paddingLeft: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e' }} />
+                  <span style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>Present</span>
                 </div>
-                <div className="m-progress-bar" style={{ marginBottom: '8px' }}>
-                  <div className="m-progress-bar-fill" style={{ width: `${r.percentage}%`, background: pctColor, boxShadow: `0 0 8px ${pctColor}44` }} />
-                </div>
-                <div style={{ display: 'flex', gap: '16px', fontSize: '11px', color: '#7a80a1' }}>
-                  <span><CheckCircle2 size={11} style={{ display: 'inline', marginRight: '3px', verticalAlign: '-1px', color: '#22c55e' }} />{r.present} Present</span>
-                  <span><XCircle size={11} style={{ display: 'inline', marginRight: '3px', verticalAlign: '-1px', color: '#ef4444' }} />{r.absent} Absent</span>
-                  <span>{r.totalClasses} Total</span>
-                </div>
+                <span style={{ fontSize: '15px', fontWeight: 700, color: '#09090b' }}>{stats.totalAttended}</span>
               </div>
-              {isExpanded && (
-                <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', borderTop: 'none', borderRadius: '0 0 16px 16px', padding: '16px', marginBottom: '12px' }}>
-                  <SubjectCalendarAccordionContent
-                    subjectStat={r}
-                    calendarData={stats.calendarData}
-                    isMobile={true}
-                  />
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444' }} />
+                  <span style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>Absent</span>
                 </div>
-              )}
-            </motion.div>
-          );
-        })}
-      </motion.div>
-    </motion.div>
+                <span style={{ fontSize: '15px', fontWeight: 700, color: '#09090b' }}>{stats.totalMissed}</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#94a3b8' }} />
+                  <span style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>Total</span>
+                </div>
+                <span style={{ fontSize: '15px', fontWeight: 700, color: '#09090b' }}>{stats.totalDelivered}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Section: Subject-wise Attendance */}
+          <div style={{
+            fontSize: '16px',
+            fontWeight: 700,
+            color: '#09090b',
+            marginBottom: '14px',
+            letterSpacing: '-0.3px',
+          }}>
+            Subject-wise Attendance
+          </div>
+
+          {/* Subject Cards */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {stats.subjectWise.map((r) => {
+              const theme = getSubjectTheme(r.subjectName);
+              const Icon = theme.icon;
+              const isExpanded = expandedSubject === r.subjectId;
+              const barColor = r.percentage >= 75 ? '#22c55e' : r.percentage >= 60 ? '#f59e0b' : '#ef4444';
+
+              return (
+                <div key={r.subjectId}>
+                  <div
+                    onClick={() => setExpandedSubject(isExpanded ? null : r.subjectId)}
+                    style={{
+                      background: '#ffffff',
+                      borderRadius: isExpanded ? '18px 18px 0 0' : '18px',
+                      border: '1px solid rgba(0,0,0,0.06)',
+                      padding: '14px 16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    {/* Icon container */}
+                    <div style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '12px',
+                      background: theme.bg,
+                      color: theme.color,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}>
+                      <Icon size={20} />
+                    </div>
+
+                    {/* Subject info + progress bar */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        color: '#09090b',
+                        marginBottom: '6px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}>
+                        {r.subjectName}
+                      </div>
+
+                      {/* Progress bar */}
+                      <div style={{
+                        width: '100%',
+                        height: '6px',
+                        borderRadius: '999px',
+                        background: '#f1f5f9',
+                        overflow: 'hidden',
+                      }}>
+                        <div style={{
+                          height: '100%',
+                          width: `${Math.min(r.percentage, 100)}%`,
+                          background: barColor,
+                          borderRadius: '999px',
+                          transition: 'width 0.4s ease',
+                        }} />
+                      </div>
+                    </div>
+
+                    {/* Stats & Chevron */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      flexShrink: 0,
+                      textAlign: 'right',
+                    }}>
+                      <div>
+                        <div style={{ fontSize: '13px', fontWeight: 700, color: '#09090b' }}>
+                          {r.percentage}%
+                        </div>
+                        <div style={{ fontSize: '10px', color: '#64748b' }}>
+                          {r.present}/{r.totalClasses}
+                        </div>
+                      </div>
+                      <ChevronRight
+                        size={16}
+                        color="#94a3b8"
+                        style={{
+                          transform: isExpanded ? 'rotate(90deg)' : 'none',
+                          transition: 'transform 0.2s',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Expanded Accordion Calendar Content */}
+                  {isExpanded && (
+                    <div style={{
+                      background: '#f8fafc',
+                      border: '1px solid rgba(0,0,0,0.06)',
+                      borderTop: 'none',
+                      borderRadius: '0 0 18px 18px',
+                      padding: '16px',
+                      marginBottom: '10px',
+                    }}>
+                      <SubjectCalendarAccordionContent
+                        subjectStat={r}
+                        calendarData={stats.calendarData}
+                        isMobile={true}
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {activeTab === 'subjects' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {stats.subjectWise.map((r) => {
+            const theme = getSubjectTheme(r.subjectName);
+            const Icon = theme.icon;
+            const isExpanded = expandedSubject === r.subjectId;
+            const barColor = r.percentage >= 75 ? '#22c55e' : r.percentage >= 60 ? '#f59e0b' : '#ef4444';
+
+            return (
+              <div
+                key={r.subjectId}
+                style={{
+                  background: '#ffffff',
+                  borderRadius: '18px',
+                  border: '1px solid rgba(0,0,0,0.06)',
+                  padding: '16px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                  <div style={{
+                    width: '42px',
+                    height: '42px',
+                    borderRadius: '12px',
+                    background: theme.bg,
+                    color: theme.color,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    <Icon size={22} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '15px', fontWeight: 700, color: '#09090b' }}>
+                      {r.subjectName}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#64748b' }}>
+                      {r.subjectCode} • Prof. {r.teacherName || 'Faculty'}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '16px', fontWeight: 800, color: barColor }}>
+                      {r.percentage}%
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#64748b' }}>
+                      {r.present}/{r.totalClasses} classes
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{
+                  width: '100%',
+                  height: '6px',
+                  borderRadius: '999px',
+                  background: '#f1f5f9',
+                  overflow: 'hidden',
+                  marginBottom: '12px',
+                }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${Math.min(r.percentage, 100)}%`,
+                    background: barColor,
+                    borderRadius: '999px',
+                  }} />
+                </div>
+
+                <button
+                  onClick={() => setExpandedSubject(isExpanded ? null : r.subjectId)}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    borderRadius: '10px',
+                    border: '1px solid #e2e8f0',
+                    background: '#f8fafc',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    color: '#282B4A',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Calendar size={14} />
+                  {isExpanded ? 'Hide Calendar' : 'View Lecture History'}
+                </button>
+
+                {isExpanded && (
+                  <div style={{ marginTop: '14px', paddingTop: '14px', borderTop: '1px solid #f1f5f9' }}>
+                    <SubjectCalendarAccordionContent
+                      subjectStat={r}
+                      calendarData={stats.calendarData}
+                      isMobile={true}
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -173,7 +518,7 @@ function SubjectCalendarAccordionContent({
   }
   for (let d = 1; d <= daysInMonth; d++) {
     const fullDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-    
+
     // Extract dots for this day from backend calendarData
     const dayData = calendarData[fullDateStr];
     let dots: string[] = [];
@@ -182,7 +527,7 @@ function SubjectCalendarAccordionContent({
         .filter((r: any) => r.subjectId === subjectStat.subjectId)
         .map((r: any) => String(r.status));
     }
-    
+
     gridCells.push({
       day: d,
       isCurrentMonth: true,
@@ -202,11 +547,11 @@ function SubjectCalendarAccordionContent({
 
   const currentSlots = TimetableAttendanceService.getLectureInstancesForDateAndSubject(selectedDateStr, subjectStat.subjectId);
 
-  const textColor = isMobile ? '#ffffff' : '#09090b';
-  const subtextColor = isMobile ? '#7a80a1' : '#71717a';
-  const bgCard = isMobile ? 'rgba(255,255,255,0.04)' : '#fafafa';
-  const bgButton = isMobile ? 'rgba(255,255,255,0.06)' : '#ffffff';
-  const borderColor = isMobile ? 'rgba(255,255,255,0.08)' : '#e4e4e7';
+  const textColor = '#09090b';
+  const subtextColor = '#71717a';
+  const bgCard = isMobile ? '#ffffff' : '#fafafa';
+  const bgButton = '#ffffff';
+  const borderColor = '#e4e4e7';
 
   return (
     <div>
@@ -285,12 +630,12 @@ function SubjectCalendarAccordionContent({
                         background: isSelected
                           ? '#ffffff'
                           : st === 'present'
-                          ? '#16a34a'
-                          : st === 'absent'
-                          ? '#ef4444'
-                          : st === 'cancelled'
-                          ? '#f59e0b'
-                          : '#a1a1aa',
+                            ? '#16a34a'
+                            : st === 'absent'
+                              ? '#ef4444'
+                              : st === 'cancelled'
+                                ? '#f59e0b'
+                                : '#a1a1aa',
                       }}
                     />
                   ))}
@@ -568,7 +913,7 @@ function SubjectAccordionCard({
 
 // ── Main Component Export ──
 export function MyAttendance() {
-  const { isMobile } = useIsMobile();
+  const { isMobile, isTablet } = useIsMobile();
 
   const [stats, setStats] = useState<OverallAttendanceStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -597,7 +942,7 @@ export function MyAttendance() {
 
   React.useEffect(() => {
     setTimeout(fetchStats, 0);
-    
+
     // Listen for cross-tab or scan updates
     const handleUpdate = () => fetchStats();
     window.addEventListener('attendance_updated', handleUpdate);
@@ -693,14 +1038,61 @@ export function MyAttendance() {
 
   // Ensure stats is non-null using fallback if state was somehow clear
   const activeStats = stats || TimetableAttendanceService.getAttendanceStats();
+  const isSmallScreen = isMobile || isTablet;
 
   // Mobile View
-  if (isMobile) {
+  if (isSmallScreen) {
     return (
-      <MobileAttendance
-        stats={activeStats}
-        onRefresh={fetchStats}
-      />
+      <>
+        {showScanner && (
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              style={{ background: '#ffffff', borderRadius: '24px', padding: '32px', width: '100%', maxWidth: '420px', boxShadow: '0 20px 40px rgba(0,0,0,0.2)', textAlign: 'center' }}
+            >
+              <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#09090b', margin: '0 0 8px 0' }}>Scan Attendance QR</h2>
+              <p style={{ fontSize: '14px', color: '#71717a', margin: '0 0 24px 0' }}>Point your camera at the QR code displayed by your faculty.</p>
+
+              <div id="qr-reader" style={{ width: '100%', borderRadius: '16px', overflow: 'hidden', marginBottom: '16px' }}></div>
+
+              {scanMessage.text && (
+                <div style={{
+                  padding: '12px 16px', borderRadius: '12px', marginBottom: '16px',
+                  fontWeight: 600, fontSize: '14px',
+                  background:
+                    scanMessage.type === 'success' ? '#dcfce7' :
+                      scanMessage.type === 'error' ? '#fee2e2' :
+                        scanMessage.type === 'warning' ? '#fef3c7' : '#eff6ff',
+                  color:
+                    scanMessage.type === 'success' ? '#15803d' :
+                      scanMessage.type === 'error' ? '#b91c1c' :
+                        scanMessage.type === 'warning' ? '#b45309' : '#1d4ed8',
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                }}>
+                  {scanMessage.type === 'success' && <CheckCircle2 size={16} />}
+                  {scanMessage.type === 'error' && <XCircle size={16} />}
+                  {scanMessage.type === 'warning' && <AlertCircle size={16} />}
+                  {scanMessage.text}
+                </div>
+              )}
+
+              <button
+                onClick={() => setShowScanner(false)}
+                style={{ width: '100%', padding: '14px', borderRadius: '14px', background: '#f4f4f5', color: '#09090b', border: 'none', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+            </motion.div>
+          </div>
+        )}
+
+        <MobileAttendance
+          stats={activeStats}
+          onRefresh={fetchStats}
+          onOpenScanner={() => { setShowScanner(true); setScanMessage({ text: '', type: '' }); }}
+        />
+      </>
     );
   }
 
@@ -766,12 +1158,12 @@ export function MyAttendance() {
                 fontWeight: 600, fontSize: '14px',
                 background:
                   scanMessage.type === 'success' ? '#dcfce7' :
-                  scanMessage.type === 'error' ? '#fee2e2' :
-                  scanMessage.type === 'warning' ? '#fef3c7' : '#eff6ff',
+                    scanMessage.type === 'error' ? '#fee2e2' :
+                      scanMessage.type === 'warning' ? '#fef3c7' : '#eff6ff',
                 color:
                   scanMessage.type === 'success' ? '#15803d' :
-                  scanMessage.type === 'error' ? '#b91c1c' :
-                  scanMessage.type === 'warning' ? '#b45309' : '#1d4ed8',
+                    scanMessage.type === 'error' ? '#b91c1c' :
+                      scanMessage.type === 'warning' ? '#b45309' : '#1d4ed8',
                 display: 'flex', alignItems: 'center', gap: '8px',
               }}>
                 {scanMessage.type === 'success' && <CheckCircle2 size={16} />}

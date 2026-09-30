@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { Plus, Search, Edit3, Trash2, X, CheckCircle2, AlertCircle, BookOpen } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import TextType from '../../../components/TextType';
 
 interface Subject {
   id: number;
@@ -19,6 +22,7 @@ export default function ManageSubject() {
   const navigate = useNavigate();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
   const [editForm, setEditForm] = useState({ 
     name: "", 
@@ -85,12 +89,14 @@ export default function ManageSubject() {
       });
       if (res.ok) {
         setSubjects(subjects.filter(s => s.id !== id));
+        setSuccessMessage("Subject deleted successfully.");
+        setTimeout(() => setSuccessMessage(""), 3000);
       } else {
-        alert("Failed to delete subject.");
+        setErrorMessage("Failed to delete subject.");
       }
     } catch (err) {
       console.error(err);
-      alert("Network error.");
+      setErrorMessage("Network error.");
     }
   };
 
@@ -150,181 +156,433 @@ export default function ManageSubject() {
     }
   };
 
+  const filteredSubjects = subjects.filter(s => {
+    const q = searchQuery.toLowerCase();
+    const name = s.name?.toLowerCase() || '';
+    const code = s.code?.toLowerCase() || '';
+    const facName = s.faculty?.user?.full_name?.toLowerCase() || '';
+    return name.includes(q) || code.includes(q) || facName.includes(q);
+  });
+
   return (
-    <div className="page-wide">
-      {successMessage && (
-        <div style={{ padding: '12px', background: '#d4edda', color: '#155724', borderRadius: '8px', marginBottom: '16px', border: '1px solid #c3e6cb' }}>
-          {successMessage}
-        </div>
-      )}
-      {errorMessage && (
-        <div style={{ padding: '12px', background: '#f8d7da', color: '#721c24', borderRadius: '8px', marginBottom: '16px', border: '1px solid #f5c6cb' }}>
-          {errorMessage}
-        </div>
-      )}
-      <div className="card">
-        <div className="card-header">
-          <span className="card-title">All Subjects</span>
-          <button className="card-btn" onClick={() => navigate('/admin/dashboard/subject/add')}>
-            + Add Subject
-          </button>
-        </div>
+    <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
+      {/* ── Header ── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
         <div>
-          {loading ? (
-            <div style={{ padding: '24px', textAlign: 'center' }}>Loading...</div>
-          ) : subjects.length === 0 ? (
-            <div style={{ padding: '24px', textAlign: 'center' }}>No subjects found.</div>
-          ) : isMobile ? (
-            <div className="mobile-list-container" style={{ padding: '0 16px 16px 16px' }}>
-              {subjects.map(s => {
-                const branchCode = departments.find(d => d.id === s.department_id)?.code || `DEP ${s.department_id}`;
-                return (
-                  <div className="mobile-list-card" key={s.id}>
-                    <div className="mobile-list-card-header">
-                      <div className="student-info" style={{ alignItems: 'flex-start' }}>
-                        <div className="student-avatar" style={{ background: 'linear-gradient(135deg, #4f8ef7, #9aa8ff)', borderRadius: '8px' }}>
-                          {s.code.substring(0, 2).toUpperCase()}
-                        </div>
-                        <div>
-                          <div className="student-name" style={{ fontSize: '15px' }}>{s.name}</div>
-                          <div className="student-email mono" style={{ fontSize: '11px', marginTop: '2px' }}>{s.code}</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mobile-list-card-body">
-                      <div className="mobile-list-card-row">
-                        <span>Branch</span>
-                        <span className="badge badge-teal" style={{ padding: '2px 8px', fontSize: '10px' }}>{branchCode}</span>
-                      </div>
-                      <div className="mobile-list-card-row">
-                        <span>Semester & Credits</span>
-                        <span>Sem {s.semester || '-'} • {s.credits} CR</span>
-                      </div>
-                      <div className="mobile-list-card-row">
-                        <span>Faculty</span>
-                        <span>{s.faculty?.user?.full_name || 'Not Assigned'}</span>
-                      </div>
-                    </div>
-                    <div className="mobile-list-card-actions">
-                      <button className="btn-edit" onClick={() => handleEditClick(s)}>Edit</button>
-                      <button className="btn-del" onClick={() => handleDelete(s.id)}>Delete</button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>CODE</th>
-                <th>NAME</th>
-                <th>BRANCH</th>
-                <th>SEM</th>
-                <th>CREDITS</th>
-                <th>FACULTY</th>
-                <th>ACTIONS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {subjects.map(s => (
-                <tr key={s.id}>
-                  <td className="mono">{s.code}</td>
-                  <td style={{ color: 'var(--text)', fontWeight: 500 }}>{s.name}</td>
-                  <td><span className="badge badge-teal">{departments.find(d => d.id === s.department_id)?.code || `DEP ${s.department_id}`}</span></td>
-                  <td>{s.semester || '-'}</td>
-                  <td>{s.credits}</td>
-                  <td style={{ fontSize: '12px', color: 'var(--text2)' }}>{s.faculty?.user?.full_name || '-'}</td>
-                  <td>
-                    <div className="action-btns">
-                      <button className="btn-edit" onClick={() => handleEditClick(s)}>Edit</button>
-                      <button className="btn-del" onClick={() => handleDelete(s.id)}>Delete</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          )}
+          <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <span>Manage</span>
+            <span style={{
+              background: '#282B4A',
+              color: '#EEEBDA',
+              padding: '4px 18px',
+              borderRadius: '14px',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              lineHeight: 1.2,
+              border: '1px solid rgba(238, 235, 218, 0.2)',
+            }}>
+              <TextType
+                text={["Subjects", "Courses", "Curriculum"]}
+                typingSpeed={60}
+                deletingSpeed={35}
+                pauseDuration={2200}
+                loop={true}
+                showCursor={true}
+                cursorCharacter="|"
+                style={{ color: '#EEEBDA' }}
+              />
+            </span>
+          </h1>
+          <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>
+            Add, edit, view, and organize academic course subjects across departments
+          </div>
+        </div>
+
+        <button
+          onClick={() => navigate('/admin/dashboard/subject/add')}
+          style={{
+            background: '#282B4A',
+            color: '#EEEBDA',
+            border: '1px solid rgba(238, 235, 218, 0.2)',
+            padding: '12px 22px',
+            borderRadius: '16px',
+            fontSize: '14px',
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            boxShadow: '0 4px 14px rgba(40, 43, 74, 0.25)',
+            transition: 'all 0.2s ease',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.background = '#373a61')}
+          onMouseLeave={e => (e.currentTarget.style.background = '#282B4A')}
+        >
+          <Plus size={18} color="#EEEBDA" /> Add Subject
+        </button>
+      </div>
+
+      {successMessage && (
+        <motion.div 
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{
+            marginBottom: '20px', padding: '14px 20px', borderRadius: '14px',
+            backgroundColor: 'rgba(5, 150, 105, 0.1)', color: '#059669',
+            border: '1px solid rgba(5, 150, 105, 0.2)', fontWeight: 600, fontSize: '13px',
+            display: 'flex', alignItems: 'center', gap: '8px'
+          }}
+        >
+          <CheckCircle2 size={16} /> {successMessage}
+        </motion.div>
+      )}
+
+      {errorMessage && (
+        <motion.div 
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{
+            marginBottom: '20px', padding: '14px 20px', borderRadius: '14px',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444',
+            border: '1px solid rgba(239, 68, 68, 0.2)', fontWeight: 600, fontSize: '13px',
+            display: 'flex', alignItems: 'center', gap: '8px'
+          }}
+        >
+          <AlertCircle size={16} /> {errorMessage}
+        </motion.div>
+      )}
+
+      {/* ── Search Bar ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+        <div style={{
+          position: 'relative',
+          flex: 1,
+          maxWidth: '520px',
+        }}>
+          <Search size={18} color="#71717a" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)' }} />
+          <input
+            type="text"
+            placeholder="Search by subject name, code or assigned faculty..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '12px 18px 12px 46px',
+              borderRadius: '16px',
+              border: '1.5px solid rgba(40, 43, 74, 0.12)',
+              background: '#ffffff',
+              fontSize: '14px',
+              color: '#09090b',
+              boxShadow: '0 2px 8px rgba(40, 43, 74, 0.02)',
+              outline: 'none',
+              boxSizing: 'border-box'
+            }}
+            onFocus={e => (e.currentTarget.style.borderColor = '#282B4A')}
+            onBlur={e => (e.currentTarget.style.borderColor = 'rgba(40, 43, 74, 0.12)')}
+          />
         </div>
       </div>
 
-      {editingSubject && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '16px' }}>
-          <div className="card" style={{ width: '100%', maxWidth: '400px', padding: '24px', maxHeight: '90vh', overflowY: 'auto' }}>
-
-            <h3 style={{ marginTop: 0 }}>Edit Subject</h3>
-            <form onSubmit={handleUpdate}>
-              <div className="fg" style={{ marginBottom: '16px' }}>
-                <label>Subject Name</label>
-                <input 
-                  type="text" 
-                  value={editForm.name} 
-                  onChange={e => setEditForm({...editForm, name: e.target.value})} 
-                  required 
-                />
-              </div>
-              <div className="fg" style={{ marginBottom: '16px' }}>
-                <label>Subject Code</label>
-                <input 
-                  type="text" 
-                  value={editForm.code} 
-                  onChange={e => setEditForm({...editForm, code: e.target.value})} 
-                  required 
-                />
-              </div>
-              <div className="fg" style={{ marginBottom: '16px' }}>
-                <label>Credits</label>
-                <input 
-                  type="number" 
-                  value={editForm.credits} 
-                  onChange={e => setEditForm({...editForm, credits: parseInt(e.target.value)})} 
-                  required 
-                />
-              </div>
-              <div className="fg" style={{ marginBottom: '16px' }}>
-                <label>Department</label>
-                <select 
-                  value={editForm.department_id} 
-                  onChange={e => setEditForm({...editForm, department_id: e.target.value})}
-                  required
-                >
-                  <option value="">-- Select Department --</option>
-                  {departments.map(d => (
-                    <option key={d.id} value={d.id}>{d.name} ({d.code})</option>
-                  ))}
-                </select>
-              </div>
-              <div className="fg" style={{ marginBottom: '16px' }}>
-                <label>Semester</label>
-                <input 
-                  type="number" 
-                  min="1" max="8"
-                  value={editForm.semester} 
-                  onChange={e => setEditForm({...editForm, semester: parseInt(e.target.value)})} 
-                  required 
-                />
-              </div>
-              <div className="fg" style={{ marginBottom: '16px' }}>
-                <label>Faculty</label>
-                <select 
-                  value={editForm.faculty_id} 
-                  onChange={e => setEditForm({...editForm, faculty_id: e.target.value})}
-                >
-                  <option value="">-- Select Faculty --</option>
-                  {faculties.map(f => (
-                    <option key={f.id} value={f.id}>{f.user?.full_name || f.employee_id}</option>
-                  ))}
-                </select>
-              </div>
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '24px' }}>
-                <button type="button" className="btn" style={{ background: 'var(--surface2)', color: 'var(--text)' }} onClick={() => setEditingSubject(null)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Save Changes</button>
-              </div>
-            </form>
+      {/* ── Table Container ── */}
+      <div style={{
+        background: '#ffffff',
+        borderRadius: '24px',
+        border: '1.5px solid rgba(40, 43, 74, 0.08)',
+        boxShadow: '0 4px 24px rgba(40, 43, 74, 0.03)',
+        overflow: 'hidden'
+      }}>
+        {loading ? (
+          <div style={{ padding: '48px', textAlign: 'center', color: '#64748b' }}>Loading subjects...</div>
+        ) : filteredSubjects.length === 0 ? (
+          <div style={{ padding: '48px', textAlign: 'center', color: '#64748b' }}>
+            No subjects found matching your search.
           </div>
-        </div>
-      )}
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <thead>
+                <tr style={{ background: '#f8fafc', borderBottom: '1px solid rgba(40, 43, 74, 0.08)' }}>
+                  <th style={{ padding: '16px 24px', fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>CODE</th>
+                  <th style={{ padding: '16px 24px', fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>NAME</th>
+                  <th style={{ padding: '16px 24px', fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>BRANCH</th>
+                  <th style={{ padding: '16px 24px', fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>SEM</th>
+                  <th style={{ padding: '16px 24px', fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>CREDITS</th>
+                  <th style={{ padding: '16px 24px', fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>FACULTY</th>
+                  <th style={{ padding: '16px 24px', fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredSubjects.map(s => {
+                  const deptObj = departments.find(d => d.id === s.department_id);
+                  const branchLabel = deptObj?.code || (deptObj ? deptObj.name : `DEP ${s.department_id}`);
+
+                  return (
+                    <tr 
+                      key={s.id} 
+                      style={{ 
+                        borderBottom: '1px solid rgba(40, 43, 74, 0.05)',
+                        transition: 'background 0.15s ease'
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.background = '#fafafa'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                    >
+                      <td style={{ padding: '16px 24px', color: '#282B4A', fontSize: '13px', fontFamily: 'monospace', fontWeight: 700 }}>
+                        {s.code}
+                      </td>
+                      <td style={{ padding: '16px 24px', fontWeight: 700, color: '#09090b', fontSize: '14px' }}>
+                        {s.name}
+                      </td>
+                      <td style={{ padding: '16px 24px' }}>
+                        <span style={{
+                          fontSize: '11px', fontWeight: 800,
+                          color: '#282B4A', background: 'rgba(40, 43, 74, 0.08)',
+                          border: '1px solid rgba(40, 43, 74, 0.12)',
+                          padding: '4px 10px', borderRadius: '8px', display: 'inline-block'
+                        }}>
+                          {branchLabel}
+                        </span>
+                      </td>
+                      <td style={{ padding: '16px 24px', color: '#52525b', fontSize: '13px', fontWeight: 600 }}>
+                        Sem {s.semester || '-'}
+                      </td>
+                      <td style={{ padding: '16px 24px', color: '#52525b', fontSize: '13px', fontWeight: 600 }}>
+                        {s.credits} CR
+                      </td>
+                      <td style={{ padding: '16px 24px', color: '#52525b', fontSize: '13px' }}>
+                        {s.faculty?.user?.full_name || (
+                          <span style={{ color: '#a1a1aa', fontStyle: 'italic' }}>Not Assigned</span>
+                        )}
+                      </td>
+                      <td style={{ padding: '16px 24px', textAlign: 'right' }}>
+                        <div style={{ display: 'inline-flex', gap: '8px' }}>
+                          <button
+                            onClick={() => handleEditClick(s)}
+                            style={{
+                              background: '#f8fafc',
+                              border: '1px solid #e2e8f0',
+                              borderRadius: '10px',
+                              padding: '6px 12px',
+                              fontSize: '12px',
+                              fontWeight: 700,
+                              color: '#282B4A',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                              transition: 'all 0.15s ease'
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(40, 43, 74, 0.06)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = '#f8fafc'; }}
+                          >
+                            <Edit3 size={13} /> Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(s.id)}
+                            style={{
+                              background: 'rgba(239,68,68,0.08)',
+                              border: '1px solid rgba(239,68,68,0.2)',
+                              borderRadius: '10px',
+                              padding: '6px 12px',
+                              fontSize: '12px',
+                              fontWeight: 700,
+                              color: '#ef4444',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                              transition: 'all 0.15s ease'
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.14)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+                          >
+                            <Trash2 size={13} /> Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* ── Edit Subject Modal ── */}
+      <AnimatePresence>
+        {editingSubject && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 99999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '20px'
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setEditingSubject(null)}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(9, 9, 11, 0.6)',
+                backdropFilter: 'blur(8px)'
+              }}
+            />
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              style={{
+                position: 'relative',
+                width: '100%',
+                maxWidth: '520px',
+                background: '#ffffff',
+                borderRadius: '28px',
+                padding: '32px',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                zIndex: 100000,
+                border: '1.5px solid rgba(40, 43, 74, 0.1)'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#282B4A', margin: 0 }}>
+                  Edit Subject Details
+                </h2>
+                <button
+                  onClick={() => setEditingSubject(null)}
+                  style={{
+                    background: '#f4f4f5',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '34px',
+                    height: '34px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <X size={18} color="#71717a" />
+                </button>
+              </div>
+
+              <form onSubmit={handleUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#282B4A', marginBottom: '6px' }}>Subject Name *</label>
+                  <input
+                    type="text"
+                    value={editForm.name}
+                    onChange={e => setEditForm({...editForm, name: e.target.value})}
+                    required
+                    style={{ width: '100%', padding: '12px 16px', borderRadius: '14px', border: '1.5px solid #e2e8f0', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#282B4A', marginBottom: '6px' }}>Subject Code *</label>
+                  <input
+                    type="text"
+                    value={editForm.code}
+                    onChange={e => setEditForm({...editForm, code: e.target.value})}
+                    required
+                    style={{ width: '100%', padding: '12px 16px', borderRadius: '14px', border: '1.5px solid #e2e8f0', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#282B4A', marginBottom: '6px' }}>Semester</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="8"
+                      value={editForm.semester}
+                      onChange={e => setEditForm({...editForm, semester: e.target.value})}
+                      style={{ width: '100%', padding: '12px 16px', borderRadius: '14px', border: '1.5px solid #e2e8f0', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#282B4A', marginBottom: '6px' }}>Credits</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="10"
+                      value={editForm.credits}
+                      onChange={e => setEditForm({...editForm, credits: parseInt(e.target.value) || 4})}
+                      style={{ width: '100%', padding: '12px 16px', borderRadius: '14px', border: '1.5px solid #e2e8f0', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#282B4A', marginBottom: '6px' }}>Department</label>
+                  <select
+                    value={editForm.department_id}
+                    onChange={e => setEditForm({...editForm, department_id: e.target.value})}
+                    style={{ width: '100%', padding: '12px 16px', borderRadius: '14px', border: '1.5px solid #e2e8f0', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                  >
+                    <option value="">-- Select Department --</option>
+                    {departments.map(d => (
+                      <option key={d.id} value={d.id}>{d.name} ({d.code || `ID: ${d.id}`})</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#282B4A', marginBottom: '6px' }}>Assigned Faculty</label>
+                  <select
+                    value={editForm.faculty_id}
+                    onChange={e => setEditForm({...editForm, faculty_id: e.target.value})}
+                    style={{ width: '100%', padding: '12px 16px', borderRadius: '14px', border: '1.5px solid #e2e8f0', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                  >
+                    <option value="">-- Select Faculty --</option>
+                    {faculties.map(f => (
+                      <option key={f.id} value={f.id}>{f.user?.full_name || f.employee_id}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setEditingSubject(null)}
+                    style={{
+                      flex: 1, padding: '12px', borderRadius: '14px',
+                      border: '1px solid #cbd5e1', background: '#ffffff',
+                      color: '#475569', fontSize: '14px', fontWeight: 700, cursor: 'pointer'
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    style={{
+                      flex: 1, padding: '12px', borderRadius: '14px',
+                      border: '1px solid rgba(238, 235, 218, 0.2)',
+                      background: '#282B4A',
+                      color: '#EEEBDA', fontSize: '14px', fontWeight: 700, cursor: 'pointer',
+                      boxShadow: '0 4px 14px rgba(40, 43, 74, 0.25)',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.background = '#373a61')}
+                    onMouseLeave={e => (e.currentTarget.style.background = '#282B4A')}
+                  >
+                    Update Subject
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

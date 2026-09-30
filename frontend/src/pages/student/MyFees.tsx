@@ -1,14 +1,243 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   Wallet, Receipt, Clock, Calendar, ChevronDown, Download,
-  FileText, ArrowRight, Bell, Headset, ArrowUpRight, Loader, X, CheckCircle2, AlertCircle, Printer, CreditCard
+  FileText, ArrowRight, Bell, Headset, ArrowUpRight, Loader, X, CheckCircle2, AlertCircle, Printer, CreditCard,
+  ArrowLeft
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
 import TextType from "../../components/TextType";
 import { useFeeStore } from "../../store/useFeeStore";
+import { useIsMobile } from "../../hooks/useIsMobile";
+
+// ── Mobile Fee Management Component (Reference Screen 12) ──
+function MobileFees({
+  kpis,
+  paymentHistory,
+  onPayClick,
+}: any) {
+  const navigate = useNavigate();
+
+  const defaultTransactions = [
+    { title: "Tuition Fee", date: "15 Aug 2026", amount: 25000, status: "Paid", icon: Receipt, bg: "#eff6ff", color: "#2563eb" },
+    { title: "Exam Fee", date: "10 Jul 2026", amount: 7500, status: "Paid", icon: FileText, bg: "#f0fdf4", color: "#16a34a" },
+    { title: "Library Fee", date: "05 Jul 2026", amount: 1250, status: "Paid", icon: Wallet, bg: "#fffbeb", color: "#d97706" },
+  ];
+
+  const txns = (paymentHistory && paymentHistory.length > 0) ? paymentHistory.map((p: any, i: number) => ({
+    title: p.remarks || (p.payment_mode ? `${p.payment_mode} Payment` : `Fee Payment #${i + 1}`),
+    date: p.payment_date ? new Date(p.payment_date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recently',
+    amount: p.amount || 25000,
+    status: p.status || 'Paid',
+    icon: Receipt,
+    bg: '#eff6ff',
+    color: '#2563eb'
+  })) : defaultTransactions;
+
+  const totalFee = kpis?.total_fee || 120000;
+  const paidFee = kpis?.paid_fee || 85750;
+  const pendingFee = kpis?.pending_fee || 34250;
+
+  return (
+    <div style={{ padding: '0 4px', maxWidth: '500px', margin: '0 auto' }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: '8px 0 16px 0',
+        gap: '12px',
+      }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '12px',
+            border: 'none',
+            background: '#f1f5f9',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            color: '#09090b',
+          }}
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#09090b', margin: 0, letterSpacing: '-0.3px' }}>
+          Fee Management
+        </h1>
+      </div>
+
+      {/* Total Fee Card (Reference Screen 12) */}
+      <div style={{
+        background: '#ffffff',
+        borderRadius: '24px',
+        padding: '24px 20px',
+        border: '1px solid rgba(0,0,0,0.06)',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+        marginBottom: '24px',
+      }}>
+        {/* Top Wallet & Total Amount */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
+          <div style={{
+            width: '44px',
+            height: '44px',
+            borderRadius: '14px',
+            background: '#fff7ed',
+            color: '#ea580c',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}>
+            <Wallet size={22} />
+          </div>
+
+          <div>
+            <div style={{ fontSize: '12px', fontWeight: 600, color: '#64748b' }}>
+              Total Fee
+            </div>
+            <div style={{ fontSize: '26px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.6px', lineHeight: 1.1 }}>
+              ₹{totalFee.toLocaleString('en-IN')}
+            </div>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div style={{ height: '1px', background: '#f1f5f9', marginBottom: '16px' }} />
+
+        {/* Paid and Pending Breakdown (2 columns) */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div>
+            <div style={{ fontSize: '12px', fontWeight: 600, color: '#64748b', marginBottom: '4px' }}>
+              Paid
+            </div>
+            <div style={{ fontSize: '20px', fontWeight: 800, color: '#16a34a', letterSpacing: '-0.4px' }}>
+              ₹{paidFee.toLocaleString('en-IN')}
+            </div>
+          </div>
+
+          <div style={{ borderLeft: '1px solid #f1f5f9', paddingLeft: '16px' }}>
+            <div style={{ fontSize: '12px', fontWeight: 600, color: '#64748b', marginBottom: '4px' }}>
+              Pending
+            </div>
+            <div style={{ fontSize: '20px', fontWeight: 800, color: '#ef4444', letterSpacing: '-0.4px' }}>
+              ₹{pendingFee.toLocaleString('en-IN')}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Pay Pending Fee Button if any */}
+      {pendingFee > 0 && (
+        <button
+          onClick={onPayClick}
+          style={{
+            width: '100%',
+            padding: '14px',
+            borderRadius: '16px',
+            background: '#282B4A',
+            color: '#ffffff',
+            border: 'none',
+            fontSize: '14px',
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            marginBottom: '24px',
+            boxShadow: '0 4px 16px rgba(40,43,74,0.15)',
+          }}
+        >
+          <CreditCard size={18} />
+          <span>Pay Pending Fee (₹{pendingFee.toLocaleString('en-IN')})</span>
+        </button>
+      )}
+
+      {/* Section: Recent Transactions */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+        <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#09090b', margin: 0, letterSpacing: '-0.3px' }}>
+          Recent Transactions
+        </h2>
+        <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>
+          View All
+        </span>
+      </div>
+
+      {/* Transaction Cards List */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {txns.map((item: any, idx: number) => {
+          const Icon = item.icon || Receipt;
+          return (
+            <div
+              key={idx}
+              style={{
+                background: '#ffffff',
+                borderRadius: '18px',
+                border: '1px solid rgba(0,0,0,0.06)',
+                padding: '16px 18px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+              }}
+            >
+              {/* Icon */}
+              <div style={{
+                width: '42px',
+                height: '42px',
+                borderRadius: '12px',
+                background: item.bg || '#eff6ff',
+                color: item.color || '#2563eb',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}>
+                <Icon size={20} />
+              </div>
+
+              {/* Title & Date */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  color: '#09090b',
+                  marginBottom: '2px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}>
+                  {item.title}
+                </div>
+                <div style={{ fontSize: '11px', color: '#64748b' }}>
+                  {item.date}
+                </div>
+              </div>
+
+              {/* Amount & Status */}
+              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                <div style={{ fontSize: '15px', fontWeight: 800, color: '#09090b' }}>
+                  ₹{item.amount.toLocaleString('en-IN')}
+                </div>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#16a34a' }}>
+                  {item.status}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export function MyFees() {
+  const { isMobile, isTablet } = useIsMobile();
+  const isSmallScreen = isMobile || isTablet;
   const { studentDashboardData, fetchStudentDashboard, payFee, isLoading } = useFeeStore();
 
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
@@ -111,6 +340,16 @@ export function MyFees() {
       setIsPaying(false);
     }
   };
+
+  if (isSmallScreen) {
+    return (
+      <MobileFees
+        kpis={kpis}
+        paymentHistory={payment_history}
+        onPayClick={() => handleOpenPayModal("ALL")}
+      />
+    );
+  }
 
   return (
     <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>

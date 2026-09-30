@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { apiClient as api } from "../../api/axios";
 import { 
   UserCircle, BookOpen, GraduationCap, Building2, Save, Mail, Phone, Calendar, 
   ShieldCheck, CheckCircle2, Copy, Check, Sparkles, MapPin, Award, User, 
-  RefreshCw, Hash, Clock, FileCheck, Layers, Users, PhoneCall, RotateCcw
+  RefreshCw, Hash, Clock, FileCheck, Layers, Users, PhoneCall, RotateCcw,
+  ArrowLeft, Camera, CreditCard, ChevronRight
 } from "lucide-react";
 import { useAuthStore } from "../../store/authStore";
 import { useIsMobile } from "../../hooks/useIsMobile";
@@ -49,265 +51,331 @@ function CopyButton({ text, label = "Copy" }: { text: string; label?: string }) 
   );
 }
 
-// ── Mobile Profile Component ──
+// ── Mobile Profile Component (Reference Screen 10) ──
 function MobileProfile({ profile, formData, setFormData, handleUpdate, updating, msg }: any) {
-  const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.06 } } };
-  const itemVariants = { hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0, transition: { duration: 0.3 } } };
+  const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState(false);
 
-  const getInitials = (name: string) => {
-    if (!name) return "ST";
-    const parts = name.trim().split(" ");
-    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-    return name.slice(0, 2).toUpperCase();
-  };
+  const enrollmentNo = profile?.enrollment_number || 'CS629';
+  const fullName = profile?.full_name || 'Harsh Rao';
+  const branchName = profile?.department && profile?.department !== "Unknown" 
+    ? profile.department 
+    : (profile?.course && profile?.course !== "Unknown" ? profile.course : "Computer Science Engineering");
+  const semesterNo = profile?.semester || 7;
+  const emailAddr = formData.email || profile?.email || `${(profile?.full_name || 'harsh.rao').toLowerCase().replace(' ', '.')}@indusuni.ac.in`;
+  const phoneNo = formData.phone || profile?.phone || "+91 98765 43210";
+
+  const infoCards = [
+    {
+      label: "Enrollment Number",
+      value: enrollmentNo,
+      icon: CreditCard,
+      bg: "#eff6ff",
+      color: "#2563eb",
+      copyable: true,
+    },
+    {
+      label: "Branch",
+      value: branchName,
+      icon: GraduationCap,
+      bg: "#faf5ff",
+      color: "#9333ea",
+    },
+    {
+      label: "Semester",
+      value: String(semesterNo),
+      icon: Layers,
+      bg: "#eef2ff",
+      color: "#4f46e5",
+    },
+    {
+      label: "Email",
+      value: emailAddr,
+      icon: Mail,
+      bg: "#eff6ff",
+      color: "#2563eb",
+    },
+    {
+      label: "Phone Number",
+      value: phoneNo,
+      icon: PhoneCall,
+      bg: "#f0fdf4",
+      color: "#16a34a",
+    }
+  ];
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="visible" style={{ paddingBottom: '90px' }}>
-      {/* Mobile Animated Header */}
-      <motion.div variants={itemVariants} style={{ marginBottom: '16px' }}>
-        <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.5px', margin: 0, display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-          <span>My</span>
-          <span style={{
-            background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
-            color: '#EEEBDA',
-            padding: '3px 12px',
-            borderRadius: '10px',
-            boxShadow: '0 4px 16px rgba(40, 43, 74, 0.25)',
-            display: 'inline-flex',
-            alignItems: 'center',
-            lineHeight: 1.2,
-          }}>
-            <TextType
-              text={["Profile", "Identity", "Record"]}
-              typingSpeed={60}
-              deletingSpeed={35}
-              pauseDuration={2200}
-              loop={true}
-              showCursor={true}
-              cursorCharacter="|"
-              style={{ color: '#EEEBDA' }}
-            />
-          </span>
-        </h1>
-        <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
-          Manage your personal and academic student records
-        </div>
-      </motion.div>
-
-      {/* Avatar Card */}
-      <motion.div variants={itemVariants} className="m-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: '16px', paddingTop: '20px', paddingBottom: '20px', position: 'relative', overflow: 'hidden' }}>
-        <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: '60px',
-          background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15))',
-        }} />
-        
-        <div style={{
-          width: '76px', height: '76px', borderRadius: '50%',
-          background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
-          color: '#EEEBDA',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '24px', fontWeight: 800,
-          boxShadow: '0 8px 24px rgba(40, 43, 74, 0.25)',
-          border: '3px solid #ffffff',
-          position: 'relative',
-          zIndex: 2,
-          marginBottom: '10px'
-        }}>
-          {getInitials(profile?.full_name)}
-          <span style={{
-            position: 'absolute', bottom: '2px', right: '2px',
-            width: '14px', height: '14px', borderRadius: '50%',
-            background: '#10b981', border: '2px solid #ffffff'
-          }} />
-        </div>
-
-        <div style={{ fontSize: '18px', fontWeight: 700, color: '#09090b', display: 'flex', alignItems: 'center', gap: '6px', zIndex: 2 }}>
-          {profile?.full_name || 'Student'}
-          <CheckCircle2 size={16} color="#4f46e5" fill="#e0e7ff" />
-        </div>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', zIndex: 2 }}>
-          <span style={{ fontSize: '12px', fontWeight: 600, color: '#4f46e5', background: 'rgba(99, 102, 241, 0.1)', padding: '2px 8px', borderRadius: '6px' }}>
-            {profile?.enrollment_number || 'CS629'}
-          </span>
-          <span style={{ fontSize: '11px', color: '#6b7280' }}>• Semester {profile?.semester || 7}</span>
-        </div>
-      </motion.div>
-
-      {/* Success/Error Message */}
-      {msg.text && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          className="m-card"
-          style={{
-            marginBottom: '12px',
-            border: msg.type === 'error' ? '1px solid rgba(239,68,68,0.2)' : '1px solid rgba(34,197,94,0.2)',
-            background: msg.type === 'error' ? 'rgba(239,68,68,0.08)' : 'rgba(34,197,94,0.08)',
-            color: msg.type === 'error' ? '#ef4444' : '#15803d',
-            fontSize: '13px',
-            fontWeight: 600
-          }}
-        >
-          {msg.text}
-        </motion.div>
-      )}
-
-      {/* Quick Stats Grid */}
-      <motion.div variants={itemVariants} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px' }}>
-        <div style={{ background: '#f4f4f5', padding: '12px', borderRadius: '14px', border: '1px solid rgba(0,0,0,0.05)' }}>
-          <div style={{ fontSize: '10px', fontWeight: 700, color: '#71717a', textTransform: 'uppercase' }}>Current Batch</div>
-          <div style={{ fontSize: '13px', fontWeight: 700, color: '#09090b', marginTop: '2px' }}>{profile?.batch || 'CSE 2022-26'}</div>
-        </div>
-        <div style={{ background: '#f4f4f5', padding: '12px', borderRadius: '14px', border: '1px solid rgba(0,0,0,0.05)' }}>
-          <div style={{ fontSize: '10px', fontWeight: 700, color: '#71717a', textTransform: 'uppercase' }}>Program Mode</div>
-          <div style={{ fontSize: '13px', fontWeight: 700, color: '#4f46e5', marginTop: '2px' }}>Full-Time UG</div>
-        </div>
-      </motion.div>
-
-      {/* Academic Details */}
-      <motion.div variants={itemVariants}>
-        <div className="m-section-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '13px', color: '#374151', marginBottom: '8px' }}>
-          <BookOpen size={14} color="#4f46e5" />
-          Academic Information
-        </div>
-        <div className="m-card" style={{ marginBottom: '16px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <div style={{ fontSize: '10px', color: '#71717a', textTransform: 'uppercase', fontWeight: 600 }}>Enrollment No</div>
-                <div style={{ fontSize: '14px', color: '#09090b', fontWeight: 700 }}>{profile?.enrollment_number || 'CS629'}</div>
-              </div>
-              <CopyButton text={profile?.enrollment_number || 'CS629'} />
-            </div>
-            
-            <div style={{ borderTop: '1px solid #f3f4f6', paddingTop: '10px' }}>
-              <div style={{ fontSize: '10px', color: '#71717a', textTransform: 'uppercase', fontWeight: 600 }}>Course & Department</div>
-              <div style={{ fontSize: '13px', color: '#09090b', fontWeight: 600, marginTop: '2px' }}>
-                {profile?.course === "Unknown" ? "B.Tech Computer Science" : profile?.course}
-              </div>
-              {profile?.department && profile?.department !== "Unknown" && (
-                <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '2px' }}>{profile.department}</div>
-              )}
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', borderTop: '1px solid #f3f4f6', paddingTop: '10px' }}>
-              <div>
-                <div style={{ fontSize: '10px', color: '#71717a', textTransform: 'uppercase', fontWeight: 600 }}>Semester & Section</div>
-                <div style={{ fontSize: '13px', color: '#09090b', fontWeight: 600 }}>Sem {profile?.semester || 7} (Section A)</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '10px', color: '#71717a', textTransform: 'uppercase', fontWeight: 600 }}>Academic Year</div>
-                <div style={{ fontSize: '13px', color: '#09090b', fontWeight: 600 }}>2025 - 2026</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Editable Personal Info */}
-      <motion.div variants={itemVariants}>
-        <div className="m-section-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '13px', color: '#374151', marginBottom: '8px' }}>
-          <UserCircle size={14} color="#4f46e5" />
-          Personal & Contact Details
-        </div>
-        <div className="m-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '16px' }}>
-          <div>
-            <label style={{ fontSize: '11px', color: '#71717a', fontWeight: 600, display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>Full Name</label>
-            <input
-              type="text"
-              className="m-input"
-              value={formData.full_name}
-              onChange={e => setFormData({ ...formData, full_name: e.target.value })}
-              placeholder="Full Name"
-              style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '10px 14px', fontSize: '14px', width: '100%' }}
-            />
-          </div>
-
-          <div>
-            <label style={{ fontSize: '11px', color: '#71717a', fontWeight: 600, display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>Date of Birth</label>
-            <input
-              type="date"
-              className="m-input"
-              value={formData.date_of_birth}
-              onChange={e => setFormData({ ...formData, date_of_birth: e.target.value })}
-              style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '10px 14px', fontSize: '14px', width: '100%' }}
-            />
-          </div>
-
-          <div>
-            <label style={{ fontSize: '11px', color: '#71717a', fontWeight: 600, display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>Email Address</label>
-            <input
-              type="email"
-              className="m-input"
-              value={formData.email}
-              onChange={e => setFormData({ ...formData, email: e.target.value })}
-              placeholder="student@example.com"
-              style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '10px 14px', fontSize: '14px', width: '100%' }}
-            />
-          </div>
-
-          <div>
-            <label style={{ fontSize: '11px', color: '#71717a', fontWeight: 600, display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>Contact Number</label>
-            <input
-              type="tel"
-              className="m-input"
-              value={formData.contact_number}
-              onChange={e => setFormData({ ...formData, contact_number: e.target.value })}
-              placeholder="+91 XXXXX XXXXX"
-              style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '10px 14px', fontSize: '14px', width: '100%' }}
-            />
-          </div>
-
-          <div>
-            <label style={{ fontSize: '11px', color: '#71717a', fontWeight: 600, display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>Residential Address</label>
-            <input
-              type="text"
-              className="m-input"
-              value={formData.address}
-              onChange={e => setFormData({ ...formData, address: e.target.value })}
-              placeholder="Address"
-              style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '10px 14px', fontSize: '14px', width: '100%' }}
-            />
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Sticky Save Button */}
-      <motion.div variants={itemVariants} style={{ position: 'sticky', bottom: '80px', zIndex: 10, paddingTop: '8px' }}>
+    <div style={{ padding: '0 4px', maxWidth: '500px', margin: '0 auto' }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: '8px 0 16px 0',
+        gap: '12px',
+      }}>
         <button
-          onClick={handleUpdate}
-          disabled={updating}
+          onClick={() => navigate(-1)}
           style={{
-            width: '100%',
-            minHeight: '48px',
-            borderRadius: '14px',
-            background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+            width: '36px',
+            height: '36px',
+            borderRadius: '12px',
             border: 'none',
-            color: '#EEEBDA',
-            fontWeight: 700,
-            fontSize: '15px',
-            cursor: updating ? 'not-allowed' : 'pointer',
+            background: '#f1f5f9',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '8px',
-            opacity: updating ? 0.7 : 1,
-            boxShadow: '0 4px 16px rgba(40, 43, 74, 0.25)',
+            cursor: 'pointer',
+            color: '#09090b',
           }}
         >
-          {updating ? <RefreshCw size={16} className="animate-spin" /> : <Save size={16} />}
-          {updating ? 'Saving Changes...' : 'Save Profile Changes'}
+          <ArrowLeft size={18} />
         </button>
-      </motion.div>
-    </motion.div>
+        <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#09090b', margin: 0, letterSpacing: '-0.3px' }}>
+          Profile
+        </h1>
+      </div>
+
+      {/* Hero Card with Gradient and Camera Avatar (Reference Screen 10) */}
+      <div style={{
+        background: 'linear-gradient(180deg, #ede9fe 0%, #f8fafc 100%)',
+        borderRadius: '24px',
+        padding: '28px 16px 22px',
+        textAlign: 'center',
+        border: '1px solid rgba(0,0,0,0.06)',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.02)',
+        marginBottom: '20px',
+        position: 'relative',
+      }}>
+        {/* Avatar with Camera badge */}
+        <div style={{ position: 'relative', display: 'inline-block', marginBottom: '12px' }}>
+          <div style={{
+            width: '86px',
+            height: '86px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+            color: '#EEEBDA',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '28px',
+            fontWeight: 800,
+            border: '3px solid #ffffff',
+            boxShadow: '0 8px 24px rgba(40,43,74,0.18)',
+            overflow: 'hidden',
+          }}>
+            <User size={46} color="#EEEBDA" />
+          </div>
+
+          <div style={{
+            position: 'absolute',
+            bottom: '0px',
+            right: '0px',
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: '#282B4A',
+            border: '2px solid #ffffff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#ffffff',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+            cursor: 'pointer',
+          }}>
+            <Camera size={13} />
+          </div>
+        </div>
+
+        {/* Student Name */}
+        <div style={{
+          fontSize: '20px',
+          fontWeight: 800,
+          color: '#09090b',
+          letterSpacing: '-0.4px',
+          marginBottom: '4px',
+        }}>
+          {fullName}
+        </div>
+
+        {/* Subtitle: CS629 • 7th Semester */}
+        <div style={{
+          fontSize: '13px',
+          fontWeight: 600,
+          color: '#64748b',
+          marginBottom: '2px',
+        }}>
+          {enrollmentNo} • {semesterNo}th Semester
+        </div>
+
+        {/* Department: Computer Science Engineering */}
+        <div style={{
+          fontSize: '12px',
+          color: '#94a3b8',
+          fontWeight: 500,
+        }}>
+          {branchName}
+        </div>
+      </div>
+
+      {/* Success/Error Message */}
+      {msg?.text && (
+        <div style={{
+          padding: '12px 16px',
+          borderRadius: '14px',
+          marginBottom: '16px',
+          fontSize: '13px',
+          fontWeight: 600,
+          background: msg.type === 'error' ? '#fee2e2' : '#dcfce7',
+          color: msg.type === 'error' ? '#b91c1c' : '#15803d',
+        }}>
+          {msg.text}
+        </div>
+      )}
+
+      {/* Information Cards Stack (Reference Screen 10) */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
+        {infoCards.map((card, idx) => {
+          const Icon = card.icon;
+          return (
+            <div
+              key={idx}
+              style={{
+                background: '#ffffff',
+                borderRadius: '18px',
+                border: '1px solid rgba(0,0,0,0.06)',
+                padding: '16px 18px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+              }}
+            >
+              {/* Icon Container */}
+              <div style={{
+                width: '42px',
+                height: '42px',
+                borderRadius: '12px',
+                background: card.bg,
+                color: card.color,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}>
+                <Icon size={20} />
+              </div>
+
+              {/* Label & Value */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600, textTransform: 'capitalize', marginBottom: '2px' }}>
+                  {card.label}
+                </div>
+                <div style={{
+                  fontSize: '15px',
+                  fontWeight: 700,
+                  color: '#09090b',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}>
+                  {card.value}
+                </div>
+              </div>
+
+              {card.copyable && (
+                <CopyButton text={card.value} />
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Toggle Edit Section */}
+      <button
+        onClick={() => setIsEditing(!isEditing)}
+        style={{
+          width: '100%',
+          padding: '12px',
+          borderRadius: '14px',
+          background: isEditing ? '#ede9fe' : '#f1f5f9',
+          color: isEditing ? '#4f46e5' : '#475569',
+          border: 'none',
+          fontSize: '13px',
+          fontWeight: 700,
+          cursor: 'pointer',
+          marginBottom: '16px',
+        }}
+      >
+        {isEditing ? 'Hide Edit Form' : 'Edit Contact Details'}
+      </button>
+
+      {isEditing && (
+        <form
+          onSubmit={(e) => {
+            handleUpdate(e);
+            setIsEditing(false);
+          }}
+          style={{
+            background: '#ffffff',
+            borderRadius: '20px',
+            border: '1px solid rgba(0,0,0,0.06)',
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
+            marginBottom: '24px',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.02)',
+          }}
+        >
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 600, color: '#09090b', display: 'block', marginBottom: '6px' }}>Phone Number</label>
+            <input
+              type="text"
+              value={formData.phone}
+              onChange={e => setFormData({ ...formData, phone: e.target.value })}
+              placeholder="+91 98765 43210"
+              style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '14px', boxSizing: 'border-box' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 600, color: '#09090b', display: 'block', marginBottom: '6px' }}>Address</label>
+            <textarea
+              rows={2}
+              value={formData.address}
+              onChange={e => setFormData({ ...formData, address: e.target.value })}
+              placeholder="Residential address"
+              style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '14px', boxSizing: 'border-box' }}
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={updating}
+            style={{
+              padding: '14px',
+              borderRadius: '14px',
+              background: '#282B4A',
+              color: '#ffffff',
+              border: 'none',
+              fontSize: '14px',
+              fontWeight: 700,
+              cursor: updating ? 'not-allowed' : 'pointer',
+            }}
+          >
+            {updating ? 'Saving...' : 'Save Changes'}
+          </button>
+        </form>
+      )}
+    </div>
   );
 }
 
 // ── Main Export: Desktop & Responsive Student Profile ──
 export function MyProfile() {
   const { user, setUser } = useAuthStore();
-  const { isMobile } = useIsMobile();
+  const { isMobile, isTablet } = useIsMobile();
+  const isSmallScreen = isMobile || isTablet;
   
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -403,7 +471,7 @@ export function MyProfile() {
   };
 
   // ── Mobile View ──
-  if (isMobile) {
+  if (isSmallScreen) {
     if (loading) {
       return (
         <div>

@@ -13,12 +13,13 @@ import { useIsMobile } from "../../hooks/useIsMobile";
 import { MobileTopBar } from "../../components/mobile/MobileTopBar";
 import { MobileBottomNav } from "../../components/mobile/MobileBottomNav";
 import { motion, AnimatePresence } from "framer-motion";
+import { GlobalSearchIsland } from "../../components/GlobalSearchIsland";
 import GradualBlur from "../../components/GradualBlur";
 
 export function StudentLayout() {
   const { user, setUser, logout } = useAuthStore();
   const navigate = useNavigate();
-  const { isMobile } = useIsMobile();
+  const { isMobile, isTablet } = useIsMobile();
   const [activeState, setActiveState] = useState<'idle' | 'search' | 'notifications' | 'profile'>('idle');
   const [notifIndex, setNotifIndex] = useState(0);
   const navbarRef = useRef<HTMLDivElement>(null);
@@ -77,7 +78,7 @@ export function StudentLayout() {
 
   // Auto-close Dynamic Island on 5s inactivity
   useEffect(() => {
-    if (activeState === 'search' || activeState === 'notifications' || activeState === 'profile') {
+    if (activeState === 'notifications' || activeState === 'profile') {
       const startTimer = () => {
         if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
         inactivityTimerRef.current = setTimeout(() => {
@@ -132,12 +133,15 @@ export function StudentLayout() {
     navigate('/login');
   };
 
-  // ── Mobile Layout ──
-  if (isMobile) {
+  // ── Mobile / Tablet Responsive Shell (< 1024px) ──
+  const isSmallScreen = isMobile || isTablet;
+  if (isSmallScreen) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'var(--bg)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%', background: '#f8fafc', paddingBottom: '76px', boxSizing: 'border-box' }}>
         <MobileTopBar />
-        <main className="m-content"><Outlet /></main>
+        <main style={{ flex: 1, padding: '16px 14px', maxWidth: '640px', width: '100%', margin: '0 auto', boxSizing: 'border-box' }}>
+          <Outlet />
+        </main>
         <MobileBottomNav />
       </div>
     );
@@ -324,34 +328,9 @@ export function StudentLayout() {
                 </motion.div>
               )}
 
-              {/* ─── SEARCH EXPANDED: Dynamic Island morph (No X button, auto-closes on inactivity) ─── */}
+              {/* ─── SEARCH EXPANDED: Dynamic Island morph with Live Universal Search ─── */}
               {activeState === 'search' && (
-                <motion.div
-                  key="search-expanded"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                  style={{
-                    display: 'flex', alignItems: 'center',
-                    width: 380, height: 60,
-                    padding: '0 20px', gap: 10,
-                  }}
-                >
-                  <Search size={18} color="#282B4A" strokeWidth={1.8} style={{ flexShrink: 0 }} />
-                  <input
-                    autoFocus
-                    type="text"
-                    placeholder="Search anything..."
-                    style={{
-                      flex: 1, background: 'transparent',
-                      border: 'none', outline: 'none',
-                      fontSize: 15, fontWeight: 500,
-                      color: '#282B4A', fontFamily: 'Space Grotesk, sans-serif',
-                      caretColor: '#282B4A',
-                    }}
-                  />
-                </motion.div>
+                <GlobalSearchIsland role="student" onClose={() => setActiveState('idle')} />
               )}
 
               {/* ─── NOTIFICATION EXPANDED: Dynamic Island morph (No X button, auto-closes on inactivity) ─── */}

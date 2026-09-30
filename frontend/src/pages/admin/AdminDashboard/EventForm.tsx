@@ -122,8 +122,21 @@ export const EventForm: React.FC = () => {
           <ArrowLeft size={20} color="#09090b" />
         </button>
         <div>
-          <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#09090b', margin: 0, letterSpacing: '-0.5px' }}>
-            {isEdit ? 'Edit Event' : 'Create New Event'}
+          <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#09090b', margin: 0, letterSpacing: '-0.8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span>{isEdit ? 'Edit' : 'Create New'}</span>
+            <span style={{
+              background: '#282B4A',
+              color: '#EEEBDA',
+              padding: '4px 18px',
+              borderRadius: '14px',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              lineHeight: 1.2,
+              border: '1px solid rgba(238, 235, 218, 0.2)',
+            }}>
+              Event
+            </span>
           </h1>
         </div>
       </div>
@@ -236,9 +249,26 @@ export const EventForm: React.FC = () => {
             type="submit" 
             disabled={saving}
             onClick={(e) => { if (!isEdit) handleSubmit(e, 'PUBLISHED') }}
-            style={{ padding: '12px 24px', borderRadius: '12px', background: '#4f46e5', color: '#ffffff', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+            style={{
+              padding: '12px 28px',
+              borderRadius: '14px',
+              border: '1px solid rgba(238, 235, 218, 0.2)',
+              background: '#282B4A',
+              color: '#EEEBDA',
+              fontWeight: 700,
+              fontSize: '14px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              boxShadow: '0 4px 14px rgba(40, 43, 74, 0.25)',
+              transition: 'all 0.2s ease',
+              opacity: saving ? 0.7 : 1,
+            }}
+            onMouseEnter={e => { if (!saving) e.currentTarget.style.background = '#373a61'; }}
+            onMouseLeave={e => { if (!saving) e.currentTarget.style.background = '#282B4A'; }}
           >
-            <Save size={18} />
+            <Save size={18} color="#EEEBDA" />
             {isEdit ? 'Save Changes' : 'Publish Event'}
           </button>
         </div>

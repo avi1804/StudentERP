@@ -1,15 +1,202 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { apiClient as api } from "../../api/axios";
-import { 
+import {
   ClipboardList, CheckCircle2, Clock, AlertCircle,
-  Filter, List, Grid, MoreVertical, 
-  ChevronLeft, ChevronRight, ChevronDown, ArrowUpRight, FileUp, X, Download
+  Filter, List, Grid, MoreVertical,
+  ChevronLeft, ChevronRight, ChevronDown, ArrowUpRight, FileUp, X, Download,
+  ArrowLeft, Cloud, Cpu, FileText, Binary
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
 import TextType from "../../components/TextType";
+import { useIsMobile } from "../../hooks/useIsMobile";
+
+// ── Mobile Assignments Component (Reference Screen 7) ──
+function MobileAssignments({ assignments, onSubmitClick }: { assignments: any[]; onSubmitClick: (a: any) => void }) {
+  const navigate = useNavigate();
+  const [filter, setFilter] = useState<'ongoing' | 'submitted' | 'all'>('ongoing');
+
+  const defaultList = [
+    { id: 1, title: "ML Assignment #3", subject: "Machine Learning", dueText: "Due in 2 days", dueDate: "27 Sep 2026", status: "PENDING", raw: null as any },
+    { id: 2, title: "NLP Research Report", subject: "NLP", dueText: "Due in 5 days", dueDate: "30 Sep 2026", status: "PENDING", raw: null as any },
+    { id: 3, title: "FLAT Problems Set", subject: "FLAT", dueText: "Due in 7 days", dueDate: "02 Oct 2026", status: "PENDING", raw: null as any },
+    { id: 4, title: "Cloud Project", subject: "Cloud Computing", dueText: "Due in 10 days", dueDate: "05 Oct 2026", status: "PENDING", raw: null as any },
+    { id: 5, title: "Network Architecture Lab", subject: "Computer Networks", dueText: "Submitted", dueDate: "22 Sep 2026", status: "SUBMITTED", raw: null as any }
+  ];
+
+  const listToUse = (assignments && assignments.length > 0) ? assignments.map((a, i) => ({
+    id: a.id || i + 1,
+    title: a.title || `Assignment #${i + 1}`,
+    subject: a.subject_name || a.subject || 'General',
+    dueText: (a.status === 'SUBMITTED' || a.status === 'GRADED') ? 'Submitted' : (a.due_date ? `Due ${new Date(a.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : 'Due in 3 days'),
+    dueDate: a.due_date ? new Date(a.due_date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : '28 Sep 2026',
+    status: a.status || 'PENDING',
+    raw: a,
+  })) : defaultList;
+
+  const filtered = listToUse.filter(item => {
+    if (filter === 'ongoing') return item.status !== 'SUBMITTED' && item.status !== 'GRADED';
+    if (filter === 'submitted') return item.status === 'SUBMITTED' || item.status === 'GRADED';
+    return true;
+  });
+
+  const getTheme = (subject: string) => {
+    const l = (subject || '').toLowerCase();
+    if (l.includes('machine') || l.includes('ml')) return { icon: Cpu, bg: '#fff7ed', color: '#ea580c', badgeBg: '#fee2e2', badgeColor: '#ef4444' };
+    if (l.includes('nlp') || l.includes('natural')) return { icon: FileText, bg: '#faf5ff', color: '#9333ea', badgeBg: '#ffedd5', badgeColor: '#ea580c' };
+    if (l.includes('flat') || l.includes('automata')) return { icon: Binary, bg: '#fefce8', color: '#ca8a04', badgeBg: '#fef3c7', badgeColor: '#b45309' };
+    if (l.includes('cloud')) return { icon: Cloud, bg: '#eff6ff', color: '#2563eb', badgeBg: '#dbeafe', badgeColor: '#1d4ed8' };
+    return { icon: ClipboardList, bg: '#f1f5f9', color: '#475569', badgeBg: '#f1f5f9', badgeColor: '#475569' };
+  };
+
+  return (
+    <div style={{ padding: '0 4px', maxWidth: '500px', margin: '0 auto' }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: '8px 0 16px 0',
+        gap: '12px',
+      }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '12px',
+            border: 'none',
+            background: '#f1f5f9',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            color: '#09090b',
+          }}
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#09090b', margin: 0, letterSpacing: '-0.3px' }}>
+          Assignments
+        </h1>
+      </div>
+
+      {/* Filter Chips Bar (Reference Screen 7: [ Ongoing ] [ Submitted ] [ All ]) */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        marginBottom: '20px',
+      }}>
+        {[
+          { key: 'ongoing', label: 'Ongoing' },
+          { key: 'submitted', label: 'Submitted' },
+          { key: 'all', label: 'All' },
+        ].map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => setFilter(tab.key as any)}
+            style={{
+              padding: '8px 18px',
+              borderRadius: '14px',
+              border: 'none',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              background: filter === tab.key ? '#ede9fe' : '#f1f5f9',
+              color: filter === tab.key ? '#4f46e5' : '#64748b',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Stacked Assignment Cards */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {filtered.map((item, idx) => {
+          const theme = getTheme(item.subject);
+          const Icon = theme.icon;
+
+          return (
+            <div
+              key={item.id || idx}
+              onClick={() => onSubmitClick((item as any).raw || item)}
+              style={{
+                background: '#ffffff',
+                borderRadius: '18px',
+                border: '1px solid rgba(0,0,0,0.06)',
+                padding: '16px 18px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+                cursor: 'pointer',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+              }}
+            >
+              {/* Icon */}
+              <div style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '14px',
+                background: theme.bg,
+                color: theme.color,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}>
+                <Icon size={22} />
+              </div>
+
+              {/* Info */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  fontSize: '15px',
+                  fontWeight: 700,
+                  color: '#09090b',
+                  marginBottom: '2px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}>
+                  {item.title}
+                </div>
+                <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '8px' }}>
+                  {item.subject}
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    background: item.status === 'SUBMITTED' ? '#dcfce7' : theme.badgeBg,
+                    color: item.status === 'SUBMITTED' ? '#16a34a' : theme.badgeColor,
+                    padding: '2px 8px',
+                    borderRadius: '8px',
+                  }}>
+                    {item.dueText}
+                  </span>
+                  <span style={{ fontSize: '11px', color: '#94a3b8' }}>
+                    {item.dueDate}
+                  </span>
+                </div>
+              </div>
+
+              {/* Chevron */}
+              <ChevronRight size={18} color="#94a3b8" style={{ flexShrink: 0 }} />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export function MyAssignments() {
+  const { isMobile, isTablet } = useIsMobile();
+  const isSmallScreen = isMobile || isTablet;
   const [loading, setLoading] = useState(true);
   const [assignments, setAssignments] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("All Assignments");
@@ -70,6 +257,44 @@ export function MyAssignments() {
     if (activeTab === "Overdue") return a.status === 'OVERDUE';
     return true;
   });
+
+  if (isSmallScreen) {
+    return (
+      <>
+        {/* Modal if submitting on mobile */}
+        {submitModalAssignment && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+            <div style={{ background: '#ffffff', borderRadius: '24px', padding: '24px', width: '100%', maxWidth: '400px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#09090b' }}>Submit Assignment</h3>
+                <button onClick={() => setSubmitModalAssignment(null)} style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}><X size={20} /></button>
+              </div>
+              <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px' }}>{submitModalAssignment.title}</p>
+              <form onSubmit={handleStudentSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 600, color: '#09090b', display: 'block', marginBottom: '4px' }}>Solution URL / File Link</label>
+                  <input
+                    type="text"
+                    value={submissionUrl}
+                    onChange={(e) => setSubmissionUrl(e.target.value)}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '13px', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <button type="submit" style={{ padding: '12px', borderRadius: '14px', background: '#282B4A', color: '#ffffff', border: 'none', fontWeight: 700, cursor: 'pointer', marginTop: '8px' }}>
+                  Submit Now
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        <MobileAssignments
+          assignments={assignments}
+          onSubmitClick={(a) => setSubmitModalAssignment(a)}
+        />
+      </>
+    );
+  }
 
   return (
     <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>

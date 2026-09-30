@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { apiClient as api } from "../../api/axios";
 
 import { 
   BookOpen, ClipboardList, TrendingUp, Award, 
   ChevronRight, CalendarDays, CheckCircle2,
   Monitor, Database, Network, Code2, Brain, BarChart2,
-  ChevronDown, ArrowUpRight
+  ChevronDown, ArrowUpRight, ArrowLeft, Cloud, FileText, Binary, Wifi
 } from "lucide-react";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
@@ -13,8 +14,217 @@ import { motion } from "framer-motion";
 import TextType from "../../components/TextType";
 import { TimetableAttendanceService } from "../../services/timetableAttendanceService";
 
+// ── Mobile Subjects Component (Reference Screen 4) ──
+function MobileSubjects({ subjects, selectedSemester, onSemesterChange }: {
+  subjects: any[];
+  selectedSemester: number;
+  onSemesterChange: (sem: number) => void;
+}) {
+  const navigate = useNavigate();
+  const [filterType, setFilterType] = useState<'all' | 'core' | 'lab'>('all');
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+
+  const getTheme = (name: string) => {
+    const lower = (name || '').toLowerCase();
+    if (lower.includes('cloud')) return { icon: Cloud, bg: '#eff6ff', color: '#2563eb' };
+    if (lower.includes('machine') || lower.includes('ml')) return { icon: Brain, bg: '#fff7ed', color: '#ea580c' };
+    if (lower.includes('nlp') || lower.includes('natural')) return { icon: FileText, bg: '#fffbeb', color: '#d97706' };
+    if (lower.includes('flat') || lower.includes('automata')) return { icon: Binary, bg: '#f5f3ff', color: '#9333ea' };
+    if (lower.includes('network')) return { icon: Wifi, bg: '#ecfeff', color: '#0891b2' };
+    return { icon: BookOpen, bg: '#f1f5f9', color: '#475569' };
+  };
+
+  return (
+    <div style={{ padding: '0 4px', maxWidth: '500px', margin: '0 auto' }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: '8px 0 16px 0',
+        gap: '12px',
+      }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '12px',
+            border: 'none',
+            background: '#f1f5f9',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            color: '#09090b',
+          }}
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#09090b', margin: 0, letterSpacing: '-0.3px' }}>
+          Subjects
+        </h1>
+      </div>
+
+      {/* Filter Chips Bar (Reference Screen 4) */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
+        <button
+          onClick={() => setFilterType('all')}
+          style={{
+            padding: '8px 18px',
+            borderRadius: '12px',
+            border: 'none',
+            fontSize: '13px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            background: filterType === 'all' ? '#ede9fe' : '#f1f5f9',
+            color: filterType === 'all' ? '#4f46e5' : '#64748b',
+          }}
+        >
+          All Subjects
+        </button>
+
+        {/* Semester selector pill */}
+        <div style={{ position: 'relative' }}>
+          <select
+            value={selectedSemester}
+            onChange={(e) => onSemesterChange(Number(e.target.value))}
+            style={{
+              padding: '8px 28px 8px 14px',
+              borderRadius: '12px',
+              border: '1px solid #e2e8f0',
+              background: '#ffffff',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#09090b',
+              appearance: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            {[1, 2, 3, 4, 5, 6, 7, 8].map(s => (
+              <option key={s} value={s}>Semester {s}</option>
+            ))}
+          </select>
+          <ChevronDown size={14} color="#64748b" style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+        </div>
+      </div>
+
+      {/* Vertical Subject Cards List */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {subjects.map((sub, idx) => {
+          const theme = getTheme(sub.name);
+          const Icon = theme.icon;
+          const isExpanded = expandedId === (sub.id || idx);
+
+          return (
+            <div
+              key={sub.id || idx}
+              style={{
+                background: '#ffffff',
+                borderRadius: '18px',
+                border: '1px solid rgba(0,0,0,0.06)',
+                overflow: 'hidden',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <div
+                onClick={() => setExpandedId(isExpanded ? null : (sub.id || idx))}
+                style={{
+                  padding: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '14px',
+                  cursor: 'pointer',
+                }}
+              >
+                {/* Icon container */}
+                <div style={{
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '14px',
+                  background: theme.bg,
+                  color: theme.color,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}>
+                  <Icon size={22} />
+                </div>
+
+                {/* Details */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    fontSize: '15px',
+                    fontWeight: 700,
+                    color: '#09090b',
+                    marginBottom: '2px',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}>
+                    {sub.name}
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>
+                    <span style={{ fontWeight: 600, color: '#475569' }}>{sub.code || `CS${701 + idx}`}</span>
+                    <span style={{ margin: '0 6px' }}>•</span>
+                    <span>Prof. {sub.professor || sub.faculty_name || 'Faculty'}</span>
+                  </div>
+                </div>
+
+                {/* Chevron */}
+                <ChevronRight
+                  size={18}
+                  color="#94a3b8"
+                  style={{
+                    transform: isExpanded ? 'rotate(90deg)' : 'none',
+                    transition: 'transform 0.2s',
+                    flexShrink: 0,
+                  }}
+                />
+              </div>
+
+              {/* Expandable info */}
+              {isExpanded && (
+                <div style={{
+                  padding: '14px 16px 16px',
+                  background: '#f8fafc',
+                  borderTop: '1px solid #f1f5f9',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                    <div style={{ background: '#ffffff', padding: '10px', borderRadius: '12px', textAlign: 'center', border: '1px solid rgba(0,0,0,0.04)' }}>
+                      <div style={{ fontSize: '14px', fontWeight: 700, color: '#09090b' }}>{sub.credits || 4}</div>
+                      <div style={{ fontSize: '11px', color: '#64748b' }}>Credits</div>
+                    </div>
+                    <div style={{ background: '#ffffff', padding: '10px', borderRadius: '12px', textAlign: 'center', border: '1px solid rgba(0,0,0,0.04)' }}>
+                      <div style={{ fontSize: '14px', fontWeight: 700, color: '#16a34a' }}>{sub.grade || 'A'}</div>
+                      <div style={{ fontSize: '11px', color: '#64748b' }}>Grade</div>
+                    </div>
+                    <div style={{ background: '#ffffff', padding: '10px', borderRadius: '12px', textAlign: 'center', border: '1px solid rgba(0,0,0,0.04)' }}>
+                      <div style={{ fontSize: '14px', fontWeight: 700, color: '#2563eb' }}>Sem {selectedSemester}</div>
+                      <div style={{ fontSize: '11px', color: '#64748b' }}>Status</div>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#64748b', display: 'flex', justifyContent: 'space-between', padding: '0 4px' }}>
+                    <span>Faculty: <strong>Prof. {sub.professor || sub.faculty_name || 'Faculty'}</strong></span>
+                    <span>Department: <strong>CSE</strong></span>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export function MySubjects() {
-  const { isMobile } = useIsMobile();
+  const { isMobile, isTablet } = useIsMobile();
+  const isSmallScreen = isMobile || isTablet;
   const [data, setData] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSemester, setSelectedSemester] = useState<number>(7);
@@ -47,6 +257,16 @@ export function MySubjects() {
 
   const subjectsList = data.length > 0 ? data : defaultSubjects;
 
+  if (isSmallScreen) {
+    return (
+      <MobileSubjects
+        subjects={subjectsList}
+        selectedSemester={selectedSemester}
+        onSemesterChange={setSelectedSemester}
+      />
+    );
+  }
+
   // Real-time metric calculations
   const totalSubjects = subjectsList.length;
   const totalCredits = subjectsList.reduce((acc: number, curr: any) => acc + (Number(curr.credits) || 4), 0);
@@ -63,8 +283,6 @@ export function MySubjects() {
       default: return { bg: "rgba(40,43,74,0.08)", text: "#282B4A" };
     }
   };
-
-
 
   return (
     <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto' }}>

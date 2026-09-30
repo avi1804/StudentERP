@@ -21,11 +21,16 @@ export interface CollegeEvent {
   status: 'DRAFT' | 'PUBLISHED' | 'CANCELLED';
 }
 
+import { useIsMobile } from '../../hooks/useIsMobile';
+
 export const EventsList: React.FC = () => {
   const [events, setEvents] = useState<CollegeEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [mobileTab, setMobileTab] = useState<'upcoming' | 'past' | 'all'>('upcoming');
   const navigate = useNavigate();
+  const { isMobile, isTablet } = useIsMobile();
+  const isSmallScreen = isMobile || isTablet;
 
   useEffect(() => {
     fetchEvents();
@@ -116,6 +121,157 @@ export const EventsList: React.FC = () => {
       </motion.div>
     );
   };
+
+  // ── Mobile Responsive Layout (< 1024px) ──
+  if (isSmallScreen) {
+    const displayedEvents = 
+      mobileTab === 'upcoming' ? upcomingEvents :
+      mobileTab === 'past' ? pastEvents :
+      filteredEvents;
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '20px' }}>
+        {/* Title */}
+        <div>
+          <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.5px', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>Campus</span>
+            <span style={{
+              background: '#282B4A',
+              color: '#EEEBDA',
+              padding: '2px 12px',
+              borderRadius: '10px',
+              fontSize: '18px',
+            }}>
+              Events
+            </span>
+          </h1>
+          <div style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>
+            Discover and participate in college activities
+          </div>
+        </div>
+
+        {/* Search */}
+        <div style={{ position: 'relative', width: '100%' }}>
+          <Search size={16} color="#94a3b8" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }} />
+          <input
+            type="text"
+            placeholder="Search events or category..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '11px 14px 11px 40px',
+              borderRadius: '14px',
+              border: '1.5px solid #e2e8f0',
+              background: '#ffffff',
+              fontSize: '14px',
+              color: '#09090b',
+              outline: 'none',
+              boxSizing: 'border-box',
+            }}
+          />
+        </div>
+
+        {/* Tab Pills */}
+        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
+          {[
+            { id: 'upcoming', label: `Upcoming (${upcomingEvents.length})` },
+            { id: 'past', label: `Past (${pastEvents.length})` },
+            { id: 'all', label: `All (${filteredEvents.length})` },
+          ].map(tab => {
+            const active = mobileTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setMobileTab(tab.id as any)}
+                style={{
+                  padding: '7px 14px',
+                  borderRadius: '10px',
+                  fontSize: '13px',
+                  fontWeight: active ? 700 : 500,
+                  border: active ? '1.5px solid #282B4A' : '1px solid #e2e8f0',
+                  background: active ? '#282B4A' : '#ffffff',
+                  color: active ? '#ffffff' : '#64748b',
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Event Cards List */}
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748b', fontSize: '14px' }}>Loading events...</div>
+        ) : displayedEvents.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '48px 20px', background: '#ffffff', borderRadius: '18px', border: '1px dashed #e2e8f0' }}>
+            <CalendarDays size={40} color="#cbd5e1" style={{ margin: '0 auto 12px' }} />
+            <div style={{ fontSize: '15px', fontWeight: 600, color: '#334155' }}>No events found</div>
+            <div style={{ fontSize: '13px', color: '#94a3b8', marginTop: '4px' }}>Check back later for new college activities</div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {displayedEvents.map(event => {
+              const isCancelled = event.status === 'CANCELLED';
+              return (
+                <div
+                  key={event.id}
+                  onClick={() => navigate(`detail/${event.id}`)}
+                  style={{
+                    background: '#ffffff',
+                    borderRadius: '18px',
+                    border: '1px solid #f1f5f9',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    opacity: isCancelled ? 0.6 : 1,
+                  }}
+                >
+                  {event.banner_image_url && (
+                    <div style={{ height: '130px', width: '100%', overflow: 'hidden' }}>
+                      <img src={event.banner_image_url} alt={event.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                  )}
+                  <div style={{ padding: '14px 16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 600, color: '#475569', background: '#f1f5f9', padding: '3px 10px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <Tag size={11} /> {event.category}
+                      </span>
+                      {isCancelled && (
+                        <span style={{ fontSize: '11px', fontWeight: 700, color: '#ef4444', background: '#fee2e2', padding: '2px 8px', borderRadius: '6px' }}>
+                          CANCELLED
+                        </span>
+                      )}
+                    </div>
+                    <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 700, color: '#09090b', lineHeight: 1.35 }}>
+                      {event.title}
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px', color: '#64748b' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <CalendarDays size={13} color="#282B4A" />
+                        <span>{new Date(event.start_date_time).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Clock size={13} color="#f59e0b" />
+                        <span>{new Date(event.start_date_time).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <MapPin size={13} color="#10b981" />
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{event.venue}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="premium-dashboard">

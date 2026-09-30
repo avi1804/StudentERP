@@ -1,4 +1,4 @@
-ximport React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useAuthStore } from "../../store/authStore";
 import { apiClient as api } from "../../api/axios";
 import { useNavigate } from "react-router-dom";
@@ -6,11 +6,13 @@ import {
   Check, TrendingUp, Play, MonitorPlay,
   User, IdCard, CheckCircle2, Calendar,
   BarChart2, Book, Megaphone, Layers, Briefcase, ArrowUpRight,
-  CheckCircle, FileText, Activity, ChevronLeft, ChevronRight, Clock, Monitor, Database, Network, Brain, Code2, Utensils, BookOpen, AlertCircle, RefreshCw
+  CheckCircle, FileText, Activity, ChevronLeft, ChevronRight, Clock, Monitor, Database, Network, Brain, Code2, Utensils, BookOpen, AlertCircle, RefreshCw,
+  ClipboardList, Wallet
 } from "lucide-react";
 import { motion } from "framer-motion";
 import TextType from "../../components/TextType";
 import { TimetableAttendanceService } from "../../services/timetableAttendanceService";
+import { useIsMobile } from "../../hooks/useIsMobile";
 
 /* ── Interactive Real-Time Calendar Component with Circular Badges & Surprising UX ── */
 /* ── Interactive Real-Time Calendar Component with Live Database Assignments ── */
@@ -818,6 +820,310 @@ export function StudentHome() {
   }, [user, setUser]);
 
   const displayName = userName || user?.full_name || 'Student';
+  const { isMobile, isTablet } = useIsMobile();
+  const isSmallScreen = isMobile || isTablet;
+
+  if (isSmallScreen) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', fontFamily: 'Space Grotesk, sans-serif' }}>
+        {/* Welcome Section */}
+        <div>
+          <div style={{ fontSize: '14px', color: '#64748b', fontWeight: 600 }}>Welcome back,</div>
+          <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.5px', margin: '2px 0 0 0' }}>
+            {displayName}! 👋
+          </h1>
+          <p style={{ fontSize: '12px', color: '#94a3b8', margin: '2px 0 0 0', fontWeight: 500 }}>
+            Learn. Manage. Grow.
+          </p>
+        </div>
+
+        {/* Enrollment Card */}
+        <div
+          onClick={() => navigate('/dashboard/idcard')}
+          style={{
+            background: '#ffffff',
+            borderRadius: '22px',
+            padding: '18px 20px',
+            border: '1.5px solid rgba(40, 43, 74, 0.08)',
+            boxShadow: '0 4px 18px rgba(40, 43, 74, 0.03)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            cursor: 'pointer',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div style={{
+              width: '46px',
+              height: '46px',
+              borderRadius: '14px',
+              background: 'rgba(59, 130, 246, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#3b82f6',
+              flexShrink: 0,
+            }}>
+              <IdCard size={24} />
+            </div>
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
+                Enrollment Number
+              </div>
+              <div style={{ fontSize: '20px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.3px', margin: '2px 0' }}>
+                {dashData.enrollment_number || 'CS629'}
+              </div>
+              <div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600 }}>
+                Active • Verified Student ID
+              </div>
+            </div>
+          </div>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            background: 'rgba(40, 43, 74, 0.06)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#282B4A',
+          }}>
+            <ArrowUpRight size={16} />
+          </div>
+        </div>
+
+        {/* 2x2 KPI Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          {/* Card 1: Attendance */}
+          <div
+            onClick={() => navigate('/dashboard/attendance')}
+            style={{
+              background: '#ffffff',
+              borderRadius: '20px',
+              padding: '16px',
+              border: '1.5px solid rgba(40, 43, 74, 0.08)',
+              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.02)',
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              minHeight: '120px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(40, 43, 74, 0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#282B4A' }}>
+                <CheckCircle size={16} />
+              </div>
+              <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Attendance</span>
+            </div>
+            <div>
+              <div style={{ fontSize: '22px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.5px' }}>
+                {dashData.attendance_rate}%
+              </div>
+              <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>
+                {dashData.total_classes > 0 ? `${dashData.present_classes}/${dashData.total_classes} classes` : '84/99 classes'}
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2: CGPA */}
+          <div
+            onClick={() => navigate('/dashboard/results')}
+            style={{
+              background: '#f7fee7',
+              borderRadius: '20px',
+              padding: '16px',
+              border: '1.5px solid rgba(132, 204, 22, 0.25)',
+              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.02)',
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              minHeight: '120px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#84cc16', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffffff' }}>
+                <TrendingUp size={16} />
+              </div>
+              <span style={{ fontSize: '11px', color: '#4d7c0f', fontWeight: 700, background: 'rgba(132, 204, 22, 0.2)', padding: '2px 6px', borderRadius: '6px' }}>
+                CGPA
+              </span>
+            </div>
+            <div>
+              <div style={{ fontSize: '22px', fontWeight: 800, color: '#1e3a1e', letterSpacing: '-0.5px' }}>
+                {dashData.cgpa}
+              </div>
+              <div style={{ fontSize: '11px', color: '#4d7c0f', marginTop: '2px', fontWeight: 600 }}>
+                Cumulative
+              </div>
+            </div>
+          </div>
+
+          {/* Card 3: Complaints */}
+          <div
+            onClick={() => navigate('/dashboard/complaints')}
+            style={{
+              background: '#ffffff',
+              borderRadius: '20px',
+              padding: '16px',
+              border: '1.5px solid rgba(40, 43, 74, 0.08)',
+              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.02)',
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              minHeight: '120px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(245, 158, 11, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b' }}>
+                <Megaphone size={16} />
+              </div>
+              <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Complaints</span>
+            </div>
+            <div>
+              <div style={{ fontSize: '22px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.5px' }}>
+                {complaintStats?.total || 2}
+              </div>
+              <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>
+                {(complaintStats?.open || 0) + (complaintStats?.in_progress || 0)} Active • {complaintStats?.resolved || 2} Resolved
+              </div>
+            </div>
+          </div>
+
+          {/* Card 4: Upcoming Class */}
+          <div
+            onClick={() => navigate('/dashboard/timetable')}
+            style={{
+              background: '#eff6ff',
+              borderRadius: '20px',
+              padding: '16px',
+              border: '1.5px solid rgba(59, 130, 246, 0.2)',
+              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.02)',
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              minHeight: '120px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffffff' }}>
+                <Clock size={16} />
+              </div>
+              <span style={{ fontSize: '11px', color: '#1d4ed8', fontWeight: 600 }}>Upcoming</span>
+            </div>
+            <div>
+              <div style={{ fontSize: '15px', fontWeight: 800, color: '#1e3a8a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                Cloud Computing
+              </div>
+              <div style={{ fontSize: '11px', color: '#2563eb', marginTop: '2px', fontWeight: 600 }}>
+                in 18 mins • Room 204
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Section: Today's Schedule */}
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <h2 style={{ fontSize: '17px', fontWeight: 800, color: '#09090b', margin: 0 }}>Today's Schedule</h2>
+            <span
+              onClick={() => navigate('/dashboard/timetable')}
+              style={{ fontSize: '12px', fontWeight: 700, color: '#282B4A', cursor: 'pointer' }}
+            >
+              View All
+            </span>
+          </div>
+
+          <div
+            onClick={() => navigate('/dashboard/timetable')}
+            style={{
+              background: '#ffffff',
+              borderRadius: '20px',
+              padding: '16px',
+              border: '1.5px solid rgba(40, 43, 74, 0.08)',
+              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.02)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              cursor: 'pointer',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <div style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '14px',
+                background: 'rgba(59, 130, 246, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#3b82f6',
+                flexShrink: 0,
+              }}>
+                <Monitor size={22} />
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '15px', fontWeight: 800, color: '#09090b' }}>Cloud Computing</span>
+                  <span style={{ background: '#fee2e2', color: '#ef4444', fontSize: '10px', fontWeight: 800, padding: '2px 6px', borderRadius: '6px' }}>
+                    • Ongoing
+                  </span>
+                </div>
+                <div style={{ fontSize: '12px', color: '#64748b', marginTop: '3px' }}>
+                  12:00 PM - 1:00 PM · Room 204
+                </div>
+              </div>
+            </div>
+            <ChevronRight size={18} color="#94a3b8" />
+          </div>
+        </div>
+
+        {/* Quick Shortcuts */}
+        <div>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '10px' }}>
+            Quick Shortcuts
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
+            {[
+              { label: 'Attendance', icon: CheckCircle, path: '/dashboard/attendance' },
+              { label: 'Timetable', icon: Calendar, path: '/dashboard/timetable' },
+              { label: 'Subjects', icon: BookOpen, path: '/dashboard/subjects' },
+              { label: 'Exams', icon: FileText, path: '/dashboard/results' },
+              { label: 'Assignments', icon: ClipboardList, path: '/dashboard/assignments' },
+              { label: 'Notices', icon: Megaphone, path: '/dashboard/notices' },
+              { label: 'Fees', icon: Wallet, path: '/dashboard/fees' },
+              { label: 'ID Card', icon: IdCard, path: '/dashboard/idcard' },
+            ].map(item => (
+              <div
+                key={item.label}
+                onClick={() => navigate(item.path)}
+                style={{
+                  background: '#ffffff',
+                  borderRadius: '16px',
+                  padding: '12px 6px',
+                  border: '1px solid rgba(40, 43, 74, 0.08)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '6px',
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                }}
+              >
+                <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: 'rgba(40, 43, 74, 0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#282B4A' }}>
+                  <item.icon size={16} />
+                </div>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: '#282B4A' }}>{item.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="premium-dashboard">

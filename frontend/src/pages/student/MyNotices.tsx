@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   Bell, Filter, Megaphone, Send, Pin, Calendar, 
   BookOpen, ClipboardList, Users, Library, FlaskConical, Bookmark,
-  ChevronDown, MailCheck, Download, Settings, Volume2, ArrowUpRight, Search, Eye, X, AlertTriangle
+  ChevronDown, MailCheck, Download, Settings, Volume2, ArrowUpRight, Search, Eye, X, AlertTriangle,
+  ArrowLeft, ChevronRight
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
 import TextType from "../../components/TextType";
 import { apiClient as api } from "../../api/axios";
+import { useIsMobile } from "../../hooks/useIsMobile";
 
 interface NoticeItem {
   id: number;
@@ -18,6 +21,188 @@ interface NoticeItem {
   author_id: number;
   author_name?: string;
   created_at: string;
+}
+
+// ── Mobile Notices Component (Reference Screen 9) ──
+function MobileNotices({ notices, onSelectNotice }: { notices: NoticeItem[]; onSelectNotice: (n: any) => void }) {
+  const navigate = useNavigate();
+  const [filter, setFilter] = useState<string>("ALL");
+
+  const defaultList = [
+    { id: 1, title: "Mid-Semester Examination Notice", category: "Academic", created_at: "2 hours ago", content: "The mid-semester examinations for Semester 7 will commence from 15th October 2026. Please check the timetable." },
+    { id: 2, title: "Library Timings Update", category: "General", created_at: "1 day ago", content: "The central library will remain open until 10:00 PM on all working days starting next Monday." },
+    { id: 3, title: "Technical Fest 2026", category: "Event", created_at: "2 days ago", content: "Registrations are now open for Indus Hackathon & Tech Fest 2026. Exciting prizes to be won!" },
+    { id: 4, title: "Fee Payment Reminder", category: "Important", created_at: "3 days ago", content: "Final deadline for Semester 7 tuition fee submission without late fine is 30th September 2026." }
+  ];
+
+  const listToUse = (notices && notices.length > 0) ? notices.map((n, i) => ({
+    id: n.id || i + 1,
+    title: n.title,
+    category: n.category || 'General',
+    created_at: n.created_at ? new Date(n.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Recently',
+    content: n.content,
+  })) : defaultList;
+
+  const filtered = listToUse.filter(item => {
+    if (filter === "ALL") return true;
+    return item.category.toUpperCase().includes(filter) || filter.includes(item.category.toUpperCase());
+  });
+
+  const getTheme = (cat: string) => {
+    const c = (cat || '').toUpperCase();
+    if (c.includes('EXAM') || c.includes('ACADEMIC')) return { icon: BookOpen, bg: '#eff6ff', color: '#2563eb', pillBg: '#ede9fe', pillColor: '#4f46e5' };
+    if (c.includes('EVENT')) return { icon: Calendar, bg: '#faf5ff', color: '#9333ea', pillBg: '#faf5ff', pillColor: '#9333ea' };
+    if (c.includes('URGENT') || c.includes('IMPORTANT')) return { icon: AlertTriangle, bg: '#fef2f2', color: '#dc2626', pillBg: '#fee2e2', pillColor: '#ef4444' };
+    return { icon: Library, bg: '#fffbeb', color: '#d97706', pillBg: '#fef3c7', pillColor: '#b45309' };
+  };
+
+  return (
+    <div style={{ padding: '0 4px', maxWidth: '500px', margin: '0 auto' }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: '8px 0 16px 0',
+        gap: '12px',
+      }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '12px',
+            border: 'none',
+            background: '#f1f5f9',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            color: '#09090b',
+          }}
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#09090b', margin: 0, letterSpacing: '-0.3px' }}>
+          Notices
+        </h1>
+      </div>
+
+      {/* Category Chips Bar (Reference Screen 9: [ All ] [ Academic ] [ Examination ] [ Event ]) */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        overflowX: 'auto',
+        paddingBottom: '4px',
+        marginBottom: '20px',
+      }}>
+        {[
+          { key: "ALL", label: "All" },
+          { key: "ACADEMIC", label: "Academic" },
+          { key: "EXAM", label: "Examination" },
+          { key: "EVENT", label: "Event" },
+        ].map(chip => (
+          <button
+            key={chip.key}
+            onClick={() => setFilter(chip.key)}
+            style={{
+              padding: '8px 18px',
+              borderRadius: '14px',
+              border: 'none',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              background: filter === chip.key ? '#ede9fe' : '#f1f5f9',
+              color: filter === chip.key ? '#4f46e5' : '#64748b',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            {chip.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Notices List */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {filtered.map((item, idx) => {
+          const theme = getTheme(item.category);
+          const Icon = theme.icon;
+
+          return (
+            <div
+              key={item.id || idx}
+              onClick={() => onSelectNotice(item)}
+              style={{
+                background: '#ffffff',
+                borderRadius: '18px',
+                border: '1px solid rgba(0,0,0,0.06)',
+                padding: '16px 18px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+                cursor: 'pointer',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+              }}
+            >
+              {/* Icon */}
+              <div style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '14px',
+                background: theme.bg,
+                color: theme.color,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}>
+                <Icon size={22} />
+              </div>
+
+              {/* Info */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  fontSize: '15px',
+                  fontWeight: 700,
+                  color: '#09090b',
+                  marginBottom: '6px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}>
+                  {item.title}
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    background: theme.pillBg,
+                    color: theme.pillColor,
+                    padding: '2px 8px',
+                    borderRadius: '8px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}>
+                    <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: theme.pillColor }} />
+                    {item.category}
+                  </span>
+                  <span style={{ fontSize: '11px', color: '#94a3b8' }}>
+                    {item.created_at}
+                  </span>
+                </div>
+              </div>
+
+              {/* Chevron */}
+              <ChevronRight size={18} color="#94a3b8" style={{ flexShrink: 0 }} />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 export function MyNotices() {
@@ -93,6 +278,43 @@ export function MyNotices() {
       default: return { bg: "rgba(40,43,74,0.08)", text: "#282B4A" };
     }
   };
+
+  const { isMobile, isTablet } = useIsMobile();
+  const isSmallScreen = isMobile || isTablet;
+
+  if (isSmallScreen) {
+    return (
+      <>
+        {selectedNotice && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+            <div style={{ background: '#ffffff', borderRadius: '24px', padding: '24px', width: '100%', maxWidth: '420px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#09090b', lineHeight: 1.3 }}>{selectedNotice.title}</h3>
+                <button onClick={() => setSelectedNotice(null)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: '4px' }}><X size={20} /></button>
+              </div>
+              <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '14px' }}>
+                Category: <strong>{selectedNotice.category}</strong>
+              </div>
+              <p style={{ fontSize: '14px', color: '#334155', lineHeight: 1.6, margin: '0 0 20px 0' }}>
+                {selectedNotice.content}
+              </p>
+              <button
+                onClick={() => setSelectedNotice(null)}
+                style={{ width: '100%', padding: '12px', borderRadius: '14px', background: '#f1f5f9', border: 'none', fontWeight: 700, color: '#09090b', cursor: 'pointer' }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+
+        <MobileNotices
+          notices={notices}
+          onSelectNotice={(n) => setSelectedNotice(n)}
+        />
+      </>
+    );
+  }
 
   return (
     <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>

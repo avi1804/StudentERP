@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   Megaphone, Plus, ClipboardList, CheckCircle2, Clock, AlertCircle,
   ChevronDown, Filter, LayoutGrid, MoreVertical, Check, MessageSquare,
-  HelpCircle, Headset, ArrowUpRight, X, Send, Eye
+  HelpCircle, Headset, ArrowUpRight, X, Send, Eye,
+  ArrowLeft, Wifi, BookOpen, Tv, ChevronRight
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
 import TextType from "../../components/TextType";
 import { apiClient as api } from "../../api/axios";
+import { useIsMobile } from "../../hooks/useIsMobile";
 
 interface ComplaintItem {
   id: number;
@@ -134,11 +137,332 @@ export function MyComplaints() {
         { name: 'Internet', value: 1, color: '#10b981' }
       ];
 
-  const trendData = [
-    { name: 'Apr 24', resolved: 2, inProgress: 1, closed: 0 },
-    { name: 'May 24', resolved: 4, inProgress: 2, closed: 1 },
-    { name: 'Jun 24', resolved: kpis.resolved || 5, inProgress: kpis.in_progress || 2, closed: kpis.closed || 1 }
+// ── Mobile Complaints Component (Reference Screen 8) ──
+function MobileComplaints({
+  complaints,
+  onCreate,
+  submitting,
+  subject, setSubject,
+  category, setCategory,
+  priority, setPriority,
+  description, setDescription
+}: any) {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'my' | 'new'>('my');
+
+  const defaultList = [
+    { id: 1, ticket_number: "CMP001", subject: "Wi-Fi not working in lab", status: "RESOLVED", category: "Network", created_at: "2 hours ago" },
+    { id: 2, ticket_number: "CMP002", subject: "Library book issue", status: "IN_PROGRESS", category: "Library", created_at: "1 day ago" },
+    { id: 3, ticket_number: "CMP003", subject: "Projector not working", status: "RESOLVED", category: "Infrastructure", created_at: "1 week ago" }
   ];
+
+  const list = complaints && complaints.length > 0 ? complaints : defaultList;
+
+  const getTheme = (subject: string, category: string) => {
+    const s = ((subject || '') + ' ' + (category || '')).toLowerCase();
+    if (s.includes('wifi') || s.includes('internet') || s.includes('network')) return { icon: Wifi, bg: '#eff6ff', color: '#2563eb' };
+    if (s.includes('book') || s.includes('library')) return { icon: BookOpen, bg: '#fffbeb', color: '#d97706' };
+    if (s.includes('projector') || s.includes('lab') || s.includes('infra')) return { icon: Tv, bg: '#ecfeff', color: '#0891b2' };
+    return { icon: HelpCircle, bg: '#f1f5f9', color: '#475569' };
+  };
+
+  const getStatusBadge = (status: string) => {
+    const s = (status || '').toUpperCase();
+    if (s === 'RESOLVED' || s === 'CLOSED') {
+      return { label: 'Resolved', bg: '#dcfce7', color: '#15803d', dot: '#22c55e' };
+    }
+    if (s === 'IN_PROGRESS') {
+      return { label: 'In Progress', bg: '#fef3c7', color: '#b45309', dot: '#f59e0b' };
+    }
+    return { label: 'Open', bg: '#eff6ff', color: '#1d4ed8', dot: '#3b82f6' };
+  };
+
+  return (
+    <div style={{ padding: '0 4px', maxWidth: '500px', margin: '0 auto' }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: '8px 0 16px 0',
+        gap: '12px',
+      }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '12px',
+            border: 'none',
+            background: '#f1f5f9',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            color: '#09090b',
+          }}
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#09090b', margin: 0, letterSpacing: '-0.3px' }}>
+          Complaints & Support
+        </h1>
+      </div>
+
+      {/* Segmented Pill Tabs: [ My Complaints ] [ New Complaint ] */}
+      <div style={{
+        display: 'flex',
+        background: '#f1f5f9',
+        borderRadius: '16px',
+        padding: '4px',
+        marginBottom: '20px',
+      }}>
+        <button
+          onClick={() => setActiveTab('my')}
+          style={{
+            flex: 1,
+            padding: '10px 0',
+            borderRadius: '12px',
+            border: 'none',
+            fontSize: '13px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            background: activeTab === 'my' ? '#ede9fe' : 'transparent',
+            color: activeTab === 'my' ? '#4f46e5' : '#64748b',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          My Complaints
+        </button>
+        <button
+          onClick={() => setActiveTab('new')}
+          style={{
+            flex: 1,
+            padding: '10px 0',
+            borderRadius: '12px',
+            border: 'none',
+            fontSize: '13px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            background: activeTab === 'new' ? '#ede9fe' : 'transparent',
+            color: activeTab === 'new' ? '#4f46e5' : '#64748b',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          New Complaint
+        </button>
+      </div>
+
+      {activeTab === 'my' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {list.map((c: any, i: number) => {
+            const theme = getTheme(c.subject, c.category);
+            const Icon = theme.icon;
+            const badge = getStatusBadge(c.status);
+
+            return (
+              <div
+                key={c.id || i}
+                style={{
+                  background: '#ffffff',
+                  borderRadius: '18px',
+                  border: '1px solid rgba(0,0,0,0.06)',
+                  padding: '16px 18px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '14px',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+                }}
+              >
+                {/* Icon */}
+                <div style={{
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '14px',
+                  background: theme.bg,
+                  color: theme.color,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}>
+                  <Icon size={22} />
+                </div>
+
+                {/* Info */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    fontSize: '15px',
+                    fontWeight: 700,
+                    color: '#09090b',
+                    marginBottom: '4px',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}>
+                    {c.subject}
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      background: badge.bg,
+                      color: badge.color,
+                      padding: '2px 8px',
+                      borderRadius: '8px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}>
+                      <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: badge.dot }} />
+                      {badge.label}
+                    </span>
+                    <span style={{ fontSize: '11px', color: '#94a3b8' }}>
+                      #{c.ticket_number || `CMP00${i+1}`}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Chevron */}
+                <ChevronRight size={18} color="#94a3b8" style={{ flexShrink: 0 }} />
+              </div>
+            );
+          })}
+
+          {/* Prominent button */}
+          <button
+            onClick={() => setActiveTab('new')}
+            style={{
+              marginTop: '12px',
+              padding: '14px',
+              borderRadius: '16px',
+              background: '#282B4A',
+              color: '#ffffff',
+              border: 'none',
+              fontSize: '14px',
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              boxShadow: '0 4px 16px rgba(40,43,74,0.15)',
+            }}
+          >
+            <Plus size={18} />
+            <span>New Complaint</span>
+          </button>
+        </div>
+      )}
+
+      {activeTab === 'new' && (
+        <form
+          onSubmit={(e) => {
+            onCreate(e);
+            setActiveTab('my');
+          }}
+          style={{
+            background: '#ffffff',
+            borderRadius: '20px',
+            border: '1px solid rgba(0,0,0,0.06)',
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.02)',
+          }}
+        >
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 600, color: '#09090b', display: 'block', marginBottom: '6px' }}>Subject</label>
+            <input
+              type="text"
+              placeholder="e.g. Wi-Fi not connecting in Lab 2"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              required
+              style={{ width: '100%', padding: '12px 14px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '14px', boxSizing: 'border-box' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 600, color: '#09090b', display: 'block', marginBottom: '6px' }}>Category</label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              style={{ width: '100%', padding: '12px 14px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '14px', boxSizing: 'border-box', background: '#fff' }}
+            >
+              <option value="Infrastructure">Infrastructure</option>
+              <option value="Academic">Academic</option>
+              <option value="Hostel">Hostel & Mess</option>
+              <option value="Library">Library</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 600, color: '#09090b', display: 'block', marginBottom: '6px' }}>Priority</label>
+            <select
+              value={priority}
+              onChange={(e) => setPriority(e.target.value as any)}
+              style={{ width: '100%', padding: '12px 14px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '14px', boxSizing: 'border-box', background: '#fff' }}
+            >
+              <option value="LOW">Low</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="HIGH">High (Urgent)</option>
+            </select>
+          </div>
+
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 600, color: '#09090b', display: 'block', marginBottom: '6px' }}>Description</label>
+            <textarea
+              rows={4}
+              placeholder="Please describe the issue in detail..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+              style={{ width: '100%', padding: '12px 14px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '14px', boxSizing: 'border-box', resize: 'vertical' }}
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={submitting}
+            style={{
+              padding: '14px',
+              borderRadius: '14px',
+              background: '#282B4A',
+              color: '#ffffff',
+              border: 'none',
+              fontSize: '14px',
+              fontWeight: 700,
+              cursor: submitting ? 'not-allowed' : 'pointer',
+              marginTop: '6px',
+            }}
+          >
+            {submitting ? 'Submitting...' : 'Submit Complaint'}
+          </button>
+        </form>
+      )}
+    </div>
+  );
+}
+
+  const { isMobile, isTablet } = useIsMobile();
+  const isSmallScreen = isMobile || isTablet;
+
+  if (isSmallScreen) {
+    return (
+      <MobileComplaints
+        complaints={complaints}
+        onCreate={handleCreateComplaint}
+        submitting={submitting}
+        subject={subject} setSubject={setSubject}
+        category={category} setCategory={setCategory}
+        priority={priority} setPriority={setPriority}
+        description={description} setDescription={setDescription}
+      />
+    );
+  }
 
   return (
     <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>

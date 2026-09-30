@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Megaphone, Send, Trash2, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Megaphone, Send, Trash2, CheckCircle2, AlertCircle, RefreshCw, ArrowLeft } from 'lucide-react';
 import { apiClient as api } from '../../../api/axios';
+import TextType from '../../../components/TextType';
 
 interface NoticeItem {
   id: number;
@@ -14,6 +16,7 @@ interface NoticeItem {
 }
 
 export function NotifyStudent() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
     content: '',
@@ -78,23 +81,76 @@ export function NotifyStudent() {
   };
 
   return (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
       
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px' }}>
-        <div>
-          <h1 style={{ fontSize: '26px', fontWeight: 800, color: '#09090b', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Megaphone color="#282B4A" size={26} /> Notice & Announcement Center
-          </h1>
-          <p style={{ fontSize: '13px', color: '#6b7280', margin: '4px 0 0 0' }}>
-            Broadcast real-time announcements directly to all student dashboards.
-          </p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <button 
+            onClick={() => navigate('/admin/dashboard/notify/faculty')}
+            style={{
+              width: '42px', height: '42px', borderRadius: '14px', background: '#ffffff',
+              border: '1px solid rgba(40, 43, 74, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', boxShadow: '0 2px 8px rgba(40, 43, 74, 0.04)',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(40, 43, 74, 0.06)')}
+            onMouseLeave={e => (e.currentTarget.style.background = '#ffffff')}
+          >
+            <ArrowLeft size={20} color="#282B4A" />
+          </button>
+          <div>
+            <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+              <span>Post</span>
+              <span style={{
+                background: '#282B4A',
+                color: '#EEEBDA',
+                padding: '4px 18px',
+                borderRadius: '14px',
+                boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                lineHeight: 1.2,
+                border: '1px solid rgba(238, 235, 218, 0.2)',
+              }}>
+                <TextType
+                  text={["Notice", "Announcement", "Bulletin"]}
+                  typingSpeed={60}
+                  deletingSpeed={35}
+                  pauseDuration={2200}
+                  loop={true}
+                  showCursor={true}
+                  cursorCharacter="|"
+                  style={{ color: '#EEEBDA' }}
+                />
+              </span>
+            </h1>
+            <p style={{ fontSize: '13px', color: '#6b7280', margin: '4px 0 0 0' }}>
+              Broadcast real-time announcements directly to all student dashboards.
+            </p>
+          </div>
         </div>
 
         <button
           onClick={fetchNotices}
-          style={{ background: '#ffffff', border: '1.5px solid #e5e7eb', padding: '8px 16px', borderRadius: '10px', fontSize: '12px', fontWeight: 600, color: '#374151', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+          style={{
+            background: '#ffffff',
+            border: '1.5px solid rgba(40, 43, 74, 0.12)',
+            padding: '10px 18px',
+            borderRadius: '12px',
+            fontSize: '13px',
+            fontWeight: 700,
+            color: '#282B4A',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            boxShadow: '0 2px 8px rgba(40, 43, 74, 0.04)',
+            transition: 'all 0.2s ease',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(40, 43, 74, 0.06)')}
+          onMouseLeave={e => (e.currentTarget.style.background = '#ffffff')}
         >
-          <RefreshCw size={14} className={fetching ? "animate-spin" : ""} /> Refresh Feed
+          <RefreshCw size={14} className={fetching ? "animate-spin" : ""} color="#282B4A" /> Refresh Feed
         </button>
       </div>
 

@@ -1,12 +1,229 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   Calendar, BookOpen, Clock, ChevronDown, Download, Info,
-  Utensils, ArrowUpRight
+  Utensils, ArrowUpRight, ArrowLeft
 } from "lucide-react";
 import { motion } from "framer-motion";
 import TextType from "../../components/TextType";
+import { useIsMobile } from "../../hooks/useIsMobile";
+
+// ── Mobile Timetable Component (Reference Screen 5) ──
+function MobileTimetable({ timetableData, now }: { timetableData: any[]; now: Date }) {
+  const navigate = useNavigate();
+  const dayNames = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+  const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+  
+  const currentDayIdx = now.getDay(); // 0 is Sun, 1 is Mon...
+  const defaultDayKey = (currentDayIdx >= 1 && currentDayIdx <= 5) ? dayNames[currentDayIdx - 1] : 'monday';
+  const [selectedDay, setSelectedDay] = useState<string>(defaultDayKey);
+
+  const getCode = (name: string) => {
+    const l = (name || '').toLowerCase();
+    if (l.includes('cloud')) return 'CS701';
+    if (l.includes('machine') || l.includes('ml')) return 'CS702';
+    if (l.includes('nlp') || l.includes('natural')) return 'CS703';
+    if (l.includes('flat') || l.includes('automata')) return 'CS704';
+    if (l.includes('network')) return 'CS705';
+    if (l.includes('software') || l.includes('project')) return 'CS706';
+    return 'CS700';
+  };
+
+  const getAccentColor = (name: string) => {
+    const l = (name || '').toLowerCase();
+    if (l.includes('machine') || l.includes('ml')) return '#22c55e';
+    if (l.includes('nlp') || l.includes('natural')) return '#a855f7';
+    if (l.includes('cloud')) return '#3b82f6';
+    if (l.includes('flat') || l.includes('automata')) return '#f59e0b';
+    if (l.includes('software') || l.includes('project')) return '#6366f1';
+    return '#64748b';
+  };
+
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  return (
+    <div style={{ padding: '0 4px', maxWidth: '500px', margin: '0 auto' }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: '8px 0 16px 0',
+        gap: '12px',
+      }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '12px',
+            border: 'none',
+            background: '#f1f5f9',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            color: '#09090b',
+          }}
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#09090b', margin: 0, letterSpacing: '-0.3px' }}>
+          Timetable
+        </h1>
+      </div>
+
+      {/* Day Selector Tabs (Reference Screen 5: [Mon] [Tue] [Wed] [Thu] [Fri]) */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        overflowX: 'auto',
+        paddingBottom: '4px',
+        marginBottom: '24px',
+      }}>
+        {dayNames.map((d, i) => {
+          const isSelected = selectedDay === d;
+          return (
+            <button
+              key={d}
+              onClick={() => setSelectedDay(d)}
+              style={{
+                flex: 1,
+                minWidth: '58px',
+                padding: '10px 0',
+                borderRadius: '14px',
+                border: 'none',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                background: isSelected ? '#ede9fe' : '#f1f5f9',
+                color: isSelected ? '#4f46e5' : '#64748b',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {dayLabels[i]}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Vertical Timeline */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        {timetableData.map((row, i) => {
+          const timeParts = row.time.split('\n-\n');
+          const startTime = timeParts[0] || '';
+          const endTime = timeParts[1] || '';
+
+          if (row.isBreak) {
+            return (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div style={{ width: '68px', fontSize: '11px', fontWeight: 700, color: '#94a3b8', flexShrink: 0 }}>
+                  {startTime}
+                </div>
+                <div style={{
+                  flex: 1,
+                  background: '#fffbeb',
+                  border: '1px solid #fef3c7',
+                  borderRadius: '14px',
+                  padding: '10px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  color: '#b45309',
+                }}>
+                  <Utensils size={14} />
+                  <span>{row.breakName} ({startTime} - {endTime})</span>
+                </div>
+              </div>
+            );
+          }
+
+          const cell = row[selectedDay];
+          if (!cell) return null;
+
+          const accentColor = getAccentColor(cell.name);
+          const isOngoing = selectedDay === dayNames[currentDayIdx - 1] && (() => {
+            const match = startTime.match(/(\d+):(\d+)\s*(AM|PM)/i);
+            if (!match) return false;
+            let h = parseInt(match[1], 10);
+            const m = parseInt(match[2], 10);
+            const ampm = match[3].toUpperCase();
+            if (ampm === 'PM' && h < 12) h += 12;
+            if (ampm === 'AM' && h === 12) h = 0;
+            const slotStart = h * 60 + m;
+            return currentMinutes >= slotStart && currentMinutes < slotStart + 60;
+          })();
+
+          return (
+            <div key={i} style={{ display: 'flex', gap: '14px', position: 'relative' }}>
+              {/* Time Column on Left */}
+              <div style={{
+                width: '68px',
+                fontSize: '11px',
+                fontWeight: 700,
+                color: '#64748b',
+                flexShrink: 0,
+                paddingTop: '4px',
+              }}>
+                {startTime}
+              </div>
+
+              {/* Lecture Card on Right */}
+              <div style={{
+                flex: 1,
+                background: '#ffffff',
+                borderRadius: '16px',
+                border: '1px solid rgba(0,0,0,0.06)',
+                borderLeft: `4px solid ${accentColor}`,
+                padding: '14px 16px',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '4px' }}>
+                  <div style={{ fontSize: '15px', fontWeight: 700, color: '#09090b', lineHeight: 1.2 }}>
+                    {cell.name}
+                  </div>
+                  {isOngoing && (
+                    <span style={{
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      background: '#fee2e2',
+                      color: '#ef4444',
+                      padding: '2px 8px',
+                      borderRadius: '999px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      flexShrink: 0,
+                    }}>
+                      <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#ef4444' }} />
+                      Ongoing
+                    </span>
+                  )}
+                </div>
+
+                <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, marginBottom: '2px' }}>
+                  {getCode(cell.name)}
+                </div>
+
+                <div style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span>{cell.room || 'Room TBA'}</span>
+                  <span>•</span>
+                  <span>Prof. {cell.prof}</span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export function MyTimetable() {
+  const { isMobile, isTablet } = useIsMobile();
+  const isSmallScreen = isMobile || isTablet;
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
@@ -188,6 +405,15 @@ export function MyTimetable() {
   ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].forEach(d => {
     weeklyClassesCount += timetableData.filter(s => !s.isBreak && (s as any)[d]).length;
   });
+
+  if (isSmallScreen) {
+    return (
+      <MobileTimetable
+        timetableData={timetableData}
+        now={now}
+      />
+    );
+  }
 
   return (
     <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>

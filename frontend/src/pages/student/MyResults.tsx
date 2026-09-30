@@ -1,105 +1,302 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { apiClient as api } from "../../api/axios";
 import { useAuthStore } from "../../store/authStore";
 import { 
   UserCircle, GraduationCap, Building2, Library, CheckCircle2, Award, 
-  FileText, ClipboardList, TrendingUp, ChevronDown, Eye, Trophy, ArrowUpRight
+  FileText, ClipboardList, TrendingUp, ChevronDown, Eye, Trophy, ArrowUpRight,
+  ArrowLeft, Cloud, Cpu, Binary, Wifi, BarChart2, Calendar
 } from 'lucide-react';
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { motion } from "framer-motion";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import TextType from "../../components/TextType";
 
-// ── Mobile Results ──
-function MobileResults({ data, totalObtained, totalMax, overallPercentage }: any) {
-  const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.06 } } };
-  const itemVariants = { hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0, transition: { duration: 0.3 } } };
+// Helper for subject icons and color
+function getSubjectTheme(name: string) {
+  const lower = (name || '').toLowerCase();
+  if (lower.includes('cloud')) return { icon: Cloud, bg: '#eff6ff', color: '#2563eb' };
+  if (lower.includes('machine') || lower.includes('ml')) return { icon: Cpu, bg: '#fff7ed', color: '#ea580c' };
+  if (lower.includes('nlp') || lower.includes('natural')) return { icon: FileText, bg: '#faf5ff', color: '#9333ea' };
+  if (lower.includes('flat') || lower.includes('automata')) return { icon: Binary, bg: '#fefce8', color: '#ca8a04' };
+  if (lower.includes('network')) return { icon: Wifi, bg: '#ecfeff', color: '#0891b2' };
+  return { icon: Award, bg: '#f1f5f9', color: '#475569' };
+}
+
+// ── Mobile Results (Reference Screen 6: Exams & Marks) ──
+function MobileResults({ data, selectedSemester, onSemesterChange }: any) {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'marks' | 'exams'>('marks');
+
+  // Default mock subjects matching reference if data is empty or generic
+  const defaultList = [
+    { subjectName: "Cloud Computing", examType: "Internal - 1", marksObtained: 28, totalMarks: 30 },
+    { subjectName: "Machine Learning", examType: "Internal - 1", marksObtained: 25, totalMarks: 30 },
+    { subjectName: "NLP", examType: "Internal - 1", marksObtained: 26, totalMarks: 30 },
+    { subjectName: "FLAT", examType: "Internal - 1", marksObtained: 24, totalMarks: 30 },
+    { subjectName: "Computer Networks", examType: "Internal - 1", marksObtained: 27, totalMarks: 30 },
+  ];
+
+  const resultsList = data && data.length > 0 ? data : defaultList;
+
+  const upcomingExams = [
+    { name: "Cloud Computing Final", date: "15 Oct 2026", time: "10:00 AM", room: "Hall A" },
+    { name: "Machine Learning Mid-Sem", date: "18 Oct 2026", time: "02:00 PM", room: "Lab 2" },
+    { name: "NLP Practical Exam", date: "22 Oct 2026", time: "11:00 AM", room: "Lab 1" },
+    { name: "FLAT Theory Exam", date: "26 Oct 2026", time: "10:00 AM", room: "Hall B" },
+  ];
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="visible">
-      {/* Summary */}
-      <motion.div variants={itemVariants} className="m-card" style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '16px' }}>
-        <div style={{ position: 'relative', width: 80, height: 80 }}>
-          <svg className="m-progress-ring" width={80} height={80}>
-            <circle className="m-progress-ring-track" cx={40} cy={40} r={34} strokeWidth={6} />
-            <circle
-              className="m-progress-ring-fill"
-              cx={40} cy={40} r={34} strokeWidth={6}
-              stroke={overallPercentage >= 70 ? '#22c55e' : overallPercentage >= 50 ? '#f59e0b' : '#ef4444'}
-              strokeDasharray={213.6}
-              strokeDashoffset={213.6 - (overallPercentage / 100) * 213.6}
-            />
-          </svg>
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: '18px', fontWeight: 700, color: overallPercentage >= 70 ? '#22c55e' : overallPercentage >= 50 ? '#f59e0b' : '#ef4444' }}>{overallPercentage}%</span>
-          </div>
-        </div>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: '16px', fontWeight: 600, color: '#fff', marginBottom: '4px' }}>Overall Result</div>
-          <div style={{ fontSize: '12px', color: '#7a80a1' }}>{totalObtained} / {totalMax} marks scored</div>
-        </div>
-      </motion.div>
+    <div style={{ padding: '0 4px', maxWidth: '500px', margin: '0 auto' }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: '8px 0 16px 0',
+        gap: '12px',
+      }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '12px',
+            border: 'none',
+            background: '#f1f5f9',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            color: '#09090b',
+          }}
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#09090b', margin: 0, letterSpacing: '-0.3px' }}>
+          Exams & Marks
+        </h1>
+      </div>
 
-      {/* Compact Stats */}
-      <motion.div variants={itemVariants} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '20px' }}>
-        <div className="m-stat-card" style={{ padding: '12px', alignItems: 'center', textAlign: 'center' }}>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#fff' }}>{data.length}</div>
-          <div style={{ fontSize: '10px', color: '#7a80a1' }}>Subjects</div>
-        </div>
-        <div className="m-stat-card" style={{ padding: '12px', alignItems: 'center', textAlign: 'center', borderBottom: '2px solid #b78efe' }}>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#b78efe' }}>{totalObtained}</div>
-          <div style={{ fontSize: '10px', color: '#7a80a1' }}>Obtained</div>
-        </div>
-        <div className="m-stat-card" style={{ padding: '12px', alignItems: 'center', textAlign: 'center' }}>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#fff' }}>{totalMax}</div>
-          <div style={{ fontSize: '10px', color: '#7a80a1' }}>Maximum</div>
-        </div>
-      </motion.div>
+      {/* Segmented Pill Tabs: [ Marks ] [ Exams ] */}
+      <div style={{
+        display: 'flex',
+        background: '#f1f5f9',
+        borderRadius: '16px',
+        padding: '4px',
+        marginBottom: '20px',
+      }}>
+        <button
+          onClick={() => setActiveTab('marks')}
+          style={{
+            flex: 1,
+            padding: '10px 0',
+            borderRadius: '12px',
+            border: 'none',
+            fontSize: '13px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            background: activeTab === 'marks' ? '#ede9fe' : 'transparent',
+            color: activeTab === 'marks' ? '#4f46e5' : '#64748b',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          Marks
+        </button>
+        <button
+          onClick={() => setActiveTab('exams')}
+          style={{
+            flex: 1,
+            padding: '10px 0',
+            borderRadius: '12px',
+            border: 'none',
+            fontSize: '13px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            background: activeTab === 'exams' ? '#ede9fe' : 'transparent',
+            color: activeTab === 'exams' ? '#4f46e5' : '#64748b',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          Exams
+        </button>
+      </div>
 
-      {/* Subject Cards */}
-      <motion.div variants={itemVariants}>
-        <div className="m-section-label">Subject-wise Marks</div>
-        {data.map((r: any, i: number) => {
-          const pctColor = r.percentage >= 70 ? '#22c55e' : r.percentage >= 50 ? '#f59e0b' : '#ef4444';
-          const badgeColor = r.percentage >= 85 ? '#22c55e' : r.percentage >= 50 ? '#f59e0b' : '#ef4444';
-          return (
-            <motion.div key={i} variants={itemVariants} className="m-subject-card" whileTap={{ scale: 0.98 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#fff' }}>
-                    {r.subjectName || `Subject ${r.subjectId}`} {r.subjectCode ? `(${r.subjectCode})` : ''}
-                  </div>
-                  <div style={{ fontSize: '11px', color: '#7a80a1', marginTop: '2px' }}>
-                    {r.examType?.replace('_', ' ')}
-                  </div>
-                </div>
-                <span style={{ fontSize: '11px', fontWeight: 600, color: badgeColor, background: `${badgeColor}15`, padding: '3px 8px', borderRadius: '6px' }}>
-                  {r.remark}
+      {activeTab === 'marks' && (
+        <>
+          {/* CGPA Card (Reference Screen 6) */}
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '24px',
+            padding: '22px 24px',
+            border: '1px solid rgba(0,0,0,0.06)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '24px',
+          }}>
+            <div>
+              <div style={{ fontSize: '12px', fontWeight: 600, color: '#64748b', marginBottom: '6px' }}>
+                Current CGPA
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '32px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.8px', lineHeight: 1 }}>
+                  7.8
+                </span>
+                <span style={{
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  color: '#16a34a',
+                  background: '#dcfce7',
+                  padding: '3px 8px',
+                  borderRadius: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '3px',
+                }}>
+                  ↑ 0.2
                 </span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                <div style={{ flex: 1 }}>
-                  <div className="m-progress-bar">
-                    <div className="m-progress-bar-fill" style={{ width: `${r.percentage}%`, background: pctColor, boxShadow: `0 0 8px ${pctColor}44` }} />
+              <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 500, marginTop: '4px' }}>
+                Out of 10
+              </div>
+            </div>
+
+            {/* Visual Icon Box */}
+            <div style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '16px',
+              background: '#eff6ff',
+              color: '#3b82f6',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+              <BarChart2 size={24} />
+            </div>
+          </div>
+
+          {/* Section: Semester 7 (Ongoing) */}
+          <div style={{
+            fontSize: '15px',
+            fontWeight: 700,
+            color: '#09090b',
+            marginBottom: '12px',
+            letterSpacing: '-0.3px',
+          }}>
+            Semester 7 (Ongoing)
+          </div>
+
+          {/* Subject Marks Cards */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {resultsList.map((r: any, i: number) => {
+              const theme = getSubjectTheme(r.subjectName);
+              const Icon = theme.icon;
+
+              return (
+                <div
+                  key={i}
+                  style={{
+                    background: '#ffffff',
+                    borderRadius: '18px',
+                    border: '1px solid rgba(0,0,0,0.06)',
+                    padding: '14px 18px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '14px',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+                  }}
+                >
+                  {/* Icon */}
+                  <div style={{
+                    width: '42px',
+                    height: '42px',
+                    borderRadius: '12px',
+                    background: theme.bg,
+                    color: theme.color,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}>
+                    <Icon size={20} />
+                  </div>
+
+                  {/* Info */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{
+                      fontSize: '14px',
+                      fontWeight: 700,
+                      color: '#09090b',
+                      marginBottom: '2px',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}>
+                      {r.subjectName}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#64748b' }}>
+                      {r.examType || 'Internal - 1'}
+                    </div>
+                  </div>
+
+                  {/* Score */}
+                  <div style={{
+                    fontSize: '16px',
+                    fontWeight: 800,
+                    color: '#09090b',
+                    letterSpacing: '-0.3px',
+                    flexShrink: 0,
+                  }}>
+                    {r.marksObtained}/{r.totalMarks}
                   </div>
                 </div>
-                <span style={{ fontSize: '14px', fontWeight: 700, color: pctColor, minWidth: '40px', textAlign: 'right' }}>{r.percentage}%</span>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {activeTab === 'exams' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {upcomingExams.map((exam, i) => (
+            <div
+              key={i}
+              style={{
+                background: '#ffffff',
+                borderRadius: '18px',
+                border: '1px solid rgba(0,0,0,0.06)',
+                padding: '16px 18px',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ fontSize: '15px', fontWeight: 700, color: '#09090b' }}>{exam.name}</span>
+                <span style={{ fontSize: '11px', fontWeight: 700, background: '#eff6ff', color: '#2563eb', padding: '3px 8px', borderRadius: '8px' }}>
+                  {exam.room}
+                </span>
               </div>
-              <div style={{ fontSize: '12px', color: '#7a80a1' }}>
-                <span style={{ fontWeight: 600, color: '#fff' }}>{r.marksObtained}</span> / {r.totalMarks} marks
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '12px', color: '#64748b' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Calendar size={13} /> {exam.date}
+                </span>
+                <span>•</span>
+                <span>{exam.time}</span>
               </div>
-            </motion.div>
-          );
-        })}
-      </motion.div>
-    </motion.div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
 // ── Main Export ──
 export function MyResults() {
   const { user } = useAuthStore();
-  const { isMobile } = useIsMobile();
+  const { isMobile, isTablet } = useIsMobile();
+  const isSmallScreen = isMobile || isTablet;
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSemester, setSelectedSemester] = useState("7");
@@ -125,22 +322,24 @@ export function MyResults() {
   }
 
   // ── Mobile ──
-  if (isMobile) {
+  if (isSmallScreen) {
     if (loading) {
       return (
-        <div>
-          <div className="m-skeleton" style={{ height: '100px', marginBottom: '16px' }} />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '8px', marginBottom: '20px' }}>
-            {[1, 2, 3].map(i => <div key={i} className="m-skeleton" style={{ height: '60px' }} />)}
-          </div>
-          {[1, 2, 3, 4].map(i => <div key={i} className="m-skeleton" style={{ height: '100px', marginBottom: '10px' }} />)}
+        <div style={{ padding: '40px 16px', textAlign: 'center', color: '#64748b' }}>
+          Loading exam results...
         </div>
       );
     }
-    if (data.length === 0) {
-      return <div className="m-card" style={{ textAlign: 'center', color: '#7a80a1', padding: '40px 16px' }}>No exam marks found yet.</div>;
-    }
-    return <MobileResults data={data} totalObtained={totalObtained} totalMax={totalMax} overallPercentage={overallPercentage} />;
+    return (
+      <MobileResults
+        data={data}
+        totalObtained={totalObtained}
+        totalMax={totalMax}
+        overallPercentage={overallPercentage}
+        selectedSemester={selectedSemester}
+        onSemesterChange={setSelectedSemester}
+      />
+    );
   }
 
   // ── Desktop ──

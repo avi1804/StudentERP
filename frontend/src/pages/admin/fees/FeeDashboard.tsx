@@ -27,13 +27,46 @@ export function FeeDashboard() {
 
   return (
     <div style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.5px' }}>Fee Dashboard</h1>
-          <p style={{ fontSize: '13px', color: '#6b7280', marginTop: '4px' }}>Overview of collections, pending dues, and recent transactions</p>
+          <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#09090b', letterSpacing: '-0.8px', margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span>Fee</span>
+            <span style={{
+              background: '#282B4A',
+              color: '#EEEBDA',
+              padding: '4px 18px',
+              borderRadius: '14px',
+              boxShadow: '0 4px 20px rgba(40, 43, 74, 0.25)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              lineHeight: 1.2,
+              border: '1px solid rgba(238, 235, 218, 0.2)',
+            }}>
+              Dashboard
+            </span>
+          </h1>
+          <p style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>Overview of collections, pending dues, and recent transactions</p>
         </div>
-        <button style={{ padding: '8px 16px', background: '#09090b', color: 'white', borderRadius: '8px', fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Download size={16} /> Export Report
+        <button 
+          style={{
+            padding: '12px 22px',
+            background: '#282B4A',
+            color: '#EEEBDA',
+            borderRadius: '16px',
+            fontSize: '14px',
+            fontWeight: 700,
+            border: '1px solid rgba(238, 235, 218, 0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer',
+            boxShadow: '0 4px 14px rgba(40, 43, 74, 0.25)',
+            transition: 'all 0.2s ease',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.background = '#373a61')}
+          onMouseLeave={e => (e.currentTarget.style.background = '#282B4A')}
+        >
+          <Download size={16} color="#EEEBDA" /> Export Report
         </button>
       </div>
 

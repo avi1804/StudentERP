@@ -1,11 +1,173 @@
 import React, { useEffect, useState } from "react";
-import { Download, User, Calendar, Droplets, Phone, Mail, GraduationCap, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Download, User, Calendar, Droplets, Phone, Mail, GraduationCap, ShieldCheck, CheckCircle2, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { apiClient } from "../../api/axios";
 import { useAuthStore } from "../../store/authStore";
 import TextType from "../../components/TextType";
+import { useIsMobile } from "../../hooks/useIsMobile";
+
+// ── Mobile ID Card Component (Reference Screen 11) ──
+function MobileIdCard({
+  studentName,
+  enrollmentNumber,
+  branch,
+  semester,
+  onDownload
+}: any) {
+  const navigate = useNavigate();
+
+  return (
+    <div style={{ padding: '0 4px', maxWidth: '500px', margin: '0 auto', textAlign: 'center' }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: '8px 0 20px 0',
+        gap: '12px',
+        textAlign: 'left',
+      }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '12px',
+            border: 'none',
+            background: '#f1f5f9',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            color: '#09090b',
+          }}
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#09090b', margin: 0, letterSpacing: '-0.3px' }}>
+          ID Card
+        </h1>
+      </div>
+
+      {/* Centered Digital ID Card (Reference Screen 11) */}
+      <div style={{
+        background: '#ffffff',
+        borderRadius: '24px',
+        border: '1.5px solid #3b82f6',
+        padding: '24px 20px',
+        boxShadow: '0 12px 36px rgba(59,130,246,0.08), 0 2px 10px rgba(0,0,0,0.04)',
+        maxWidth: '340px',
+        margin: '0 auto 24px auto',
+        textAlign: 'center',
+      }}>
+        {/* University Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '20px' }}>
+          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#282B4A', color: '#EEEBDA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 800 }}>
+            🎓
+          </div>
+          <div style={{ textAlign: 'left' }}>
+            <div style={{ fontSize: '14px', fontWeight: 800, color: '#09090b', letterSpacing: '0.5px' }}>INDUS UNIVERSITY</div>
+            <div style={{ fontSize: '9px', fontWeight: 700, color: '#64748b', letterSpacing: '1px' }}>STUDENT IDENTITY CARD</div>
+          </div>
+        </div>
+
+        {/* Student Photo */}
+        <div style={{
+          width: '84px',
+          height: '84px',
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, #282B4A 0%, #3a3e68 100%)',
+          color: '#EEEBDA',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '28px',
+          fontWeight: 800,
+          margin: '0 auto 12px auto',
+          border: '3px solid #f1f5f9',
+          boxShadow: '0 4px 14px rgba(40,43,74,0.15)',
+        }}>
+          <User size={44} color="#EEEBDA" />
+        </div>
+
+        {/* Student Name & Enrollment */}
+        <div style={{ fontSize: '18px', fontWeight: 800, color: '#09090b', marginBottom: '2px' }}>
+          {studentName}
+        </div>
+        <div style={{ fontSize: '12px', fontWeight: 700, color: '#4f46e5', marginBottom: '18px' }}>
+          {enrollmentNumber}
+        </div>
+
+        {/* Info Grid */}
+        <div style={{
+          background: '#f8fafc',
+          borderRadius: '16px',
+          padding: '14px 16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          textAlign: 'left',
+          marginBottom: '20px',
+          fontSize: '12px',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: '#64748b' }}>Branch:</span>
+            <span style={{ fontWeight: 700, color: '#09090b', textAlign: 'right' }}>{branch}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: '#64748b' }}>Semester:</span>
+            <span style={{ fontWeight: 700, color: '#09090b' }}>{semester}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: '#64748b' }}>Valid Till:</span>
+            <span style={{ fontWeight: 700, color: '#09090b' }}>2026 - 2027</span>
+          </div>
+        </div>
+
+        {/* Barcode Section */}
+        <div style={{ padding: '8px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+          <svg width="220" height="42" viewBox="0 0 220 42" fill="none">
+            {[2, 8, 14, 18, 26, 32, 40, 48, 54, 58, 66, 74, 80, 88, 92, 100, 108, 114, 122, 130, 136, 142, 150, 158, 164, 172, 178, 186, 194, 202, 210, 216].map((x, idx) => (
+              <rect key={idx} x={x} y="0" width={idx % 3 === 0 ? "4" : idx % 2 === 0 ? "2.5" : "1.5"} height="42" fill="#09090b" />
+            ))}
+          </svg>
+          <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', letterSpacing: '2px' }}>
+            INDUS UNIVERSITY
+          </span>
+        </div>
+      </div>
+
+      {/* Download ID Card Button (Reference Screen 11) */}
+      <button
+        onClick={onDownload}
+        style={{
+          width: '100%',
+          maxWidth: '340px',
+          margin: '0 auto',
+          padding: '14px',
+          borderRadius: '16px',
+          background: '#ede9fe',
+          color: '#4f46e5',
+          border: 'none',
+          fontSize: '14px',
+          fontWeight: 700,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '8px',
+          cursor: 'pointer',
+        }}
+      >
+        <Download size={18} />
+        <span>Download ID Card</span>
+      </button>
+    </div>
+  );
+}
 
 export function MyIdCard() {
+  const { isMobile, isTablet } = useIsMobile();
+  const isSmallScreen = isMobile || isTablet;
   const currentUser = useAuthStore((state) => state.user);
   const [profile, setProfile] = useState<any>(null);
 
@@ -15,8 +177,8 @@ export function MyIdCard() {
       .catch(err => console.error("Failed to fetch student profile:", err));
   }, []);
 
-  const studentName = profile?.user?.full_name || currentUser?.full_name || "Student Name";
-  const email = profile?.user?.email || currentUser?.email || "student@college.edu";
+  const studentName = profile?.user?.full_name || currentUser?.full_name || "Harsh Rao";
+  const email = profile?.user?.email || currentUser?.email || "harsh.rao@indusuni.ac.in";
   const enrollmentNumber = profile?.enrollment_number || "CS629";
   const semester = profile?.semester || 7;
   const branch = profile?.batch || "Computer Science & Engineering";
@@ -26,6 +188,18 @@ export function MyIdCard() {
   const handlePrintDownload = () => {
     window.print();
   };
+
+  if (isSmallScreen) {
+    return (
+      <MobileIdCard
+        studentName={studentName}
+        enrollmentNumber={enrollmentNumber}
+        branch={branch}
+        semester={semester}
+        onDownload={handlePrintDownload}
+      />
+    );
+  }
 
   return (
     <div style={{ padding: '32px 24px', maxWidth: '1000px', margin: '0 auto', fontFamily: 'Inter, sans-serif' }}>

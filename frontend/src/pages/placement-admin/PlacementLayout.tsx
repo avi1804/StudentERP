@@ -9,6 +9,7 @@ import {
   BarChart3, Download, Settings, Menu, X, ChevronRight
 } from "lucide-react";
 import GradualBlur from "@/components/GradualBlur";
+import { GlobalSearchIsland } from "@/components/GlobalSearchIsland";
 import { apiClient as api } from "../../api/axios";
 
 const NAV_ITEMS = [
@@ -149,7 +150,7 @@ export function PlacementLayout() {
 
   // Auto-close Dynamic Island on 5s inactivity
   useEffect(() => {
-    if (activeState === 'search' || activeState === 'notifications' || activeState === 'profile') {
+    if (activeState === 'notifications' || activeState === 'profile') {
       const startTimer = () => {
         if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
         inactivityTimerRef.current = setTimeout(() => {
@@ -341,34 +342,9 @@ export function PlacementLayout() {
                   </motion.div>
                 )}
 
-                {/* SEARCH EXPANDED */}
+                {/* SEARCH EXPANDED with Live Universal Search */}
                 {activeState === 'search' && (
-                  <motion.div
-                    key="search-expanded"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                    style={{
-                      display: 'flex', alignItems: 'center',
-                      width: 380, height: 60,
-                      padding: '0 20px', gap: 10,
-                    }}
-                  >
-                    <Search size={18} color="#282B4A" strokeWidth={1.8} style={{ flexShrink: 0 }} />
-                    <input
-                      autoFocus
-                      type="text"
-                      placeholder="Search companies, drives, applicants..."
-                      style={{
-                        flex: 1, background: 'transparent',
-                        border: 'none', outline: 'none',
-                        fontSize: 15, fontWeight: 500,
-                        color: '#282B4A', fontFamily: 'Space Grotesk, sans-serif',
-                        caretColor: '#282B4A',
-                      }}
-                    />
-                  </motion.div>
+                  <GlobalSearchIsland role="placement" onClose={() => setActiveState('idle')} />
                 )}
 
                 {/* NOTIFICATION EXPANDED */}

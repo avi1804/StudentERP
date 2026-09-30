@@ -66,12 +66,17 @@ interface StudentPlacementDashboardData {
   }>;
 }
 
+import { useIsMobile } from "../../hooks/useIsMobile";
+
 export function PlacementCell() {
   const [loading, setLoading] = useState<boolean>(true);
   const [dashboardData, setDashboardData] = useState<StudentPlacementDashboardData | null>(null);
   const [applyingId, setApplyingId] = useState<number | null>(null);
   const [selectedDrive, setSelectedDrive] = useState<Drive | null>(null);
   const [toastMsg, setToastMsg] = useState<{ text: string; type: "success" | "error" } | null>(null);
+  const [mobileTab, setMobileTab] = useState<'drives' | 'stats' | 'journey'>('drives');
+  const { isMobile, isTablet } = useIsMobile();
+  const isSmallScreen = isMobile || isTablet;
 
   const fetchDashboardData = async () => {
     try {
@@ -157,6 +162,472 @@ export function PlacementCell() {
   };
   const announcements = dashboardData?.announcements || [];
   const companies = dashboardData?.companies || [];
+
+  // ── Mobile Responsive Layout (< 1024px) ──
+  if (isSmallScreen) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '24px' }}>
+        {/* Toast Alert */}
+        <AnimatePresence>
+          {toastMsg && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              style={{
+                position: 'fixed',
+                top: '16px',
+                left: '16px',
+                right: '16px',
+                zIndex: 9999,
+                background: toastMsg.type === 'success' ? '#10b981' : '#ef4444',
+                color: 'white',
+                padding: '12px 16px',
+                borderRadius: '12px',
+                boxShadow: '0 8px 30px rgba(0,0,0,0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: '13px',
+                fontWeight: 600
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {toastMsg.type === 'success' ? <Check size={16} /> : <AlertCircle size={16} />}
+                <span>{toastMsg.text}</span>
+              </div>
+              <X size={16} style={{ cursor: 'pointer' }} onClick={() => setToastMsg(null)} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Title */}
+        <div>
+          <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#09090b', letterSpacing: '-0.5px', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>Placement</span>
+            <span style={{
+              background: '#282B4A',
+              color: '#EEEBDA',
+              padding: '2px 12px',
+              borderRadius: '10px',
+              fontSize: '18px',
+            }}>
+              Cell
+            </span>
+          </h1>
+          <div style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>
+            Real-time campus drives & placement metrics
+          </div>
+        </div>
+
+        {/* KPI Grid (2 columns) */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
+          <div style={{ background: '#ffffff', border: '1px solid #f1f5f9', borderRadius: '16px', padding: '14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(40,43,74,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <BarChart2 size={15} color="#282B4A" />
+              </div>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: '#64748b' }}>Dream Offers</span>
+            </div>
+            <div style={{ fontSize: '24px', fontWeight: 800, color: '#282B4A', lineHeight: 1.1 }}>{kpis.dream_offers}</div>
+            <div style={{ fontSize: '10px', color: '#94a3b8', marginTop: '2px' }}>≥10 LPA Drives</div>
+          </div>
+
+          <div style={{ background: '#ffffff', border: '1px solid #f1f5f9', borderRadius: '16px', padding: '14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(40,43,74,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Briefcase size={15} color="#282B4A" />
+              </div>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: '#64748b' }}>Active Drives</span>
+            </div>
+            <div style={{ fontSize: '24px', fontWeight: 800, color: '#282B4A', lineHeight: 1.1 }}>{kpis.active_drives}</div>
+            <div style={{ fontSize: '10px', color: '#94a3b8', marginTop: '2px' }}>Open Registrations</div>
+          </div>
+
+          <div style={{ background: '#ffffff', border: '1px solid #f1f5f9', borderRadius: '16px', padding: '14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(40,43,74,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Users size={15} color="#282B4A" />
+              </div>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: '#64748b' }}>Students Placed</span>
+            </div>
+            <div style={{ fontSize: '24px', fontWeight: 800, color: '#282B4A', lineHeight: 1.1 }}>{kpis.placed_students}</div>
+            <div style={{ fontSize: '10px', color: '#94a3b8', marginTop: '2px' }}>Secured Offers</div>
+          </div>
+
+          <div style={{ background: '#ffffff', border: '1px solid #f1f5f9', borderRadius: '16px', padding: '14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(40,43,74,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Target size={15} color="#282B4A" />
+              </div>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: '#64748b' }}>Highest CTC</span>
+            </div>
+            <div style={{ fontSize: '20px', fontWeight: 800, color: '#282B4A', lineHeight: 1.1 }}>{kpis.highest_package}</div>
+            <div style={{ fontSize: '10px', color: '#94a3b8', marginTop: '2px' }}>Avg: {kpis.average_package}</div>
+          </div>
+        </div>
+
+        {/* Tab Selector Pills */}
+        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
+          {[
+            { id: 'drives', label: `Drives (${upcomingDrives.length})` },
+            { id: 'stats', label: 'Analytics' },
+            { id: 'journey', label: 'Journey' },
+          ].map(tab => {
+            const active = mobileTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setMobileTab(tab.id as any)}
+                style={{
+                  padding: '7px 14px',
+                  borderRadius: '10px',
+                  fontSize: '13px',
+                  fontWeight: active ? 700 : 500,
+                  border: active ? '1.5px solid #282B4A' : '1px solid #e2e8f0',
+                  background: active ? '#282B4A' : '#ffffff',
+                  color: active ? '#ffffff' : '#64748b',
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Tab: Drives */}
+        {mobileTab === 'drives' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {upcomingDrives.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px 20px', background: '#ffffff', borderRadius: '16px', border: '1px dashed #e2e8f0' }}>
+                <Briefcase size={36} color="#cbd5e1" style={{ margin: '0 auto 10px' }} />
+                <div style={{ fontSize: '14px', fontWeight: 600, color: '#334155' }}>No active placement drives</div>
+                <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>Check back soon for new corporate openings</div>
+              </div>
+            ) : (
+              upcomingDrives.map((drive) => {
+                const isApplying = applyingId === drive.id;
+                const formattedDate = new Date(drive.registration_deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+
+                return (
+                  <div
+                    key={drive.id}
+                    onClick={() => setSelectedDrive(drive)}
+                    style={{
+                      background: '#ffffff',
+                      borderRadius: '16px',
+                      border: '1px solid #f1f5f9',
+                      padding: '14px',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
+                      <div style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '12px',
+                        background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '16px',
+                        fontWeight: 700,
+                        color: '#4f46e5',
+                        flexShrink: 0
+                      }}>
+                        {drive.company_name.charAt(0)}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: '14px', fontWeight: 700, color: '#09090b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {drive.company_name}
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {drive.title}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px' }}>
+                      <span style={{ background: 'rgba(40, 43, 74, 0.08)', color: '#282B4A', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 600 }}>
+                        {drive.package_offered}
+                      </span>
+                      <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 600 }}>
+                        Min {drive.eligibility_cgpa} CGPA
+                      </span>
+                      <span style={{ background: '#fef3c7', color: '#b45309', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 600 }}>
+                        {drive.company_industry}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '10px', borderTop: '1px solid #f8fafc' }}>
+                      <div style={{ fontSize: '11px', color: '#64748b' }}>
+                        Deadline: <span style={{ color: '#ef4444', fontWeight: 600 }}>{formattedDate}</span>
+                      </div>
+
+                      {drive.has_applied ? (
+                        <div style={{
+                          padding: '6px 12px',
+                          background: '#ecfdf5',
+                          border: '1px solid #a7f3d0',
+                          color: '#059669',
+                          borderRadius: '8px',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                          <Check size={12} /> Applied
+                        </div>
+                      ) : (
+                        <button
+                          disabled={isApplying}
+                          onClick={(e) => handleApply(drive.id, e)}
+                          style={{
+                            padding: '6px 14px',
+                            background: '#282B4A',
+                            border: 'none',
+                            color: '#EEEBDA',
+                            borderRadius: '8px',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            cursor: isApplying ? 'not-allowed' : 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            opacity: isApplying ? 0.7 : 1
+                          }}
+                        >
+                          {isApplying ? <Loader2 size={12} className="animate-spin" /> : "Apply Now"}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        )}
+
+        {/* Tab: Stats */}
+        {mobileTab === 'stats' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={{ background: '#ffffff', borderRadius: '16px', border: '1px solid #f1f5f9', padding: '16px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: '#09090b', marginBottom: '4px' }}>Role Distribution</div>
+              <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '14px' }}>Live breakdown of job domains</div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div style={{ width: '100px', height: '100px', position: 'relative', flexShrink: 0 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={pieData} innerRadius={30} outerRadius={46} paddingAngle={3} dataKey="value" stroke="none">
+                        {pieData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+                    <div style={{ fontSize: '15px', fontWeight: 800, color: '#282B4A', lineHeight: 1 }}>{totalPiePlaced}</div>
+                    <div style={{ fontSize: '9px', color: '#64748b', fontWeight: 600 }}>Drives</div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
+                  {pieData.map((d, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: d.color }}></div>
+                        <span style={{ color: '#334155', fontWeight: 500 }}>{d.name}</span>
+                      </div>
+                      <span style={{ fontWeight: 700, color: '#09090b' }}>{d.value}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ background: '#ffffff', borderRadius: '16px', border: '1px solid #f1f5f9', padding: '16px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: '#09090b', marginBottom: '4px' }}>Package Distribution</div>
+              <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '14px' }}>Live student salary brackets</div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {packageDistribution.map((item, i) => (
+                  <div key={i}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '4px' }}>
+                      <span style={{ color: '#334155', fontWeight: 600 }}>{item.label}</span>
+                      <span style={{ color: '#64748b' }}>{item.count} offers ({item.percent}%)</span>
+                    </div>
+                    <div style={{ height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
+                      <div style={{ width: `${item.percent}%`, height: '100%', background: item.color, borderRadius: '3px' }}></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab: Journey */}
+        {mobileTab === 'journey' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={{ background: '#ffffff', borderRadius: '16px', border: '1px solid #f1f5f9', padding: '16px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: '#09090b', marginBottom: '4px' }}>Preparation Journey</div>
+              <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '14px' }}>Your placement readiness roadmap</div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {[
+                  { label: 'Profile Registration', completed: journey.profile_completed },
+                  { label: 'Skill Assessment', completed: journey.skills_assessed },
+                  { label: 'Resume Upload', completed: journey.resume_submitted },
+                  { label: 'Applications Submitted', completed: journey.applications_count > 0, extra: `${journey.applications_count} applied` },
+                ].map((step, idx) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', background: '#f8fafc', borderRadius: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: step.completed ? '#ecfdf5' : '#f1f5f9', border: `1.5px solid ${step.completed ? '#10b981' : '#cbd5e1'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {step.completed && <Check size={12} color="#10b981" />}
+                      </div>
+                      <span style={{ fontSize: '12px', fontWeight: 600, color: step.completed ? '#09090b' : '#64748b' }}>{step.label}</span>
+                    </div>
+                    {step.extra && <span style={{ fontSize: '11px', color: '#4f46e5', fontWeight: 600 }}>{step.extra}</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Companies */}
+            {companies.length > 0 && (
+              <div style={{ background: '#ffffff', borderRadius: '16px', border: '1px solid #f1f5f9', padding: '16px' }}>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#09090b', marginBottom: '4px' }}>Partner Companies</div>
+                <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '12px' }}>Companies hiring on campus</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {companies.map((comp) => (
+                    <span key={comp.id} style={{ padding: '6px 12px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px', fontWeight: 600, color: '#334155' }}>
+                      {comp.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Modal for selectedDrive on mobile */}
+        <AnimatePresence>
+          {selectedDrive && (
+            <div style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 9999,
+              background: 'rgba(0,0,0,0.5)',
+              backdropFilter: 'blur(4px)',
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+              padding: 0
+            }}>
+              <motion.div
+                initial={{ opacity: 0, y: 100 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 100 }}
+                style={{
+                  background: 'white',
+                  borderTopLeftRadius: '24px',
+                  borderTopRightRadius: '24px',
+                  width: '100%',
+                  maxHeight: '85vh',
+                  overflowY: 'auto',
+                  padding: '20px',
+                  boxShadow: '0 -10px 40px rgba(0,0,0,0.15)',
+                  position: 'relative',
+                  boxSizing: 'border-box'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#282B4A', color: '#EEEBDA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', fontWeight: 700 }}>
+                      {selectedDrive.company_name.charAt(0)}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '16px', fontWeight: 700, color: '#111827' }}>{selectedDrive.company_name}</div>
+                      <div style={{ fontSize: '12px', color: '#6b7280' }}>{selectedDrive.title}</div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSelectedDrive(null)}
+                    style={{ background: '#f3f4f6', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                  >
+                    <X size={16} color="#4b5563" />
+                  </button>
+                </div>
+
+                <div style={{ background: '#f9fafb', borderRadius: '12px', padding: '12px', marginBottom: '16px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
+                  <div>
+                    <div style={{ fontSize: '10px', color: '#6b7280' }}>PACKAGE</div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#282B4A' }}>{selectedDrive.package_offered}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '10px', color: '#6b7280' }}>CUTOFF</div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827' }}>{selectedDrive.eligibility_cgpa} CGPA</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '10px', color: '#6b7280' }}>DRIVE DATE</div>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>{new Date(selectedDrive.drive_date).toLocaleDateString()}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '10px', color: '#6b7280' }}>DEADLINE</div>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#ef4444' }}>{new Date(selectedDrive.registration_deadline).toLocaleDateString()}</div>
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '16px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>Job Description</div>
+                  <p style={{ fontSize: '12px', color: '#4b5563', lineHeight: 1.5, margin: 0 }}>{selectedDrive.description}</p>
+                </div>
+
+                {selectedDrive.company_website && (
+                  <a
+                    href={selectedDrive.company_website}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#282B4A', textDecoration: 'none', fontWeight: 600, marginBottom: '20px' }}
+                  >
+                    Visit Company Career Portal <ExternalLink size={13} />
+                  </a>
+                )}
+
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button
+                    onClick={() => setSelectedDrive(null)}
+                    style={{ flex: 1, padding: '12px', background: '#f3f4f6', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: 600, color: '#374151', cursor: 'pointer' }}
+                  >
+                    Close
+                  </button>
+                  {selectedDrive.has_applied ? (
+                    <div style={{ flex: 2, padding: '12px', background: '#ecfdf5', border: '1px solid #a7f3d0', color: '#059669', borderRadius: '10px', fontSize: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                      <Check size={15} /> Applied
+                    </div>
+                  ) : (
+                    <button
+                      disabled={applyingId === selectedDrive.id}
+                      onClick={() => handleApply(selectedDrive.id)}
+                      style={{ flex: 2, padding: '12px', background: '#282B4A', border: 'none', color: '#EEEBDA', borderRadius: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                    >
+                      {applyingId === selectedDrive.id ? <Loader2 size={15} className="animate-spin" /> : "Confirm Application"}
+                    </button>
+                  )}
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: '0', maxWidth: '100%', margin: '0 auto', fontFamily: 'Space Grotesk, sans-serif' }}>
